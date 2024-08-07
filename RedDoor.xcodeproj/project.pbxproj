@@ -1,0 +1,523 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5011BBBC2C63159200A82219 /* RedDoorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBBB2C63159200A82219 /* RedDoorApp.swift */; };
+		5011BBBE2C63159200A82219 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBBD2C63159200A82219 /* ContentView.swift */; };
+		5011BBC02C63159200A82219 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5011BBBF2C63159200A82219 /* Assets.xcassets */; };
+		5011BBC32C63159200A82219 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5011BBC22C63159200A82219 /* Preview Assets.xcassets */; };
+		5011BBCC2C631AEB00A82219 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBCB2C631AEB00A82219 /* HomeView.swift */; };
+		5011BBCE2C631AF600A82219 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBCD2C631AF600A82219 /* InventoryView.swift */; };
+		5011BBD02C631B0400A82219 /* PullListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBCF2C631B0400A82219 /* PullListView.swift */; };
+		5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBD12C631B2400A82219 /* InstalledListView.swift */; };
+		5011BBD42C631B3300A82219 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBD32C631B3300A82219 /* HomeViewModel.swift */; };
+		5011BBD62C631B3B00A82219 /* InventoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBD52C631B3B00A82219 /* InventoryViewModel.swift */; };
+		5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBD72C631B4100A82219 /* PullListViewModel.swift */; };
+		5011BBE02C631D2F00A82219 /* InstalledListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBDF2C631D2F00A82219 /* InstalledListViewModel.swift */; };
+		5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBE42C631E3D00A82219 /* AccountView.swift */; };
+		5011BBE72C631E4A00A82219 /* AccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BBE62C631E4A00A82219 /* AccountViewModel.swift */; };
+		5011BBEC2C632FB400A82219 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBEB2C632FB400A82219 /* FirebaseAnalytics */; };
+		5011BBEE2C632FB400A82219 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBED2C632FB400A82219 /* FirebaseAnalyticsOnDeviceConversion */; };
+		5011BBF02C632FB400A82219 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBEF2C632FB400A82219 /* FirebaseAppCheck */; };
+		5011BBF22C632FB400A82219 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBF12C632FB400A82219 /* FirebaseAuth */; };
+		5011BBF42C632FB400A82219 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBF32C632FB400A82219 /* FirebaseCrashlytics */; };
+		5011BBF62C632FB400A82219 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBF52C632FB400A82219 /* FirebaseFirestore */; };
+		5011BBF82C632FB500A82219 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBF72C632FB500A82219 /* FirebaseStorage */; };
+		5011BBFB2C632FE400A82219 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBFA2C632FE400A82219 /* CodeScanner */; };
+		5011BBFD2C63320900A82219 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5011BBFC2C63320900A82219 /* GoogleService-Info.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		5011BBB82C63159200A82219 /* RedDoor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RedDoor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5011BBBB2C63159200A82219 /* RedDoorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedDoorApp.swift; sourceTree = "<group>"; };
+		5011BBBD2C63159200A82219 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5011BBBF2C63159200A82219 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5011BBC22C63159200A82219 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		5011BBCB2C631AEB00A82219 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		5011BBCD2C631AF600A82219 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		5011BBCF2C631B0400A82219 /* PullListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullListView.swift; sourceTree = "<group>"; };
+		5011BBD12C631B2400A82219 /* InstalledListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledListView.swift; sourceTree = "<group>"; };
+		5011BBD32C631B3300A82219 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		5011BBD52C631B3B00A82219 /* InventoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewModel.swift; sourceTree = "<group>"; };
+		5011BBD72C631B4100A82219 /* PullListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullListViewModel.swift; sourceTree = "<group>"; };
+		5011BBDF2C631D2F00A82219 /* InstalledListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledListViewModel.swift; sourceTree = "<group>"; };
+		5011BBE42C631E3D00A82219 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
+		5011BBE62C631E4A00A82219 /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewModel.swift; sourceTree = "<group>"; };
+		5011BBFC2C63320900A82219 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5011BBB52C63159200A82219 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5011BBFB2C632FE400A82219 /* CodeScanner in Frameworks */,
+				5011BBEC2C632FB400A82219 /* FirebaseAnalytics in Frameworks */,
+				5011BBF02C632FB400A82219 /* FirebaseAppCheck in Frameworks */,
+				5011BBF42C632FB400A82219 /* FirebaseCrashlytics in Frameworks */,
+				5011BBEE2C632FB400A82219 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
+				5011BBF82C632FB500A82219 /* FirebaseStorage in Frameworks */,
+				5011BBF22C632FB400A82219 /* FirebaseAuth in Frameworks */,
+				5011BBF62C632FB400A82219 /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5011BBAF2C63159200A82219 = {
+			isa = PBXGroup;
+			children = (
+				5011BBBA2C63159200A82219 /* RedDoor */,
+				5011BBB92C63159200A82219 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5011BBB92C63159200A82219 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBB82C63159200A82219 /* RedDoor.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5011BBBA2C63159200A82219 /* RedDoor */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBFC2C63320900A82219 /* GoogleService-Info.plist */,
+				5011BBBB2C63159200A82219 /* RedDoorApp.swift */,
+				5011BBBD2C63159200A82219 /* ContentView.swift */,
+				5011BBE12C631E2800A82219 /* Account */,
+				5011BBDB2C631B4D00A82219 /* Home */,
+				5011BBDC2C631B6800A82219 /* Inventory */,
+				5011BBDD2C631CEB00A82219 /* PullList */,
+				5011BBDE2C631D0D00A82219 /* InstalledList */,
+				5011BBBF2C63159200A82219 /* Assets.xcassets */,
+				5011BBC12C63159200A82219 /* Preview Content */,
+			);
+			path = RedDoor;
+			sourceTree = "<group>";
+		};
+		5011BBC12C63159200A82219 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBC22C63159200A82219 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		5011BBDB2C631B4D00A82219 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBD32C631B3300A82219 /* HomeViewModel.swift */,
+				5011BBCB2C631AEB00A82219 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		5011BBDC2C631B6800A82219 /* Inventory */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBD52C631B3B00A82219 /* InventoryViewModel.swift */,
+				5011BBCD2C631AF600A82219 /* InventoryView.swift */,
+			);
+			path = Inventory;
+			sourceTree = "<group>";
+		};
+		5011BBDD2C631CEB00A82219 /* PullList */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBCF2C631B0400A82219 /* PullListView.swift */,
+				5011BBD72C631B4100A82219 /* PullListViewModel.swift */,
+			);
+			path = PullList;
+			sourceTree = "<group>";
+		};
+		5011BBDE2C631D0D00A82219 /* InstalledList */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBDF2C631D2F00A82219 /* InstalledListViewModel.swift */,
+				5011BBD12C631B2400A82219 /* InstalledListView.swift */,
+			);
+			path = InstalledList;
+			sourceTree = "<group>";
+		};
+		5011BBE12C631E2800A82219 /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				5011BBE42C631E3D00A82219 /* AccountView.swift */,
+				5011BBE62C631E4A00A82219 /* AccountViewModel.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5011BBB72C63159200A82219 /* RedDoor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5011BBC62C63159200A82219 /* Build configuration list for PBXNativeTarget "RedDoor" */;
+			buildPhases = (
+				5011BBB42C63159200A82219 /* Sources */,
+				5011BBB52C63159200A82219 /* Frameworks */,
+				5011BBB62C63159200A82219 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RedDoor;
+			packageProductDependencies = (
+				5011BBEB2C632FB400A82219 /* FirebaseAnalytics */,
+				5011BBED2C632FB400A82219 /* FirebaseAnalyticsOnDeviceConversion */,
+				5011BBEF2C632FB400A82219 /* FirebaseAppCheck */,
+				5011BBF12C632FB400A82219 /* FirebaseAuth */,
+				5011BBF32C632FB400A82219 /* FirebaseCrashlytics */,
+				5011BBF52C632FB400A82219 /* FirebaseFirestore */,
+				5011BBF72C632FB500A82219 /* FirebaseStorage */,
+				5011BBFA2C632FE400A82219 /* CodeScanner */,
+			);
+			productName = RedDoor;
+			productReference = 5011BBB82C63159200A82219 /* RedDoor.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5011BBB02C63159200A82219 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					5011BBB72C63159200A82219 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 5011BBB32C63159200A82219 /* Build configuration list for PBXProject "RedDoor" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5011BBAF2C63159200A82219;
+			packageReferences = (
+				5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				5011BBF92C632FE400A82219 /* XCRemoteSwiftPackageReference "codeScanner" */,
+			);
+			productRefGroup = 5011BBB92C63159200A82219 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5011BBB72C63159200A82219 /* RedDoor */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5011BBB62C63159200A82219 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5011BBC32C63159200A82219 /* Preview Assets.xcassets in Resources */,
+				5011BBC02C63159200A82219 /* Assets.xcassets in Resources */,
+				5011BBFD2C63320900A82219 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5011BBB42C63159200A82219 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */,
+				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
+				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
+				5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */,
+				5011BBE02C631D2F00A82219 /* InstalledListViewModel.swift in Sources */,
+				5011BBD42C631B3300A82219 /* HomeViewModel.swift in Sources */,
+				5011BBCC2C631AEB00A82219 /* HomeView.swift in Sources */,
+				5011BBBE2C63159200A82219 /* ContentView.swift in Sources */,
+				5011BBD62C631B3B00A82219 /* InventoryViewModel.swift in Sources */,
+				5011BBBC2C63159200A82219 /* RedDoorApp.swift in Sources */,
+				5011BBE72C631E4A00A82219 /* AccountViewModel.swift in Sources */,
+				5011BBCE2C631AF600A82219 /* InventoryView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		5011BBC42C63159200A82219 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5011BBC52C63159200A82219 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5011BBC72C63159200A82219 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"RedDoor/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.liu.quinn.RedDoor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5011BBC82C63159200A82219 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"RedDoor/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.liu.quinn.RedDoor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5011BBB32C63159200A82219 /* Build configuration list for PBXProject "RedDoor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5011BBC42C63159200A82219 /* Debug */,
+				5011BBC52C63159200A82219 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5011BBC62C63159200A82219 /* Build configuration list for PBXNativeTarget "RedDoor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5011BBC72C63159200A82219 /* Debug */,
+				5011BBC82C63159200A82219 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+		5011BBF92C632FE400A82219 /* XCRemoteSwiftPackageReference "codeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/codeScanner";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5011BBEB2C632FB400A82219 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		5011BBED2C632FB400A82219 /* FirebaseAnalyticsOnDeviceConversion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsOnDeviceConversion;
+		};
+		5011BBEF2C632FB400A82219 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		5011BBF12C632FB400A82219 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		5011BBF32C632FB400A82219 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		5011BBF52C632FB400A82219 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		5011BBF72C632FB500A82219 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		5011BBFA2C632FE400A82219 /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5011BBF92C632FE400A82219 /* XCRemoteSwiftPackageReference "codeScanner" */;
+			productName = CodeScanner;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 5011BBB02C63159200A82219 /* Project object */;
+}
