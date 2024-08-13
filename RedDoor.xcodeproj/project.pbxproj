@@ -49,6 +49,7 @@
 		5011BBE42C631E3D00A82219 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		5011BBE62C631E4A00A82219 /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewModel.swift; sourceTree = "<group>"; };
 		5011BBFC2C63320900A82219 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		5011BBFE2C6AFC7F00A82219 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +100,7 @@
 				5011BBDE2C631D0D00A82219 /* InstalledList */,
 				5011BBBF2C63159200A82219 /* Assets.xcassets */,
 				5011BBC12C63159200A82219 /* Preview Content */,
+				5011BBFE2C6AFC7F00A82219 /* README.md */,
 			);
 			path = RedDoor;
 			sourceTree = "<group>";
