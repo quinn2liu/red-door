@@ -8,30 +8,32 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isMenuOpen = false
+
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
-                }
-            InventoryView()
-                .tabItem {
-                    Label("Inventory", systemImage: "square.stack.fill")
-                }
-            PullListView()
-                .tabItem {
-                    Label("PullList", systemImage: "list.bullet")
-                }
-            InstalledListView()
-                .tabItem {
-                    Label("InstalledList", systemImage: "list.bullet.clipboard")
-                }
-            AccountView()
-                .tabItem {
-                    Label("Account", systemImage: "person")
-                }
-        }
+            TabView {
+                InventoryView()
+                    .tabItem {
+                        Label("Inventory", systemImage: "square.stack.fill")
+                    }
+
+                PullListView()
+                    .tabItem {
+                        Label("Pull Lists", systemImage: "list.bullet")
+                    }
+                InstalledListView()
+                    .tabItem {
+                        Label("Installed Lists", systemImage: "list.bullet.clipboard")
+                    }
+                AccountView()
+                    .tabItem {
+                        Label("Account", systemImage: "person")
+                    }
+            }
     }
+    
+    
+    
 }
 
 #Preview {

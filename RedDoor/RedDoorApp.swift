@@ -22,6 +22,7 @@ struct RedDoorApp: App {
     
     init() {
         FirebaseApp.configure()
+        UITabBar.appearance().tintColor = UIColor.red
     }
     
     var body: some Scene {
