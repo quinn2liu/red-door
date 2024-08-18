@@ -11,18 +11,16 @@ struct InventoryView: View {
     
     @State private var viewModel = ViewModel()
     @State private var isAddItemViewPresented = false
+    @State private var isItemViewPresented = false
     @State private var isScanItemViewPresented = false
     
     var body: some View {
         NavigationStack {
-                List {
-                    ForEach(0...30, id: \.self) { id in
-                        Text("item \(id)")
-                    }
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
+            VStack {
+                HStack {
+                    ZStack {
+                        
+                        
                         Menu {
                             Button("Add Item", systemImage: "plus") { isAddItemViewPresented = true }
                             
@@ -31,23 +29,55 @@ struct InventoryView: View {
                             }
                         }
                         label: {
-                            Label("Options", systemImage: "ellipsis")
+                            Label("", systemImage: "ellipsis")
+                                .padding(.horizontal)
                         }
-                    }
-                    
-                    ToolbarItem(placement: .principal) {
+                        .frame(maxWidth: .infinity,  alignment: .topTrailing)
+                        
                         Text("Inventory")
                             .font(.system(.title2, design: .default))
                             .bold()
                             .foregroundStyle(.red)
                     }
                 }
-                .navigationDestination(isPresented: $isAddItemViewPresented) {
-                    AddItemView()
+                List {
+                    ForEach(0...30, id: \.self) { id in
+                        Text("item \(id)")
+                    }
                 }
-                .navigationDestination(isPresented: $isScanItemViewPresented) {
-                    ScanItemView()
-                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+//            .toolbar {
+//                ToolbarItem(placement: .primaryAction) {
+//                    Menu {
+//                        Button("Add Item", systemImage: "plus") { isAddItemViewPresented = true }
+//                        
+//                        Button("Scan Item", systemImage: "qrcode.viewfinder") {
+//                            isScanItemViewPresented = true
+//                        }
+//                    }
+//                    label: {
+//                        Label("Options", systemImage: "ellipsis")
+//                    }
+//                }
+//                
+//                ToolbarItem(placement: .principal) {
+//                    Text("Inventory")
+//                        .font(.system(.title2, design: .default))
+//                        .bold()
+//                        .foregroundStyle(.red)
+//                }
+//            }
+            .navigationDestination(isPresented: $isAddItemViewPresented) {
+                ItemView(mode: .active, isAdding: true)
+            }
+            .navigationDestination(isPresented: $isItemViewPresented) {
+                ItemView(mode: .active, isAdding: false)
+            }
+            .navigationDestination(isPresented: $isScanItemViewPresented) {
+                ScanItemView()
+            }
+            .padding(.bottom)
         }
     }
     

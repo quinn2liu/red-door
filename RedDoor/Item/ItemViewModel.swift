@@ -15,7 +15,7 @@ extension ItemView {
         let db = Firestore.firestore()
         var testModel = Model()
 
-        func addItem(model: Model) {
+        func updateModelFirebase(model: Model) {
             do {
                 try db.collection("unique_items").document(model.id).setData(from: model)
                 print("MODEL ADDED")

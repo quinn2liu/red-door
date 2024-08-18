@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var isMenuOpen = false
 
     var body: some View {
+        NavigationStack {
             TabView {
                 InventoryView()
                     .tabItem {
@@ -30,6 +31,9 @@ struct ContentView: View {
                         Label("Account", systemImage: "person")
                     }
             }
+            .background(Color.white)
+        }
+            
     }
     
     
