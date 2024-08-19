@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Model: Identifiable, Codable {
     
@@ -22,13 +23,13 @@ struct Model: Identifiable, Codable {
         return model_name
     }
     
-    init(model_name: String = "Enter Name Here",
+    init(model_name: String = "",
              num_model: Int = 0,
              item_ids: [Int] = [],
-             type: String = "Select Type",
-             color: String = "Select Color",
-             material: String = "Select Saterial",
-             image: String = "image_string",
+             type: String = "",
+             color: String = "",
+             material: String = "",
+             image: String = "",
              count: Int = 0) {
             self.model_name = model_name
             self.num_model = num_model
@@ -39,5 +40,6 @@ struct Model: Identifiable, Codable {
             self.image = image
             self.count = count
     }
+    
     
 }

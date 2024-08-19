@@ -37,6 +37,7 @@
 		5011BC102C6BD7D600A82219 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC0F2C6BD7D600A82219 /* AddItemView.swift */; };
 		5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC142C70FE1F00A82219 /* ScanItemView.swift */; };
 		5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */; };
+		5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC182C739D6400A82219 /* CombinedImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,7 @@
 		5011BC0F2C6BD7D600A82219 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
 		5011BC142C70FE1F00A82219 /* ScanItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemView.swift; sourceTree = "<group>"; };
 		5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemViewModel.swift; sourceTree = "<group>"; };
+		5011BC182C739D6400A82219 /* CombinedImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,6 +191,7 @@
 			children = (
 				5011BC082C6BD64900A82219 /* ItemView.swift */,
 				5011BC0A2C6BD66400A82219 /* ItemViewModel.swift */,
+				5011BC182C739D6400A82219 /* CombinedImagePicker.swift */,
 			);
 			path = Item;
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 				5011BC0B2C6BD66400A82219 /* ItemViewModel.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ItemView.swift in Sources */,
+				5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */,
 				5011BC0E2C6BD7CE00A82219 /* AddItemViewModel.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
 				5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */,

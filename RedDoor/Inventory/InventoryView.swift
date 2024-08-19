@@ -14,12 +14,15 @@ struct InventoryView: View {
     @State private var isItemViewPresented = false
     @State private var isScanItemViewPresented = false
     
+    var TESTMODEL = Model()
+    
+    // INITIALIZE A NAVIGATION PATH
+    
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
                     ZStack {
-                        
                         
                         Menu {
                             Button("Add Item", systemImage: "plus") { isAddItemViewPresented = true }
@@ -47,32 +50,11 @@ struct InventoryView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .primaryAction) {
-//                    Menu {
-//                        Button("Add Item", systemImage: "plus") { isAddItemViewPresented = true }
-//                        
-//                        Button("Scan Item", systemImage: "qrcode.viewfinder") {
-//                            isScanItemViewPresented = true
-//                        }
-//                    }
-//                    label: {
-//                        Label("Options", systemImage: "ellipsis")
-//                    }
-//                }
-//                
-//                ToolbarItem(placement: .principal) {
-//                    Text("Inventory")
-//                        .font(.system(.title2, design: .default))
-//                        .bold()
-//                        .foregroundStyle(.red)
-//                }
-//            }
             .navigationDestination(isPresented: $isAddItemViewPresented) {
-                ItemView(mode: .active, isAdding: true)
+                ItemView(editMode: .active, model: TESTMODEL, isAdding: true)
             }
             .navigationDestination(isPresented: $isItemViewPresented) {
-                ItemView(mode: .active, isAdding: false)
+                ItemView(editMode: .active, model: TESTMODEL, isAdding: false)
             }
             .navigationDestination(isPresented: $isScanItemViewPresented) {
                 ScanItemView()

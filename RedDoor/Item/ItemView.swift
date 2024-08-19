@@ -6,33 +6,45 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ItemView: View {
-    @State private var viewModel = ViewModel()
-    @State var mode: EditMode
+    
+    @State private var viewModel: ViewModel
+    @State var editMode: EditMode
     @State private var model: Model = Model()
-    @State private var modelName: String = ""
     var isAdding: Bool
+    
+//    @State private var pickerItems = [PhotosPickerItem]()
+//    @State private var selectedImages = [Image]()
+        
+    init(editMode: EditMode, model: Model, isAdding: Bool) {
+        if (isAdding == true) {
+            self.viewModel = ViewModel(selectedModel: Model())
+            self.editMode = editMode
+        } else {
+            self.viewModel = ViewModel(selectedModel: model)
+            self.editMode = editMode
+        }
+        self.isAdding = isAdding
+        self.model = self.viewModel.selectedModel
+    }
 
     var body: some View {
         NavigationStack {
     
             Form {
                 TextField("Color", text: $model.color)
-                List {
-                    ForEach(0...30, id: \.self) { id in
-                        Text("item \(id)")
-                    }
-                }
+                
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        if mode == .active {
+                        if editMode == .active {
                             HStack {
                                 Text("Editing:")
                                     .font(.headline)
-                                TextField("", text: $modelName)
+                                TextField("", text: $model.model_name)
                             }
                         } else {
                             HStack {
@@ -50,11 +62,11 @@ struct ItemView: View {
                 
             }
             .navigationBarTitleDisplayMode(.inline)
-            .environment(\.editMode, $mode)
+            .environment(\.editMode, $editMode)
             .onAppear() {
-                modelName = model.model_name
+//                modelName = model.model_name
             }
-            .onChange(of: mode) { oldMode, newMode  in
+            .onChange(of: editMode) { oldMode, newMode  in
                 if newMode == .inactive {
                     saveModel()
                 }
@@ -84,11 +96,11 @@ struct ItemView: View {
     }
     
     func saveModel() {
-        model.model_name = modelName
+//        model.model_name = modelName
     }
     
 }
 
 #Preview {
-    ItemView(mode: .active, isAdding: false)
+    ItemView(editMode: .active, model: Model(), isAdding: true)
 }

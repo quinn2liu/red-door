@@ -8,13 +8,21 @@
 import Foundation
 import FirebaseCore
 import FirebaseFirestore
+import PhotosUI
+import SwiftUI
 
 extension ItemView {
+    
     @Observable
     class ViewModel {
         let db = Firestore.firestore()
-        var testModel = Model()
-
+        var selectedModel: Model
+        
+        
+        init(selectedModel: Model) {
+            self.selectedModel = selectedModel
+        }
+        
         func updateModelFirebase(model: Model) {
             do {
                 try db.collection("unique_items").document(model.id).setData(from: model)
@@ -23,5 +31,12 @@ extension ItemView {
                 print("Error adding document: \(error)")
             }
         }
+        
+        func getImages(model: Model) -> [Image] {
+            let images = [Image]()
+            return images
+        }
+        
     }
+    
 }
