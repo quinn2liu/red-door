@@ -11,7 +11,7 @@ import FirebaseFirestore
 import PhotosUI
 import SwiftUI
 
-extension ItemView {
+extension ItemViewCopy {
     
     @Observable
     class ViewModel {
@@ -95,30 +95,20 @@ extension ItemView {
             "Stainless Steel"
         ]
         
-        init(selectedModel: Model = Model()) {
+        init(selectedModel: Model) {
             self.selectedModel = selectedModel
-        }
-        
-        func printViewModelValues() {
-            print(
-        """
-        selectedModel.primaryColor = \(selectedModel.primaryColor)
-        selectedModel.type = \(selectedModel.type)
-        selectedModel.primaryMaterial = \(selectedModel.primaryMaterial)
-        selectedModel.count = \(selectedModel.count)
-        """)
         }
         
         func updateModelFirebase(model: Model) {
             do {
-                try db.collection("unique_models").document(model.id).setData(from: model)
+                try db.collection("unique_items").document(model.id).setData(from: model)
                 print("MODEL ADDED")
             } catch {
                 print("Error adding document: \(error)")
             }
         }
         
-        func getImages() -> [Image] {
+        func getImages(model: Model) -> [Image] {
             let images = [Image]()
             return images
         }

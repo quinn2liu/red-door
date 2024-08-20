@@ -8,29 +8,29 @@
 import SwiftUI
 import PhotosUI
 
-struct ItemView: View {
+struct ItemViewCopy: View {
     
-    @State private var viewModel: ViewModel = ViewModel()
+    @State private var viewModel: ViewModel
+    @State private var model: Model = Model()
     @State private var isEditing: Bool
-    @State private var selectedImages: [Image] = [Image]()
-    @State private var selectedItems: [PhotosPickerItem] = [PhotosPickerItem]()
 
     var isAdding: Bool
     
-    
+    @State private var selectedItems = [PhotosPickerItem]()
+    @State private var selectedImages = [Image]()
 
     init(model: Model, isAdding: Bool, isEditing: Bool) {
         self.isEditing = isEditing
         self.isAdding = isAdding
-        self.viewModel = ViewModel(selectedModel: model)
-        if (!isAdding) {
-            self.selectedImages = self.viewModel.getImages()
-        }
+        self.viewModel = ViewModel(selectedModel: isAdding ? Model() : model)
+        self.model = self.viewModel.selectedModel
     }
 
     var body: some View {
         NavigationStack {
     
+            
+            
             Form {
                 if (isEditing == true) {
 
@@ -74,7 +74,7 @@ struct ItemView: View {
                     }
                     
                     Section(header: Text("Options")) {
-                        Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
+                        Picker("Primary Color", selection: $model.primaryColor) {
                             ForEach(viewModel.colorOptions, id: \.self) { option in
                                 HStack {
                                     Text(option)
@@ -90,7 +90,7 @@ struct ItemView: View {
                         .pickerStyle(.navigationLink)
                         
                         
-                        Picker("Item Type", selection: $viewModel.selectedModel.type) {
+                        Picker("Item Type", selection: $model.type) {
                             ForEach(viewModel.typeOptions, id: \.self) { option in
                                 HStack {
                                     Text("\(option)")
@@ -99,36 +99,39 @@ struct ItemView: View {
                             }
                         }
                         
-                        Picker("Material", selection: $viewModel.selectedModel.primaryMaterial) {
+                        Picker("Material", selection: $model.primaryMaterial) {
                             ForEach(viewModel.materialOptions, id: \.self) { material in
                                 Text(material)
                             }
                         }
                         
-                        Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
+                        Stepper("Item Count: \(model.count)", value: $model.count, in: 0...12, step: 1)
                     }
 
                 } else {
                     HStack {
-                        Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
+                        Text("Primary Color: \(model.primaryColor)")
                         Image(systemName: "circle.fill")
-                            .foregroundStyle(viewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
+                            .foregroundStyle(viewModel.colorMap[model.primaryColor] ?? .black)
                             .overlay(
                                 Image(systemName: "circle")
                                     .foregroundColor(.black.opacity(0.5))
                             )
                     }
                     HStack {
-                        Text("Item Type: \(viewModel.selectedModel.type)")
-                        Image(systemName: viewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
+                        Text("Item Type: \(model.type)")
+                        Image(systemName: viewModel.typeMap[model.type] ?? "camera.metering.unknown")
                     }
                     
-                    Text("Material: \(viewModel.selectedModel.primaryMaterial)")
+                    Text("Material: \(model.primaryMaterial)")
                     
-                    Text("Item Count: \(viewModel.selectedModel.count)")
+                    Text("Item Count: \(model.count)")
                     
                 }
                 
+                Button("check values") {
+                    print("viewModel.typeMap[model.type] = \(String(describing: viewModel.typeMap[model.type]))")
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -137,17 +140,21 @@ struct ItemView: View {
                             HStack {
                                 Text(isAdding ? "Adding:" : "Editing:")
                                     .font(.headline)
-                                TextField("", text: $viewModel.selectedModel.model_name)
+                                TextField("", text: $model.model_name)
                                     .padding(.vertical, 6)
                                     .padding(.horizontal, 6)
                                     .background(Color(.systemGray5))
                                     .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .stroke(Color.gray, lineWidth: 2)
+                                    )
                             }
                         } else {
                             HStack {
                                 Text("Viewing:")
                                     .font(.headline)
-                                Text(viewModel.selectedModel.model_name)
+                                Text(model.model_name)
                             }
                         }
                     }
@@ -169,7 +176,7 @@ struct ItemView: View {
                 HStack {
                     Spacer()
                     Button(isAdding == true ? "Add Item to Inventory" : "Save Item") {
-                        viewModel.printViewModelValues()
+                        // stuff
                     }
                     .foregroundColor(.white)
                     .padding(.vertical, 12)
@@ -193,5 +200,5 @@ struct ItemView: View {
 }
 
 #Preview {
-    ItemView(model: Model(), isAdding: true, isEditing: true)
+    ItemViewCopy(model: Model(), isAdding: true, isEditing: true)
 }

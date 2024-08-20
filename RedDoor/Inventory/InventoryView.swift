@@ -44,8 +44,8 @@ struct InventoryView: View {
                     }
                 }
                 List {
-                    ForEach(0...30, id: \.self) { id in
-                        Text("item \(id)")
+                    ForEach(0...10, id: \.self) { id in
+                        InventoryItemView(model: TESTMODEL)
                     }
                 }
             }

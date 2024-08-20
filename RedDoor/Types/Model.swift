@@ -11,12 +11,11 @@ import SwiftUI
 struct Model: Identifiable, Codable {
     
     var model_name: String
-    var num_model: Int
     var item_ids: [Int]
     var type: String
     var primaryColor: String
-    var material: String
-    var image: String
+    var primaryMaterial: String
+    var images: [String]
     var count: Int
     
     var id: String {
@@ -25,20 +24,18 @@ struct Model: Identifiable, Codable {
     
     init(
         model_name: String = "",
-        num_model: Int = 0,
         item_ids: [Int] = [],
         type: String = "Chair",
         primaryColor: String = "Red",
-        material: String = "",
-        image: String = "",
-        count: Int = 0) {
+        primaryMaterial: String = "Wood",
+        images: [String] = [""],
+        count: Int = 1) {
         self.model_name = model_name
-        self.num_model = num_model
         self.item_ids = item_ids
         self.type = type
         self.primaryColor = primaryColor
-        self.material = material
-        self.image = image
+        self.primaryMaterial = primaryMaterial
+        self.images = images
         self.count = count
     }
 }
