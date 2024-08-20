@@ -38,6 +38,7 @@
 		5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC142C70FE1F00A82219 /* ScanItemView.swift */; };
 		5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */; };
 		5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC182C739D6400A82219 /* CombinedImagePicker.swift */; };
+		5011BC242C74101D00A82219 /* HexColorsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC232C74101D00A82219 /* HexColorsExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +67,7 @@
 		5011BC142C70FE1F00A82219 /* ScanItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemView.swift; sourceTree = "<group>"; };
 		5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemViewModel.swift; sourceTree = "<group>"; };
 		5011BC182C739D6400A82219 /* CombinedImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedImagePicker.swift; sourceTree = "<group>"; };
+		5011BC232C74101D00A82219 /* HexColorsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexColorsExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 		5011BBBA2C63159200A82219 /* RedDoor */ = {
 			isa = PBXGroup;
 			children = (
+				5011BC202C740FEA00A82219 /* HexColors */,
 				5011BC132C70FE1200A82219 /* ScanItem */,
 				5011BC0C2C6BD7C300A82219 /* AddItem */,
 				5011BC072C6BD63200A82219 /* Item */,
@@ -214,6 +217,14 @@
 			path = ScanItem;
 			sourceTree = "<group>";
 		};
+		5011BC202C740FEA00A82219 /* HexColors */ = {
+			isa = PBXGroup;
+			children = (
+				5011BC232C74101D00A82219 /* HexColorsExtension.swift */,
+			);
+			path = HexColors;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -312,6 +323,7 @@
 				5011BBE02C631D2F00A82219 /* InstalledListViewModel.swift in Sources */,
 				5011BBD42C631B3300A82219 /* HomeViewModel.swift in Sources */,
 				5011BC012C6BCEDF00A82219 /* Model.swift in Sources */,
+				5011BC242C74101D00A82219 /* HexColorsExtension.swift in Sources */,
 				5011BBCC2C631AEB00A82219 /* HomeView.swift in Sources */,
 				5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */,
 				5011BBBE2C63159200A82219 /* ContentView.swift in Sources */,
@@ -452,6 +464,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"RedDoor/Preview Content\"";
+				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -480,6 +493,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"RedDoor/Preview Content\"";
+				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

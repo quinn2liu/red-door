@@ -11,22 +11,34 @@ import PhotosUI
 struct ItemView: View {
     
     @State private var viewModel: ViewModel
-    @State var editMode: EditMode
     @State private var model: Model = Model()
+    @State private var isEditing: Bool
+
     var isAdding: Bool
-    
-//    @State private var pickerItems = [PhotosPickerItem]()
-//    @State private var selectedImages = [Image]()
+
+    let colorOptions: [(name: String, color: Color)] = [
+        ("Black", .black),
+        ("White", .white),
+        ("Brown", .brown),
+        ("Gray", .gray),
+        ("Pink", .pink),
+        ("Red", .red),
+        ("Orange", .orange),
+        ("Yellow", .yellow),
+        ("Green", .green),
+        ("Mint", .mint),
+        ("Teal", .teal),
+        ("Cyan", .cyan),
+        ("Blue", .blue),
+        ("Purple", .purple),
+        ("Indigo", .indigo)
         
-    init(editMode: EditMode, model: Model, isAdding: Bool) {
-        if (isAdding == true) {
-            self.viewModel = ViewModel(selectedModel: Model())
-            self.editMode = editMode
-        } else {
-            self.viewModel = ViewModel(selectedModel: model)
-            self.editMode = editMode
-        }
+    ]
+
+    init(model: Model, isAdding: Bool, isEditing: Bool) {
+        self.isEditing = isEditing
         self.isAdding = isAdding
+        self.viewModel = ViewModel(selectedModel: isAdding ? Model() : model)
         self.model = self.viewModel.selectedModel
     }
 
@@ -34,13 +46,32 @@ struct ItemView: View {
         NavigationStack {
     
             Form {
-                TextField("Color", text: $model.color)
-                
+                if (isEditing == true) {
+                    Picker("Select Color:", selection: $model.primaryColor) {
+                        ForEach(colorOptions, id: \.name) { option in
+                            HStack {
+                                Text(option.name)
+                                Spacer()
+                                Image(systemName: "circle.fill")
+                                    .foregroundStyle(option.color)
+                                    .overlay(
+                                        Image(systemName: "circle")
+                                            .foregroundColor(.black.opacity(0.5))
+                                    )
+                            }
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+
+                } else {
+                    Text("Color: \(model.primaryColor)")
+                    
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        if editMode == .active {
+                        if (isEditing == true) {
                             HStack {
                                 Text("Editing:")
                                     .font(.headline)
@@ -56,21 +87,15 @@ struct ItemView: View {
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    EditButton()
-                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                    Button(isEditing ? "Done" : "Edit") {
+                        isEditing.toggle()
+                    }
                 }
                 
             }
             .navigationBarTitleDisplayMode(.inline)
-            .environment(\.editMode, $editMode)
-            .onAppear() {
-//                modelName = model.model_name
-            }
-            .onChange(of: editMode) { oldMode, newMode  in
-                if newMode == .inactive {
-                    saveModel()
-                }
-            }
+            
+        
             
             HStack {
                 Spacer()
@@ -95,12 +120,8 @@ struct ItemView: View {
         }
     }
     
-    func saveModel() {
-//        model.model_name = modelName
-    }
-    
 }
 
 #Preview {
-    ItemView(editMode: .active, model: Model(), isAdding: true)
+    ItemView(model: Model(), isAdding: true, isEditing: true)
 }

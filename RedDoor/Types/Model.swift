@@ -14,7 +14,7 @@ struct Model: Identifiable, Codable {
     var num_model: Int
     var item_ids: [Int]
     var type: String
-    var color: String
+    var primaryColor: String
     var material: String
     var image: String
     var count: Int
@@ -23,23 +23,36 @@ struct Model: Identifiable, Codable {
         return model_name
     }
     
-    init(model_name: String = "",
-             num_model: Int = 0,
-             item_ids: [Int] = [],
-             type: String = "",
-             color: String = "",
-             material: String = "",
-             image: String = "",
-             count: Int = 0) {
-            self.model_name = model_name
-            self.num_model = num_model
-            self.item_ids = item_ids
-            self.type = type
-            self.color = color
-            self.material = material
-            self.image = image
-            self.count = count
+    init(
+        model_name: String = "",
+        num_model: Int = 0,
+        item_ids: [Int] = [],
+        type: String = "",
+        primaryColor: String = "Red",
+        material: String = "",
+        image: String = "",
+        count: Int = 0) {
+        self.model_name = model_name
+        self.num_model = num_model
+        self.item_ids = item_ids
+        self.type = type
+        self.primaryColor = primaryColor
+        self.material = material
+        self.image = image
+        self.count = count
     }
+}
+
+struct CodableColor: Codable {
+    var red: Double
+    var green: Double
+    var blue: Double
+    var alpha: Double
     
+    
+    
+    func toColor() -> Color {
+        return Color(.sRGB, red: red, green: green, blue: blue)
+    }
     
 }

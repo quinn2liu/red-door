@@ -51,10 +51,10 @@ struct InventoryView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $isAddItemViewPresented) {
-                ItemView(editMode: .active, model: TESTMODEL, isAdding: true)
+                ItemView(model: TESTMODEL, isAdding: true, isEditing: true)
             }
             .navigationDestination(isPresented: $isItemViewPresented) {
-                ItemView(editMode: .active, model: TESTMODEL, isAdding: false)
+                ItemView(model: TESTMODEL, isAdding: false, isEditing: false)
             }
             .navigationDestination(isPresented: $isScanItemViewPresented) {
                 ScanItemView()
