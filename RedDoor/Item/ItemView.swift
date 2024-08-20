@@ -16,25 +16,6 @@ struct ItemView: View {
 
     var isAdding: Bool
 
-    let colorOptions: [(name: String, color: Color)] = [
-        ("Black", .black),
-        ("White", .white),
-        ("Brown", .brown),
-        ("Gray", .gray),
-        ("Pink", .pink),
-        ("Red", .red),
-        ("Orange", .orange),
-        ("Yellow", .yellow),
-        ("Green", .green),
-        ("Mint", .mint),
-        ("Teal", .teal),
-        ("Cyan", .cyan),
-        ("Blue", .blue),
-        ("Purple", .purple),
-        ("Indigo", .indigo)
-        
-    ]
-
     init(model: Model, isAdding: Bool, isEditing: Bool) {
         self.isEditing = isEditing
         self.isAdding = isAdding
@@ -47,13 +28,14 @@ struct ItemView: View {
     
             Form {
                 if (isEditing == true) {
+                    
                     Picker("Select Color:", selection: $model.primaryColor) {
-                        ForEach(colorOptions, id: \.name) { option in
+                        ForEach(viewModel.colorOptions, id: \.self) { option in
                             HStack {
-                                Text(option.name)
+                                Text(option)
                                 Spacer()
                                 Image(systemName: "circle.fill")
-                                    .foregroundStyle(option.color)
+                                    .foregroundStyle(viewModel.colorMap[option] ?? .black)
                                     .overlay(
                                         Image(systemName: "circle")
                                             .foregroundColor(.black.opacity(0.5))
@@ -63,9 +45,34 @@ struct ItemView: View {
                     }
                     .pickerStyle(.navigationLink)
 
-                } else {
-                    Text("Color: \(model.primaryColor)")
                     
+                    Picker("Select Item Type:", selection: $model.type) {
+                        ForEach(viewModel.typeOptions, id: \.self) { option in
+                            HStack {
+                                Text("\(option)")
+                                Image(systemName: viewModel.typeMap[option] ?? "camera.metering.unknown")
+                            }
+                        }
+                    }
+
+                } else {
+                    HStack {
+                        Text("Color: \(model.primaryColor)")
+                        Image(systemName: "circle.fill")
+                            .foregroundStyle(viewModel.colorMap[model.primaryColor] ?? .black)
+                            .overlay(
+                                Image(systemName: "circle")
+                                    .foregroundColor(.black.opacity(0.5))
+                            )
+                    }
+                    HStack {
+                        Text("Item Type: \(model.type)")
+                        Image(systemName: viewModel.typeMap[model.type] ?? "camera.metering.unknown")
+                    }
+                }
+                
+                Button("check values") {
+                    print("viewModel.typeMap[model.type]")
                 }
             }
             .toolbar {
@@ -73,7 +80,7 @@ struct ItemView: View {
                     HStack {
                         if (isEditing == true) {
                             HStack {
-                                Text("Editing:")
+                                Text(isAdding ? "Adding:" : "Editing:")
                                     .font(.headline)
                                 TextField("", text: $model.model_name)
                             }
@@ -96,30 +103,30 @@ struct ItemView: View {
             .navigationBarTitleDisplayMode(.inline)
             
         
-            
-            HStack {
-                Spacer()
-                Button(isAdding == true ? "Add Item to Inventory" : "Save Item") {
-                    // stuff
-                }
-                .foregroundColor(.white)
-                .padding(12)
-                .background(.red)
-                .clipShape(Capsule())
-                if (isAdding == false) {
+            if (isEditing) {
+                HStack {
                     Spacer()
-
-                    Button("Add Item to Pull List") {
-                        
+                    Button(isAdding == true ? "Add Item to Inventory" : "Save Item") {
+                        // stuff
                     }
-                }
-                Spacer()
-            }
-            .padding(.top)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(.red)
+                    .clipShape(Capsule())
+                    if (isAdding == false) {
+                        Spacer()
 
+                        Button("Add Item to Pull List") {
+                            // stuff
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(.top)
+            }
         }
     }
-    
+        
 }
 
 #Preview {

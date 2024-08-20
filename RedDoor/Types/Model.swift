@@ -27,7 +27,7 @@ struct Model: Identifiable, Codable {
         model_name: String = "",
         num_model: Int = 0,
         item_ids: [Int] = [],
-        type: String = "",
+        type: String = "Chair",
         primaryColor: String = "Red",
         material: String = "",
         image: String = "",
