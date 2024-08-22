@@ -109,9 +109,9 @@ extension ItemView {
         """)
         }
         
-        func updateModelFirebase(model: Model) {
+        func updateModelFirebase() {
             do {
-                try db.collection("unique_models").document(model.id).setData(from: model)
+                try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
                 print("MODEL ADDED")
             } catch {
                 print("Error adding document: \(error)")

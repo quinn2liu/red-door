@@ -10,29 +10,35 @@ import SwiftUI
 struct InventoryView: View {
     
     @State private var viewModel = ViewModel()
-    @State private var isAddItemViewPresented = false
-    @State private var isItemViewPresented = false
-    @State private var isScanItemViewPresented = false
-    
+    @State private var testModelArray = [Model()]
+    @State private var isAdding = false
+    @State private var isEditing = false
     var TESTMODEL = Model()
-    
-    // INITIALIZE A NAVIGATION PATH
-    
+    @State private var path = NavigationPath()
+
     var body: some View {
-        NavigationStack {
-            VStack {
+        VStack(spacing: 0) {
+            NavigationStack(path: $path) {
                 HStack {
                     ZStack {
-                        
                         Menu {
-                            Button("Add Item", systemImage: "plus") { isAddItemViewPresented = true }
-                            
-                            Button("Scan Item", systemImage: "qrcode.viewfinder") {
-                                isScanItemViewPresented = true
+                            Button(action: {
+                                isAdding = true
+                                isEditing = true
+                                print(isAdding)
+                                path.append(Model())
+                            }) {
+                                HStack {
+                                    Text("Add Item")
+                                    Image(systemName: "plus")
+                                }
                             }
-                        }
-                        label: {
-                            Label("", systemImage: "ellipsis")
+                            NavigationLink(destination: ScanItemView()) {
+                                Text("Scan Item")
+                                Image(systemName: "qrcode.viewfinder")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
                                 .padding(.horizontal)
                         }
                         .frame(maxWidth: .infinity,  alignment: .topTrailing)
@@ -43,29 +49,37 @@ struct InventoryView: View {
                             .foregroundStyle(.red)
                     }
                 }
+                .padding(.bottom)
+                
+                //            HStack {
+                //                Text("Type")
+                //                Spacer()
+                //                Text("Color 1")
+                //            }
+                //            .padding(.horizontal, 20)
+                //            .padding(.top, 20)
+                //            .padding(.bottom, 10)
+                //            .background(Color(.systemGray6))
+                //            .foregroundColor(Color(.systemGray))
+                //            Divider()
+                //                .padding(.horizontal)
+                
                 List {
-                    ForEach(0...10, id: \.self) { id in
-                        InventoryItemView(model: TESTMODEL)
+                    ForEach(testModelArray) { model in
+                        NavigationLink(value: model) {
+                            InventoryItemView(model: model)
+                        }
                     }
                 }
+                .navigationDestination(for: Model.self) { model in
+                    ItemView(path: $path, model: model, isAdding: $isAdding, isEditing: $isEditing)
+                }
+
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $isAddItemViewPresented) {
-                ItemView(model: TESTMODEL, isAdding: true, isEditing: true)
-            }
-            .navigationDestination(isPresented: $isItemViewPresented) {
-                ItemView(model: TESTMODEL, isAdding: false, isEditing: false)
-            }
-            .navigationDestination(isPresented: $isScanItemViewPresented) {
-                ScanItemView()
-            }
+            .navigationViewStyle(StackNavigationViewStyle())
             .padding(.bottom)
         }
     }
-    
-    
-    
-    
 }
 
 #Preview {

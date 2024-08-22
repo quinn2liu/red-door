@@ -11,28 +11,29 @@ import PhotosUI
 struct ItemView: View {
     
     @State private var viewModel: ViewModel = ViewModel()
-    @State private var isEditing: Bool
     @State private var selectedImages: [Image] = [Image]()
     @State private var selectedItems: [PhotosPickerItem] = [PhotosPickerItem]()
-
-    var isAdding: Bool
+    @Binding var path: NavigationPath
     
-    
+    @Binding private var isAdding: Bool
+    @Binding private var isEditing: Bool
 
-    init(model: Model, isAdding: Bool, isEditing: Bool) {
-        self.isEditing = isEditing
-        self.isAdding = isAdding
+    
+    init(path: Binding<NavigationPath>, model: Model, isAdding: Binding<Bool>, isEditing: Binding<Bool>) {
         self.viewModel = ViewModel(selectedModel: model)
-        if (!isAdding) {
+        self._path = path
+        self._isAdding = isAdding
+        self._isEditing = isEditing
+        if (!self.isAdding) {
             self.selectedImages = self.viewModel.getImages()
         }
     }
 
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
     
             Form {
-                if (isEditing == true) {
+                if (isEditing) {
 
                     Section(header: Text("Item Images")) {
                         VStack {
@@ -133,7 +134,7 @@ struct ItemView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        if (isEditing == true) {
+                        if (isEditing) {
                             HStack {
                                 Text(isAdding ? "Adding:" : "Editing:")
                                     .font(.headline)
@@ -165,33 +166,40 @@ struct ItemView: View {
             .navigationBarTitleDisplayMode(.inline)
             
         
-            if (isEditing) {
-                HStack {
+            HStack {
+                if (isEditing) {
                     Spacer()
-                    Button(isAdding == true ? "Add Item to Inventory" : "Save Item") {
+                    Button(isAdding ? "Add Item to Inventory" : "Save Item") {
                         viewModel.printViewModelValues()
+//                        viewModel.updateModelFirebase()
+                        path = NavigationPath()
+                        isAdding = false
+                        isEditing = false
                     }
                     .foregroundColor(.white)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 16)
                     .background(.red)
                     .clipShape(Capsule())
-                    if (isAdding == false) {
-                        Spacer()
-
-                        Button("Add Item to Pull List") {
-                            // stuff
-                        }
-                    }
-                    Spacer()
                 }
-                .padding(.top)
+               
+                if (!isAdding && !isEditing) {
+                    Spacer()
+
+                    Button("Add Item to Pull List") {
+                        path = NavigationPath()
+                        print(path)
+                    }
+                }
+                Spacer()
             }
-        }
+            .padding(.top)
+        
+        
     }
         
 }
 
-#Preview {
-    ItemView(model: Model(), isAdding: true, isEditing: true)
-}
+//#Preview {
+//    ItemView(path: Binding<NavigationPath>, model: Model(), isAdding: true, isEditing: true)
+//}

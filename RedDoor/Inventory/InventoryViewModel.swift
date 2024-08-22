@@ -14,6 +14,17 @@ extension InventoryView {
     class ViewModel {
         
         let db = Firestore.firestore()
+        
+        func getInventoryModels() async {
+            
+            do {
+                let querySnapshot = try await db.collection("unique_models").getDocuments()
+                return
+            } catch {
+                print("Error getting documents: \(error)")
+            }
+            
+        }
 
     }
 }

@@ -16,8 +16,13 @@ struct InventoryItemView: View {
     }
     
     var body: some View {
+       
         HStack {
             Text(model.type)
+            Text(model.model_name)
+            Text(model.primaryColor)
+            Text(model.primaryMaterial)
+            Text(String(model.count))
         }
     }
 }
