@@ -15,11 +15,11 @@ struct Model: Identifiable, Codable, Hashable {
     var type: String
     var primaryColor: String
     var primaryMaterial: String
-    var images: [String]
+    var imageIDs: [String]
     var count: Int
     
     var id: String {
-        return model_name
+        return UUID()
     }
     
     init(
@@ -28,14 +28,14 @@ struct Model: Identifiable, Codable, Hashable {
         type: String = "Chair",
         primaryColor: String = "Red",
         primaryMaterial: String = "Wood",
-        images: [String] = [""],
+        imageIDs: [String] = [""],
         count: Int = 1) {
         self.model_name = model_name
         self.item_ids = item_ids
         self.type = type
         self.primaryColor = primaryColor
         self.primaryMaterial = primaryMaterial
-        self.images = images
+        self.imageIDs = imageIDs
         self.count = count
     }
 }

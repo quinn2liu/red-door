@@ -14,17 +14,35 @@ extension InventoryView {
     class ViewModel {
         
         let db = Firestore.firestore()
+        private var listener: ListenerRegistration?
         
-        func getInventoryModels() async {
-            
-            do {
-                let querySnapshot = try await db.collection("unique_models").getDocuments()
-                return
-            } catch {
-                print("Error getting documents: \(error)")
+        func getInventoryModels(completion: @escaping ([Model]) -> Void) {
+                let collectionRef = db.collection("unique_models")
+                
+                listener = collectionRef.addSnapshotListener { querySnapshot, error in
+                    guard let documents = querySnapshot?.documents else {
+                        print("Error fetching documents: \(error?.localizedDescription ?? "Unknown error")")
+                        return
+                    }
+                    
+                    let models = documents.compactMap { document -> Model? in
+                        do {
+                           let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
+                           let model = try JSONDecoder().decode(Model.self, from: jsonData)
+                           return model
+                       } catch {
+                           print("Error decoding document: \(error)")
+                           return nil
+                       }
+                    }
+                    
+                    completion(models)
+                }
             }
             
-        }
+            func stopListening() {
+                listener?.remove()
+            }
 
     }
 }

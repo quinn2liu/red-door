@@ -10,8 +10,7 @@ import SwiftUI
 struct InventoryView: View {
     
     @State private var viewModel = ViewModel()
-    @State private var testModelArray = [Model()]
-    @State private var isAdding = false
+    @State private var modelsArray: [Model] = []
     @State private var isEditing = false
     var TESTMODEL = Model()
     @State private var path = NavigationPath()
@@ -22,16 +21,9 @@ struct InventoryView: View {
                 HStack {
                     ZStack {
                         Menu {
-                            Button(action: {
-                                isAdding = true
-                                isEditing = true
-                                print(isAdding)
-                                path.append(Model())
-                            }) {
-                                HStack {
-                                    Text("Add Item")
-                                    Image(systemName: "plus")
-                                }
+                            NavigationLink(destination: AddItemView()) {
+                                Text("Add Item")
+                                Image(systemName: "plus")
                             }
                             NavigationLink(destination: ScanItemView()) {
                                 Text("Scan Item")
@@ -51,35 +43,48 @@ struct InventoryView: View {
                 }
                 .padding(.bottom)
                 
-                //            HStack {
-                //                Text("Type")
-                //                Spacer()
-                //                Text("Color 1")
-                //            }
-                //            .padding(.horizontal, 20)
-                //            .padding(.top, 20)
-                //            .padding(.bottom, 10)
-                //            .background(Color(.systemGray6))
-                //            .foregroundColor(Color(.systemGray))
-                //            Divider()
-                //                .padding(.horizontal)
+                            HStack {
+//                                Text("Type")
+//                                Spacer()
+//                                Text("Color 1")
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 20)
+                            .padding(.bottom, 10)
+                            .background(Color(.systemGray6))
+                            .foregroundColor(Color(.systemGray))
+                            Divider()
+                                .padding(.horizontal)
                 
                 List {
-                    ForEach(testModelArray) { model in
+                    ForEach(modelsArray) { model in
                         NavigationLink(value: model) {
                             InventoryItemView(model: model)
                         }
                     }
                 }
                 .navigationDestination(for: Model.self) { model in
-                    ItemView(path: $path, model: model, isAdding: $isAdding, isEditing: $isEditing)
+                    ItemView(path: $path, model: model, isEditing: $isEditing)
                 }
+                .onAppear {
+                    viewModel.getInventoryModels { fetchedModels in
+                        self.modelsArray = fetchedModels
+                    }
+                }
+                
 
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .padding(.bottom)
         }
+        .onAppear {
+            isEditing = false
+        }
+        .onDisappear {
+            viewModel.stopListening()
+        }
     }
+        
 }
 
 #Preview {

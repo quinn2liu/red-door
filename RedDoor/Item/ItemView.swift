@@ -10,43 +10,43 @@ import PhotosUI
 
 struct ItemView: View {
     
-    @State private var viewModel: ViewModel = ViewModel()
-    @State private var selectedImages: [Image] = [Image]()
+    @State private var viewModel: ViewModel
     @State private var selectedItems: [PhotosPickerItem] = [PhotosPickerItem]()
+//    @State private var selectedImages: [String: Image] = [:]
+    @State private var selectedImages: [String: UIImage] = [:]
     @Binding var path: NavigationPath
-    
-    @Binding private var isAdding: Bool
     @Binding private var isEditing: Bool
-
     
-    init(path: Binding<NavigationPath>, model: Model, isAdding: Binding<Bool>, isEditing: Binding<Bool>) {
+    @State private var showingDeleteAlert = false
+
+    init(path: Binding<NavigationPath>, model: Model, isEditing: Binding<Bool>) {
         self.viewModel = ViewModel(selectedModel: model)
         self._path = path
-        self._isAdding = isAdding
         self._isEditing = isEditing
-        if (!self.isAdding) {
-            self.selectedImages = self.viewModel.getImages()
-        }
+        self.selectedImages = self.viewModel.getImages()
     }
 
     var body: some View {
-//        NavigationStack {
-    
             Form {
                 if (isEditing) {
-
                     Section(header: Text("Item Images")) {
                         VStack {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     if (!selectedImages.isEmpty) {
-                                        ForEach(0..<selectedImages.count, id: \.self) { i in
-                                            selectedImages[i]
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 200, height: 200)
-                                                .background(Color(.systemGray5))
-                                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                        ForEach(Array(selectedImages.keys), id: \.self) { imageName in
+                                            if let image = selectedImages[imageName] {
+                                                
+                                                Image(uiImage: image)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 200, height: 200)
+                                                    .background(Color(.systemGray5))
+                                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                            } else {
+                                                Text("Unable to load image")
+                                                Image("photo.badge.exclamationmark")
+                                            }
                                         }
                                     }
                                     PhotosPicker(selection: $selectedItems, maxSelectionCount: 3, matching: .any(of: [.images, .not(.screenshots)])) {
@@ -62,11 +62,16 @@ struct ItemView: View {
                         .onChange(of: selectedItems) {
                             Task {
                                 selectedImages.removeAll()
-
-                                for item in selectedItems {
-                                    if let data = try? await item.loadTransferable(type: Data.self) {
+                                viewModel.selectedModel.imageIDs = []
+                                for (index, photoPickerItem) in selectedItems.enumerated() {
+                                    if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
                                         if let loadedImage = UIImage(data: data) {
-                                            selectedImages.append(Image(uiImage: loadedImage))
+                                            let imageID = viewModel.selectedModel.id + "-\(index)"
+                                            viewModel.selectedModel.imageIDs.append(imageID)
+//                                            let image = Image(uiImage: loadedImage)
+//                                            selectedImages[imageID] = image
+                                            selectedImages[imageID] = loadedImage
+                                            print("imageID: \(imageID)")
                                         }
                                     }
                                 }
@@ -134,9 +139,9 @@ struct ItemView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        if (isEditing) {
+                        if isEditing {
                             HStack {
-                                Text(isAdding ? "Adding:" : "Editing:")
+                                Text("Editing:")
                                     .font(.headline)
                                 TextField("", text: $viewModel.selectedModel.model_name)
                                     .padding(.vertical, 6)
@@ -155,11 +160,18 @@ struct ItemView: View {
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    if (!isAdding) {
-                        Button(isEditing ? "Done" : "Edit") {
-                            isEditing.toggle()
+                    Button(isEditing ? "Done" : "Edit") {
+                        if (isEditing) {
+                            isEditing = false
+                            viewModel.updateModelDataFirebase()
+                            Task {
+                                await viewModel.updateModelImagesFirebase(imageDict: selectedImages)
+                            }
+                        } else {
+                            isEditing = true
                         }
                     }
+                    
                 }
                 
             }
@@ -168,37 +180,35 @@ struct ItemView: View {
         
             HStack {
                 if (isEditing) {
-                    Spacer()
-                    Button(isAdding ? "Add Item to Inventory" : "Save Item") {
-                        viewModel.printViewModelValues()
-//                        viewModel.updateModelFirebase()
-                        path = NavigationPath()
-                        isAdding = false
-                        isEditing = false
+                    Button("Delete Item") {
+                        showingDeleteAlert = true
                     }
-                    .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 16)
-                    .background(.red)
-                    .clipShape(Capsule())
-                }
-               
-                if (!isAdding && !isEditing) {
-                    Spacer()
-
+                    .foregroundColor(.red)
+                    .alert(isPresented: $showingDeleteAlert) {
+                        Alert(
+                            title: Text("Delete Confirmation"),
+                            message: Text("Please confirm if you want to delete this item."),
+                            primaryButton: .cancel(Text("Cancel")),
+                            secondaryButton: .destructive(Text("Delete")) {
+                                Task {
+                                    await viewModel.deleteModelFirebase()
+                                    path = NavigationPath()
+                                    isEditing = false
+                                }
+                            }
+                        )
+                    }
+                } else {
                     Button("Add Item to Pull List") {
-                        path = NavigationPath()
-                        print(path)
+                    
                     }
                 }
-                Spacer()
             }
             .padding(.top)
-        
-        
     }
         
 }
+                                                    
 
 //#Preview {
 //    ItemView(path: Binding<NavigationPath>, model: Model(), isAdding: true, isEditing: true)

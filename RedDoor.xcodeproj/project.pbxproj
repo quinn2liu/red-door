@@ -32,16 +32,12 @@
 		5011BBFD2C63320900A82219 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5011BBFC2C63320900A82219 /* GoogleService-Info.plist */; };
 		5011BC012C6BCEDF00A82219 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC002C6BCEDF00A82219 /* Model.swift */; };
 		5011BC092C6BD64900A82219 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC082C6BD64900A82219 /* ItemView.swift */; };
-		5011BC0B2C6BD66400A82219 /* ItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC0A2C6BD66400A82219 /* ItemViewModel.swift */; };
-		5011BC0E2C6BD7CE00A82219 /* AddItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC0D2C6BD7CE00A82219 /* AddItemViewModel.swift */; };
-		5011BC102C6BD7D600A82219 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC0F2C6BD7D600A82219 /* AddItemView.swift */; };
 		5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC142C70FE1F00A82219 /* ScanItemView.swift */; };
 		5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */; };
 		5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC182C739D6400A82219 /* CombinedImagePicker.swift */; };
-		5011BC242C74101D00A82219 /* HexColorsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC232C74101D00A82219 /* HexColorsExtension.swift */; };
-		5011BC2B2C75494F00A82219 /* ItemViewCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2A2C75494F00A82219 /* ItemViewCopy.swift */; };
-		5011BC2D2C75497100A82219 /* ItemViewCopyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2C2C75497100A82219 /* ItemViewCopyViewModel.swift */; };
 		5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2E2C75525F00A82219 /* InventoryItemView.swift */; };
+		501B59A22C7811460097A966 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A12C7811460097A966 /* AddItemView.swift */; };
+		501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,16 +60,12 @@
 		5011BBFE2C6AFC7F00A82219 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5011BC002C6BCEDF00A82219 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		5011BC082C6BD64900A82219 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
-		5011BC0A2C6BD66400A82219 /* ItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModel.swift; sourceTree = "<group>"; };
-		5011BC0D2C6BD7CE00A82219 /* AddItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemViewModel.swift; sourceTree = "<group>"; };
-		5011BC0F2C6BD7D600A82219 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
 		5011BC142C70FE1F00A82219 /* ScanItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemView.swift; sourceTree = "<group>"; };
 		5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemViewModel.swift; sourceTree = "<group>"; };
 		5011BC182C739D6400A82219 /* CombinedImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedImagePicker.swift; sourceTree = "<group>"; };
-		5011BC232C74101D00A82219 /* HexColorsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexColorsExtension.swift; sourceTree = "<group>"; };
-		5011BC2A2C75494F00A82219 /* ItemViewCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewCopy.swift; sourceTree = "<group>"; };
-		5011BC2C2C75497100A82219 /* ItemViewCopyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewCopyViewModel.swift; sourceTree = "<group>"; };
 		5011BC2E2C75525F00A82219 /* InventoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemView.swift; sourceTree = "<group>"; };
+		501B59A12C7811460097A966 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
+		501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModelProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,14 +106,12 @@
 		5011BBBA2C63159200A82219 /* RedDoor */ = {
 			isa = PBXGroup;
 			children = (
-				5011BC202C740FEA00A82219 /* HexColors */,
+				5011BBBB2C63159200A82219 /* RedDoorApp.swift */,
+				5011BBBD2C63159200A82219 /* ContentView.swift */,
 				5011BC132C70FE1200A82219 /* ScanItem */,
-				5011BC0C2C6BD7C300A82219 /* AddItem */,
 				5011BC072C6BD63200A82219 /* Item */,
 				5011BBFF2C6BC83A00A82219 /* Types */,
 				5011BBFC2C63320900A82219 /* GoogleService-Info.plist */,
-				5011BBBB2C63159200A82219 /* RedDoorApp.swift */,
-				5011BBBD2C63159200A82219 /* ContentView.swift */,
 				5011BBE12C631E2800A82219 /* Account */,
 				5011BBDB2C631B4D00A82219 /* Home */,
 				5011BBDC2C631B6800A82219 /* Inventory */,
@@ -200,21 +190,11 @@
 			isa = PBXGroup;
 			children = (
 				5011BC082C6BD64900A82219 /* ItemView.swift */,
-				5011BC0A2C6BD66400A82219 /* ItemViewModel.swift */,
 				5011BC182C739D6400A82219 /* CombinedImagePicker.swift */,
-				5011BC2A2C75494F00A82219 /* ItemViewCopy.swift */,
-				5011BC2C2C75497100A82219 /* ItemViewCopyViewModel.swift */,
+				501B59A12C7811460097A966 /* AddItemView.swift */,
+				501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */,
 			);
 			path = Item;
-			sourceTree = "<group>";
-		};
-		5011BC0C2C6BD7C300A82219 /* AddItem */ = {
-			isa = PBXGroup;
-			children = (
-				5011BC0D2C6BD7CE00A82219 /* AddItemViewModel.swift */,
-				5011BC0F2C6BD7D600A82219 /* AddItemView.swift */,
-			);
-			path = AddItem;
 			sourceTree = "<group>";
 		};
 		5011BC132C70FE1200A82219 /* ScanItem */ = {
@@ -224,14 +204,6 @@
 				5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */,
 			);
 			path = ScanItem;
-			sourceTree = "<group>";
-		};
-		5011BC202C740FEA00A82219 /* HexColors */ = {
-			isa = PBXGroup;
-			children = (
-				5011BC232C74101D00A82219 /* HexColorsExtension.swift */,
-			);
-			path = HexColors;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -319,28 +291,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5011BC102C6BD7D600A82219 /* AddItemView.swift in Sources */,
 				5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */,
-				5011BC2D2C75497100A82219 /* ItemViewCopyViewModel.swift in Sources */,
 				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
-				5011BC0B2C6BD66400A82219 /* ItemViewModel.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ItemView.swift in Sources */,
-				5011BC2B2C75494F00A82219 /* ItemViewCopy.swift in Sources */,
 				5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */,
-				5011BC0E2C6BD7CE00A82219 /* AddItemViewModel.swift in Sources */,
 				5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
+				501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */,
 				5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */,
 				5011BBE02C631D2F00A82219 /* InstalledListViewModel.swift in Sources */,
 				5011BBD42C631B3300A82219 /* HomeViewModel.swift in Sources */,
 				5011BC012C6BCEDF00A82219 /* Model.swift in Sources */,
-				5011BC242C74101D00A82219 /* HexColorsExtension.swift in Sources */,
 				5011BBCC2C631AEB00A82219 /* HomeView.swift in Sources */,
 				5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */,
 				5011BBBE2C63159200A82219 /* ContentView.swift in Sources */,
 				5011BBD62C631B3B00A82219 /* InventoryViewModel.swift in Sources */,
 				5011BBBC2C63159200A82219 /* RedDoorApp.swift in Sources */,
+				501B59A22C7811460097A966 /* AddItemView.swift in Sources */,
 				5011BBE72C631E4A00A82219 /* AccountViewModel.swift in Sources */,
 				5011BBCE2C631AF600A82219 /* InventoryView.swift in Sources */,
 			);

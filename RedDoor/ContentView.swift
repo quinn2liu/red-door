@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var isMenuOpen = false
-
     
     var body: some View {
         NavigationStack {
@@ -18,7 +17,6 @@ struct ContentView: View {
                     .tabItem {
                         Label("Inventory", systemImage: "square.stack.fill")
                     }
-
                 PullListView()
                     .tabItem {
                         Label("Pull Lists", systemImage: "list.bullet")
@@ -35,11 +33,7 @@ struct ContentView: View {
             .background(Color.white)
             .accentColor(.red)
         }
-            
     }
-    
-    
-    
 }
 
 #Preview {
