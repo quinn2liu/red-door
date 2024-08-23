@@ -113,7 +113,7 @@ class SharedViewModel {
     
     func updateModelDataFirebase() {
         do {
-            try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
+            try db.collection("unique_models").document(selectedModel.id.uuidString).setData(from: selectedModel)
             print("MODEL ADDED/EDITED")
         } catch {
             print("Error adding document: \(error)")
@@ -122,7 +122,7 @@ class SharedViewModel {
     
     func deleteModelFirebase() async {
         do {
-          try await db.collection("unique_models").document(selectedModel.id).delete()
+            try await db.collection("unique_models").document(selectedModel.id.uuidString).delete()
           print("Document successfully removed!")
         } catch {
           print("Error removing document: \(error)")
@@ -132,11 +132,23 @@ class SharedViewModel {
     func updateModelImagesFirebase(imageDict: [String: UIImage]) async {
         for imageID in selectedModel.imageIDs {
             let imageRef = storage.child("\(imageID)")
+            
             guard let imageData = imageDict[imageID]?.pngData() else {
                 print("error converting UIImage to pngData")
                 return
             }
-//            imageRef.putDataAsync(imageData)
+            
+            let metaData = StorageMetadata()
+            metaData.contentType = "image/png"
+            do {
+                let resultMetaData = try await imageRef.putDataAsync(imageData, metadata: metaData)
+                print("Upload finished. Metadata: \(resultMetaData)")
+                let imageURL = try await imageRef.downloadURL()
+                selectedModel.imageURLs.append(imageURL)
+            } catch {
+                print("Error occurred when uploading image \(error.localizedDescription)")
+            }
+
         }
     }
     

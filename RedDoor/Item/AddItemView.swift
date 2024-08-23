@@ -54,10 +54,8 @@ struct AddItemView: View {
                         for (index, photoPickerItem) in selectedItems.enumerated() {
                             if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
                                 if let loadedImage = UIImage(data: data) {
-                                    let imageID = viewModel.selectedModel.id + "-\(index)"
+                                    let imageID = viewModel.selectedModel.id.uuidString + "-\(index)"
                                     viewModel.selectedModel.imageIDs.append(imageID)
-//                                            let image = Image(uiImage: loadedImage)
-//                                            selectedImages[imageID] = image
                                     selectedImages[imageID] = loadedImage
                                     print("imageID: \(imageID)")
                                 }
@@ -108,7 +106,7 @@ struct AddItemView: View {
                     HStack {
                         Text("Adding:")
                             .font(.headline)
-                        TextField("", text: $viewModel.selectedModel.model_name)
+                        TextField("", text: $viewModel.selectedModel.name)
                             .padding(.vertical, 6)
                             .padding(.horizontal, 6)
                             .background(Color(.systemGray5))

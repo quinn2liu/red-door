@@ -10,32 +10,32 @@ import SwiftUI
 
 struct Model: Identifiable, Codable, Hashable {
     
-    var model_name: String
+    var name: String
     var item_ids: [Int]
     var type: String
     var primaryColor: String
     var primaryMaterial: String
     var imageIDs: [String]
+    var imageURLs: [URL]
     var count: Int
-    
-    var id: String {
-        return UUID()
-    }
+    var id: UUID = UUID()
     
     init(
-        model_name: String = "",
+        name: String = "",
         item_ids: [Int] = [],
         type: String = "Chair",
         primaryColor: String = "Red",
         primaryMaterial: String = "Wood",
-        imageIDs: [String] = [""],
+        imageIDs: [String] = [],
+        imageURLs: [URL] = [],
         count: Int = 1) {
-        self.model_name = model_name
+        self.name = name
         self.item_ids = item_ids
         self.type = type
         self.primaryColor = primaryColor
         self.primaryMaterial = primaryMaterial
         self.imageIDs = imageIDs
+        self.imageURLs = imageURLs
         self.count = count
     }
 }

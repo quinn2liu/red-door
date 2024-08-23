@@ -43,19 +43,8 @@ struct InventoryView: View {
                 }
                 .padding(.bottom)
                 
-                            HStack {
-//                                Text("Type")
-//                                Spacer()
-//                                Text("Color 1")
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.top, 20)
-                            .padding(.bottom, 10)
-                            .background(Color(.systemGray6))
-                            .foregroundColor(Color(.systemGray))
-                            Divider()
-                                .padding(.horizontal)
-                
+                InventoryItemLegendView()
+
                 List {
                     ForEach(modelsArray) { model in
                         NavigationLink(value: model) {
