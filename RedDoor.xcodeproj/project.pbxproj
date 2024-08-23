@@ -38,6 +38,9 @@
 		5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2E2C75525F00A82219 /* InventoryItemView.swift */; };
 		501B59A22C7811460097A966 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A12C7811460097A966 /* AddItemView.swift */; };
 		501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */; };
+		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
+		501B59AF2C7942270097A966 /* CachedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59AE2C7942270097A966 /* CachedImageView.swift */; };
+		501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59B02C79429E0097A966 /* MemoryImageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +69,8 @@
 		5011BC2E2C75525F00A82219 /* InventoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemView.swift; sourceTree = "<group>"; };
 		501B59A12C7811460097A966 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
 		501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModelProvider.swift; sourceTree = "<group>"; };
+		501B59AE2C7942270097A966 /* CachedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImageView.swift; sourceTree = "<group>"; };
+		501B59B02C79429E0097A966 /* MemoryImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryImageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +81,7 @@
 				5011BBFB2C632FE400A82219 /* CodeScanner in Frameworks */,
 				5011BBEC2C632FB400A82219 /* FirebaseAnalytics in Frameworks */,
 				5011BBF02C632FB400A82219 /* FirebaseAppCheck in Frameworks */,
+				501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */,
 				5011BBF42C632FB400A82219 /* FirebaseCrashlytics in Frameworks */,
 				5011BBEE2C632FB400A82219 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 				5011BBF82C632FB500A82219 /* FirebaseStorage in Frameworks */,
@@ -189,6 +195,7 @@
 		5011BC072C6BD63200A82219 /* Item */ = {
 			isa = PBXGroup;
 			children = (
+				501B59B32C7942B70097A966 /* SupportingViews */,
 				5011BC082C6BD64900A82219 /* ItemView.swift */,
 				5011BC182C739D6400A82219 /* CombinedImagePicker.swift */,
 				501B59A12C7811460097A966 /* AddItemView.swift */,
@@ -204,6 +211,15 @@
 				5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */,
 			);
 			path = ScanItem;
+			sourceTree = "<group>";
+		};
+		501B59B32C7942B70097A966 /* SupportingViews */ = {
+			isa = PBXGroup;
+			children = (
+				501B59AE2C7942270097A966 /* CachedImageView.swift */,
+				501B59B02C79429E0097A966 /* MemoryImageView.swift */,
+			);
+			path = SupportingViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -231,6 +247,7 @@
 				5011BBF52C632FB400A82219 /* FirebaseFirestore */,
 				5011BBF72C632FB500A82219 /* FirebaseStorage */,
 				5011BBFA2C632FE400A82219 /* CodeScanner */,
+				501B59AC2C7928690097A966 /* CachedAsyncImage */,
 			);
 			productName = RedDoor;
 			productReference = 5011BBB82C63159200A82219 /* RedDoor.app */;
@@ -263,6 +280,7 @@
 			packageReferences = (
 				5011BBEA2C632FB400A82219 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				5011BBF92C632FE400A82219 /* XCRemoteSwiftPackageReference "codeScanner" */,
+				501B59AB2C7928690097A966 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 			);
 			productRefGroup = 5011BBB92C63159200A82219 /* Products */;
 			projectDirPath = "";
@@ -292,11 +310,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */,
+				501B59AF2C7942270097A966 /* CachedImageView.swift in Sources */,
 				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ItemView.swift in Sources */,
 				5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */,
 				5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */,
+				501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
 				501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */,
 				5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */,
@@ -534,6 +554,14 @@
 				minimumVersion = 2.5.0;
 			};
 		};
+		501B59AB2C7928690097A966 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -576,6 +604,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5011BBF92C632FE400A82219 /* XCRemoteSwiftPackageReference "codeScanner" */;
 			productName = CodeScanner;
+		};
+		501B59AC2C7928690097A966 /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 501B59AB2C7928690097A966 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

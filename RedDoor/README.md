@@ -31,6 +31,8 @@
 
     - Create different views/add item views for different types of items (art has different fields than a couch)
 
+    - This is a monster file that you should break apart into smaller views.
+
     Optimizations:
 
     -  Add Image Compression for image upload

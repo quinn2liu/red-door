@@ -108,10 +108,15 @@ class SharedViewModel {
     selectedModel.type = \(selectedModel.type)
     selectedModel.primaryMaterial = \(selectedModel.primaryMaterial)
     selectedModel.count = \(selectedModel.count)
+    selectedModel.imageURLDict.count = \(selectedModel.imageURLDict.count)
     """)
+        for (imageID, imageURL) in selectedModel.imageURLDict {
+            print("imageID: \(imageID), imageURL: \(imageURL)")
+        }
     }
     
-    func updateModelDataFirebase() {
+    func updateModelDataFirebase()  {
+        
         do {
             try db.collection("unique_models").document(selectedModel.id.uuidString).setData(from: selectedModel)
             print("MODEL ADDED/EDITED")
@@ -130,32 +135,43 @@ class SharedViewModel {
     }
     
     func updateModelImagesFirebase(imageDict: [String: UIImage]) async {
-        for imageID in selectedModel.imageIDs {
+        
+//        var updatedURLDict = [String: String]()
+        
+        for imageID in imageDict.keys {
             let imageRef = storage.child("\(imageID)")
             
             guard let imageData = imageDict[imageID]?.pngData() else {
                 print("error converting UIImage to pngData")
                 return
             }
-            
             let metaData = StorageMetadata()
             metaData.contentType = "image/png"
+            
             do {
                 let resultMetaData = try await imageRef.putDataAsync(imageData, metadata: metaData)
                 print("Upload finished. Metadata: \(resultMetaData)")
-                let imageURL = try await imageRef.downloadURL()
-                selectedModel.imageURLs.append(imageURL)
+                let imageURL = try await imageRef.downloadURL().absoluteString
+                print("imageURL = \(imageURL)")
+                selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
             } catch {
                 print("Error occurred when uploading image \(error.localizedDescription)")
             }
 
         }
-    }
-    
-    func getImages() -> [String: UIImage] {
-        let images = [String: UIImage]()
-        return images
-    }
+        
+        print("selectedModel.imageURLDict.count: \(selectedModel.imageURLDict.count)")
+        for item in selectedModel.imageURLDict {
+            print("selectedModel.imageURLDict key: \(item.key)")
+            print("selectedModel.imageURLDict value: \(item.value)")
+        }
+}
+//    
+//    func getImageURLs() -> [String: URL] {
+//        // UPDATE
+//        let images = [String: URL]()
+//        return images
+//    }
 }
 
 extension ItemView  {

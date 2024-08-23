@@ -120,9 +120,12 @@ struct AddItemView: View {
             HStack {
                 Spacer()
                 Button("Add Item to Inventory") {
-                    viewModel.updateModelDataFirebase()
                     Task {
                         await viewModel.updateModelImagesFirebase(imageDict: selectedImages)
+                        await withCheckedContinuation { continuation in
+                            viewModel.updateModelDataFirebase()
+                            continuation.resume()
+                        }
                     }
                     dismiss()
                 }

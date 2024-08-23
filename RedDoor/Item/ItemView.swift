@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import CachedAsyncImage
 
 struct ItemView: View {
     
@@ -22,32 +23,25 @@ struct ItemView: View {
         self.viewModel = ViewModel(selectedModel: model)
         self._path = path
         self._isEditing = isEditing
-        self.selectedImages = self.viewModel.getImages()
+//        self.selectedImagesURLs = model.imageURLDict
     }
 
     var body: some View {
+        VStack {
             Form {
-                if (isEditing) {
-                    Section(header: Text("Item Images")) {
-                        VStack {
+                    if (isEditing) {
+                        Section(header: Text("Item Images")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
-                                    if (!selectedImages.isEmpty) {
-                                        ForEach(Array(selectedImages.keys), id: \.self) { imageName in
-                                            if let image = selectedImages[imageName] {
-                                                
-                                                Image(uiImage: image)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 200, height: 200)
-                                                    .background(Color(.systemGray5))
-                                                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                                            } else {
-                                                Text("Unable to load image")
-                                                Image("photo.badge.exclamationmark")
-                                            }
+                                    if (selectedImages.isEmpty) {
+                                        if (!viewModel.selectedModel.imageURLDict.isEmpty) {
+                                            CachedImageView(imageURLDict: viewModel.selectedModel.imageURLDict)
                                         }
+                                    } else { // selectedImages.isEmpty == false
+                                            MemoryImageView(selectedImages: selectedImages)
                                     }
+                                    
+                                    
                                     PhotosPicker(selection: $selectedItems, maxSelectionCount: 3, matching: .any(of: [.images, .not(.screenshots)])) {
                                         Label(selectedItems.count <= 2 ? "Select a photo" : "Edit photos", systemImage: "photo")
                                     }
@@ -55,87 +49,100 @@ struct ItemView: View {
                                     .background(Color(.systemGray5))
                                     .clipShape(RoundedRectangle(cornerRadius: 20))
                                 }
+                                .padding(.vertical, 10)
                             }
-                            .padding(.vertical, 10)
-                        }
-                        .onChange(of: selectedItems) {
-                            Task {
-                                selectedImages.removeAll()
-                                viewModel.selectedModel.imageIDs = []
-                                viewModel.selectedModel.imageURLs = []
-                                for (index, photoPickerItem) in selectedItems.enumerated() {
-                                    if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
-                                        if let loadedImage = UIImage(data: data) {
-                                            let imageID = viewModel.selectedModel.id.uuidString + "-\(index)"
-                                            viewModel.selectedModel.imageIDs.append(imageID)
-                                            selectedImages[imageID] = loadedImage
-                                            print("imageID: \(imageID)")
+                            .onChange(of: selectedItems) {
+                                Task {
+                                    selectedImages.removeAll()
+                                    for (index, photoPickerItem) in selectedItems.enumerated() {
+                                        if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
+                                            if let loadedImage = UIImage(data: data) {
+                                                let imageID = viewModel.selectedModel.id.uuidString + "-\(index)"
+                                                viewModel.selectedModel.imageIDs.append(imageID)
+                                                selectedImages[imageID] = loadedImage
+                                                
+                                                print("imageID: \(imageID)")
+                                            }
                                         }
                                     }
                                 }
                             }
+                            
+                            
+                            Section(header: Text("Options")) {
+                                Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
+                                    ForEach(viewModel.colorOptions, id: \.self) { option in
+                                        HStack {
+                                            Text(option)
+                                            Image(systemName: "circle.fill")
+                                                .foregroundStyle(viewModel.colorMap[option] ?? .black)
+                                                .overlay(
+                                                    Image(systemName: "circle")
+                                                        .foregroundColor(.black.opacity(0.5))
+                                                )
+                                        }
+                                    }
+                                }
+                                .pickerStyle(.navigationLink)
+                                
+                                
+                                Picker("Item Type", selection: $viewModel.selectedModel.type) {
+                                    ForEach(viewModel.typeOptions, id: \.self) { option in
+                                        HStack {
+                                            Text("\(option)")
+                                            Image(systemName: viewModel.typeMap[option] ?? "camera.metering.unknown")
+                                        }
+                                    }
+                                }
+                                
+                                Picker("Material", selection: $viewModel.selectedModel.primaryMaterial) {
+                                    ForEach(viewModel.materialOptions, id: \.self) { material in
+                                        Text(material)
+                                    }
+                                }
+                                
+                                Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
+                            }
                         }
-                    }
-                    
-                    Section(header: Text("Options")) {
-                        Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
-                            ForEach(viewModel.colorOptions, id: \.self) { option in
-                                HStack {
-                                    Text(option)
-                                    Image(systemName: "circle.fill")
-                                        .foregroundStyle(viewModel.colorMap[option] ?? .black)
-                                        .overlay(
-                                            Image(systemName: "circle")
-                                                .foregroundColor(.black.opacity(0.5))
-                                        )
+        
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                if (selectedImages.isEmpty) {
+                                    if (!viewModel.selectedModel.imageURLDict.isEmpty) {
+                                        CachedImageView(imageURLDict: viewModel.selectedModel.imageURLDict)
+                                    } else {
+                                        Text("No images for this item.")
+                                            .frame(width: 200, height: 200)
+                                            .background(Color(.systemGray5))
+                                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    }
+                                } else {
+                                    MemoryImageView(selectedImages: selectedImages)
                                 }
                             }
                         }
-                        .pickerStyle(.navigationLink)
-                        
-                        
-                        Picker("Item Type", selection: $viewModel.selectedModel.type) {
-                            ForEach(viewModel.typeOptions, id: \.self) { option in
-                                HStack {
-                                    Text("\(option)")
-                                    Image(systemName: viewModel.typeMap[option] ?? "camera.metering.unknown")
-                                }
-                            }
+                        .padding(.vertical, 10)
+        
+                        HStack {
+                            Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
+                            Image(systemName: "circle.fill")
+                                .foregroundStyle(viewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
+                                .overlay(
+                                    Image(systemName: "circle")
+                                        .foregroundColor(.black.opacity(0.5))
+                                )
                         }
-                        
-                        Picker("Material", selection: $viewModel.selectedModel.primaryMaterial) {
-                            ForEach(viewModel.materialOptions, id: \.self) { material in
-                                Text(material)
-                            }
+                        HStack {
+                            Text("Item Type: \(viewModel.selectedModel.type)")
+                            Image(systemName: viewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
                         }
-                        
-                        Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
+        
+                        Text("Material: \(viewModel.selectedModel.primaryMaterial)")
+        
+                        Text("Item Count: \(viewModel.selectedModel.count)")
+        
                     }
-
-                } else {
-                    
-                    
-                    
-                    HStack {
-                        Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
-                        Image(systemName: "circle.fill")
-                            .foregroundStyle(viewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
-                            .overlay(
-                                Image(systemName: "circle")
-                                    .foregroundColor(.black.opacity(0.5))
-                            )
-                    }
-                    HStack {
-                        Text("Item Type: \(viewModel.selectedModel.type)")
-                        Image(systemName: viewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
-                    }
-                    
-                    Text("Material: \(viewModel.selectedModel.primaryMaterial)")
-                    
-                    Text("Item Count: \(viewModel.selectedModel.count)")
-                    
-                }
-                
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -162,13 +169,17 @@ struct ItemView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(isEditing ? "Done" : "Edit") {
-                        if (isEditing) {
+                        if (isEditing) { // edit mode -> view mode
                             isEditing = false
+                            selectedImages = [:]
                             Task {
                                 await viewModel.updateModelImagesFirebase(imageDict: selectedImages)
+                                await withCheckedContinuation { continuation in
+                                    viewModel.updateModelDataFirebase()
+                                    continuation.resume()
+                                }
                             }
-                            viewModel.updateModelDataFirebase()
-                        } else {
+                        } else { // view mode -> edit mode
                             isEditing = true
                         }
                     }
@@ -178,7 +189,7 @@ struct ItemView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             
-        
+            //
             HStack {
                 if (isEditing) {
                     Button("Delete Item") {
@@ -200,15 +211,27 @@ struct ItemView: View {
                         )
                     }
                 } else {
-                    Button("Add Item to Pull List") {
-                    
+                    HStack {
+                        Button("Add Item to Pull List") {
+                            
+                        }
+                        Spacer()
+                        Button("Check values") {
+                            viewModel.printViewModelValues()
+                        }
                     }
+                    
                 }
             }
-            .padding(.top)
-    }
+            .padding(.top) // delete button
+                
+            } // vstack
         
-}
+    } // view
+    
+} // struct
+    
+
                                                     
 
 //#Preview {
