@@ -16,7 +16,7 @@ import FirebaseStorage
 @Observable
 class SharedViewModel {
     let db = Firestore.firestore()
-    let storage = Storage.storage().reference().child("model_images")
+    let storageRef = Storage.storage().reference().child("model_images")
     
     var selectedModel: Model
     
@@ -118,7 +118,7 @@ class SharedViewModel {
     func updateModelDataFirebase()  {
         
         do {
-            try db.collection("unique_models").document(selectedModel.id.uuidString).setData(from: selectedModel)
+            try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
             print("MODEL ADDED/EDITED")
         } catch {
             print("Error adding document: \(error)")
@@ -127,19 +127,35 @@ class SharedViewModel {
     
     func deleteModelFirebase() async {
         do {
-            try await db.collection("unique_models").document(selectedModel.id.uuidString).delete()
-          print("Document successfully removed!")
+            try await db.collection("unique_models").document(selectedModel.id).delete()
+            print("Document \(selectedModel.id) successfully removed!")
         } catch {
-          print("Error removing document: \(error)")
+            print("Error removing document: \(error)")
+        }
+        
+    }
+    
+    func deleteModelImagesFirebase() async {
+        do {
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                    for imageID in selectedModel.imageIDs {
+                        group.addTask {
+                            let deleteRef = self.storageRef.child(imageID)
+                            try await deleteRef.delete()
+                        }
+                    }
+                    
+                    try await group.waitForAll()
+            }
+        } catch {
+            print("Error removing image: \(error)")
         }
     }
     
     func updateModelImagesFirebase(imageDict: [String: UIImage]) async {
-        
-//        var updatedURLDict = [String: String]()
-        
+                
         for imageID in imageDict.keys {
-            let imageRef = storage.child("\(imageID)")
+            let imageRef = storageRef.child("\(imageID)")
             
             guard let imageData = imageDict[imageID]?.pngData() else {
                 print("error converting UIImage to pngData")
@@ -159,19 +175,8 @@ class SharedViewModel {
             }
 
         }
-        
-        print("selectedModel.imageURLDict.count: \(selectedModel.imageURLDict.count)")
-        for item in selectedModel.imageURLDict {
-            print("selectedModel.imageURLDict key: \(item.key)")
-            print("selectedModel.imageURLDict value: \(item.value)")
-        }
 }
-//    
-//    func getImageURLs() -> [String: URL] {
-//        // UPDATE
-//        let images = [String: URL]()
-//        return images
-//    }
+
 }
 
 extension ItemView  {

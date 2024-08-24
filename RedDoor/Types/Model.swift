@@ -19,7 +19,7 @@ struct Model: Identifiable, Codable, Hashable {
     var imageIDs: [String]
     var imageURLDict: [String: String]
     var count: Int
-    var id: UUID = UUID()
+    var id: String
     
     init(
         name: String = "",
@@ -29,7 +29,8 @@ struct Model: Identifiable, Codable, Hashable {
         primaryMaterial: String = "Wood",
         imageIDs: [String] = [],
         imageURLDict: [String: String] = [String: String](),
-        count: Int = 1) {
+        count: Int = 1,
+        id: String = UUID().uuidString) {
         self.name = name
         self.item_ids = item_ids
         self.type = type
@@ -38,10 +39,11 @@ struct Model: Identifiable, Codable, Hashable {
         self.imageIDs = imageIDs
         self.imageURLDict = imageURLDict
         self.count = count
+        self.id = id
     }
     
     enum CodingKeys: String, CodingKey {
-            case name, item_ids, type, primaryColor, primaryMaterial, imageIDs, imageURLDict, count
+            case name, item_ids, type, primaryColor, primaryMaterial, imageIDs, imageURLDict, count, id
     }
     
     // Custom encoding
@@ -56,7 +58,7 @@ struct Model: Identifiable, Codable, Hashable {
         guard let imageURLDictData = try? JSONEncoder().encode(imageURLDict) else { return }
         try container.encode(imageURLDict, forKey: .imageURLDict)
         try container.encode(count, forKey: .count)
-//        try container.encode(id, forKey: .id)
+        try container.encode(id, forKey: .id)
     }
     
     // Custom decoding
@@ -70,7 +72,7 @@ struct Model: Identifiable, Codable, Hashable {
         imageIDs = try container.decode([String].self, forKey: .imageIDs)
         imageURLDict = try container.decode([String: String].self, forKey: .imageURLDict)
         count = try container.decode(Int.self, forKey: .count)
-//        id = try container.decode(UUID.self, forKey: .id)
+        id = try container.decode(String.self, forKey: .id)
 
     }
     

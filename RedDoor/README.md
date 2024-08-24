@@ -10,7 +10,7 @@
 
     Possible Improvements:
 
-    - filer items
+    - filter items
 
     Optimizations:
 
@@ -37,7 +37,7 @@
 
     -  Add Image Compression for image upload
 
-    - Add some form of version tracking (only update model data if there are changes)
+    - Add some form of version tracking (only update model/images data if there are changes)
 
     Questions:
 

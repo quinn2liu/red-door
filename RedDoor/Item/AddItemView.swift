@@ -54,7 +54,7 @@ struct AddItemView: View {
                         for (index, photoPickerItem) in selectedItems.enumerated() {
                             if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
                                 if let loadedImage = UIImage(data: data) {
-                                    let imageID = viewModel.selectedModel.id.uuidString + "-\(index)"
+                                    let imageID = viewModel.selectedModel.id + "-\(index)"
                                     viewModel.selectedModel.imageIDs.append(imageID)
                                     selectedImages[imageID] = loadedImage
                                     print("imageID: \(imageID)")

@@ -33,15 +33,9 @@ struct ItemView: View {
                         Section(header: Text("Item Images")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
-                                    if (selectedImages.isEmpty) {
-                                        if (!viewModel.selectedModel.imageURLDict.isEmpty) {
-                                            CachedImageView(imageURLDict: viewModel.selectedModel.imageURLDict)
-                                        }
-                                    } else { // selectedImages.isEmpty == false
-                                            MemoryImageView(selectedImages: selectedImages)
-                                    }
                                     
-                                    
+                                    MemoryImageView(selectedImages: selectedImages)
+
                                     PhotosPicker(selection: $selectedItems, maxSelectionCount: 3, matching: .any(of: [.images, .not(.screenshots)])) {
                                         Label(selectedItems.count <= 2 ? "Select a photo" : "Edit photos", systemImage: "photo")
                                     }
@@ -57,7 +51,7 @@ struct ItemView: View {
                                     for (index, photoPickerItem) in selectedItems.enumerated() {
                                         if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
                                             if let loadedImage = UIImage(data: data) {
-                                                let imageID = viewModel.selectedModel.id.uuidString + "-\(index)"
+                                                let imageID = viewModel.selectedModel.id + "-\(index)"
                                                 viewModel.selectedModel.imageIDs.append(imageID)
                                                 selectedImages[imageID] = loadedImage
                                                 
@@ -112,7 +106,9 @@ struct ItemView: View {
                                     if (!viewModel.selectedModel.imageURLDict.isEmpty) {
                                         CachedImageView(imageURLDict: viewModel.selectedModel.imageURLDict)
                                     } else {
-                                        Text("No images for this item.")
+                                        Text("""
+                                            No Images
+                                            """)
                                             .frame(width: 200, height: 200)
                                             .background(Color(.systemGray5))
                                             .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -203,10 +199,20 @@ struct ItemView: View {
                             primaryButton: .cancel(Text("Cancel")),
                             secondaryButton: .destructive(Text("Delete")) {
                                 Task {
-                                    await viewModel.deleteModelFirebase()
+                                    try await withThrowingTaskGroup(of: Void.self) { group in
+                                        group.addTask {
+                                            await viewModel.deleteModelImagesFirebase()
+                                        }
+                                        group.addTask {
+                                            await viewModel.deleteModelFirebase()
+                                            
+                                        }
+                                        try await group.waitForAll()
+                                    }
                                     path = NavigationPath()
                                     isEditing = false
                                 }
+                                
                             }
                         )
                     }
