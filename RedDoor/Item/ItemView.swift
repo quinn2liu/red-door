@@ -221,10 +221,6 @@ struct ItemView: View {
                         Button("Add Item to Pull List") {
                             
                         }
-                        Spacer()
-                        Button("Check values") {
-                            viewModel.printViewModelValues()
-                        }
                     }
                     
                 }

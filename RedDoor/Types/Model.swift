@@ -55,7 +55,6 @@ struct Model: Identifiable, Codable, Hashable {
         try container.encode(primaryColor, forKey: .primaryColor)
         try container.encode(primaryMaterial, forKey: .primaryMaterial)
         try container.encode(imageIDs, forKey: .imageIDs)
-        guard let imageURLDictData = try? JSONEncoder().encode(imageURLDict) else { return }
         try container.encode(imageURLDict, forKey: .imageURLDict)
         try container.encode(count, forKey: .count)
         try container.encode(id, forKey: .id)

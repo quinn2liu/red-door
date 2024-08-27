@@ -41,6 +41,7 @@
 		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
 		501B59AF2C7942270097A966 /* CachedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59AE2C7942270097A966 /* CachedImageView.swift */; };
 		501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59B02C79429E0097A966 /* MemoryImageView.swift */; };
+		508373902C7D73C8004291AA /* PullList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083738F2C7D73C8004291AA /* PullList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +72,7 @@
 		501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModelProvider.swift; sourceTree = "<group>"; };
 		501B59AE2C7942270097A966 /* CachedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImageView.swift; sourceTree = "<group>"; };
 		501B59B02C79429E0097A966 /* MemoryImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryImageView.swift; sourceTree = "<group>"; };
+		5083738F2C7D73C8004291AA /* PullList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				5011BC002C6BCEDF00A82219 /* Model.swift */,
+				5083738F2C7D73C8004291AA /* PullList.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 				501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
 				501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */,
+				508373902C7D73C8004291AA /* PullList.swift in Sources */,
 				5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */,
 				5011BBE02C631D2F00A82219 /* InstalledListViewModel.swift in Sources */,
 				5011BBD42C631B3300A82219 /* HomeViewModel.swift in Sources */,
