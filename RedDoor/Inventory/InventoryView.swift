@@ -43,7 +43,7 @@ struct InventoryView: View {
                 }
                 .padding(.bottom)
                 
-                InventoryItemLegendView()
+                InventoryLegendView()
 
                 List {
                     ForEach(modelsArray) { model in

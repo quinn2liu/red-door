@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -74,6 +74,10 @@
 		501B59B02C79429E0097A966 /* MemoryImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryImageView.swift; sourceTree = "<group>"; };
 		5083738F2C7D73C8004291AA /* PullList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5012C7972D13B8E5003964C5 /* Supporting Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Supporting Views"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		5011BBB52C63159200A82219 /* Frameworks */ = {
@@ -152,6 +156,7 @@
 		5011BBDC2C631B6800A82219 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
+				5012C7972D13B8E5003964C5 /* Supporting Views */,
 				5011BBD52C631B3B00A82219 /* InventoryViewModel.swift */,
 				5011BBCD2C631AF600A82219 /* InventoryView.swift */,
 				5011BC2E2C75525F00A82219 /* InventoryItemView.swift */,
@@ -239,6 +244,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5012C7972D13B8E5003964C5 /* Supporting Views */,
 			);
 			name = RedDoor;
 			packageProductDependencies = (
