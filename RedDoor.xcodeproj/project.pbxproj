@@ -35,6 +35,7 @@
 		5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC142C70FE1F00A82219 /* ScanItemView.swift */; };
 		5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */; };
 		5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2E2C75525F00A82219 /* InventoryItemView.swift */; };
+		5012C7CF2D165BD8003964C5 /* AddedImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7CE2D165BD8003964C5 /* AddedImagesView.swift */; };
 		501B59A22C7811460097A966 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A12C7811460097A966 /* AddItemView.swift */; };
 		501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */; };
 		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
@@ -66,6 +67,7 @@
 		5011BC142C70FE1F00A82219 /* ScanItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemView.swift; sourceTree = "<group>"; };
 		5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemViewModel.swift; sourceTree = "<group>"; };
 		5011BC2E2C75525F00A82219 /* InventoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemView.swift; sourceTree = "<group>"; };
+		5012C7CE2D165BD8003964C5 /* AddedImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddedImagesView.swift; sourceTree = "<group>"; };
 		501B59A12C7811460097A966 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
 		501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModelProvider.swift; sourceTree = "<group>"; };
 		501B59AE2C7942270097A966 /* CachedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImageView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5012C7972D13B8E5003964C5 /* Supporting Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Supporting Views"; sourceTree = "<group>"; };
+		5012C7CB2D1657B6003964C5 /* Styles */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Styles; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +119,7 @@
 		5011BBBA2C63159200A82219 /* RedDoor */ = {
 			isa = PBXGroup;
 			children = (
+				5012C7CB2D1657B6003964C5 /* Styles */,
 				5011BBBB2C63159200A82219 /* RedDoorApp.swift */,
 				5011BBBD2C63159200A82219 /* ContentView.swift */,
 				5011BC132C70FE1200A82219 /* ScanItem */,
@@ -223,6 +227,7 @@
 			children = (
 				501B59AE2C7942270097A966 /* CachedImageView.swift */,
 				501B59B02C79429E0097A966 /* MemoryImageView.swift */,
+				5012C7CE2D165BD8003964C5 /* AddedImagesView.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -244,6 +249,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				5012C7972D13B8E5003964C5 /* Supporting Views */,
+				5012C7CB2D1657B6003964C5 /* Styles */,
 			);
 			name = RedDoor;
 			packageProductDependencies = (
@@ -319,6 +325,7 @@
 			files = (
 				5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */,
 				501B59AF2C7942270097A966 /* CachedImageView.swift in Sources */,
+				5012C7CF2D165BD8003964C5 /* AddedImagesView.swift in Sources */,
 				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ItemView.swift in Sources */,
