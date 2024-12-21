@@ -34,7 +34,6 @@
 		5011BC092C6BD64900A82219 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC082C6BD64900A82219 /* ItemView.swift */; };
 		5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC142C70FE1F00A82219 /* ScanItemView.swift */; };
 		5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */; };
-		5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC182C739D6400A82219 /* CombinedImagePicker.swift */; };
 		5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2E2C75525F00A82219 /* InventoryItemView.swift */; };
 		501B59A22C7811460097A966 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A12C7811460097A966 /* AddItemView.swift */; };
 		501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */; };
@@ -66,7 +65,6 @@
 		5011BC082C6BD64900A82219 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
 		5011BC142C70FE1F00A82219 /* ScanItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemView.swift; sourceTree = "<group>"; };
 		5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemViewModel.swift; sourceTree = "<group>"; };
-		5011BC182C739D6400A82219 /* CombinedImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedImagePicker.swift; sourceTree = "<group>"; };
 		5011BC2E2C75525F00A82219 /* InventoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemView.swift; sourceTree = "<group>"; };
 		501B59A12C7811460097A966 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
 		501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModelProvider.swift; sourceTree = "<group>"; };
@@ -205,7 +203,6 @@
 			children = (
 				501B59B32C7942B70097A966 /* SupportingViews */,
 				5011BC082C6BD64900A82219 /* ItemView.swift */,
-				5011BC182C739D6400A82219 /* CombinedImagePicker.swift */,
 				501B59A12C7811460097A966 /* AddItemView.swift */,
 				501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */,
 			);
@@ -325,7 +322,6 @@
 				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ItemView.swift in Sources */,
-				5011BC192C739D6400A82219 /* CombinedImagePicker.swift in Sources */,
 				5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */,
 				501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
@@ -479,6 +475,9 @@
 				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera in case you want to take photos of the items you're creating from directly within the app.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "When creating an item in the app, if you use the camera to assign an item an image, it will be useful to save it to your photo library in case the image needs to be shared.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "When creating an item in the app, we need access to the photo library in case you want to assign pre-taken photos to an item.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -508,6 +507,9 @@
 				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera in case you want to take photos of the items you're creating from directly within the app.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "When creating an item in the app, if you use the camera to assign an item an image, it will be useful to save it to your photo library in case the image needs to be shared.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "When creating an item in the app, we need access to the photo library in case you want to assign pre-taken photos to an item.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
