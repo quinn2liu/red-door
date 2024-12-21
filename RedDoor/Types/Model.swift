@@ -28,7 +28,7 @@ struct Model: Identifiable, Codable, Hashable {
         primaryColor: String = "Red",
         primaryMaterial: String = "Wood",
         imageIDs: [String] = [],
-        imageURLDict: [String: String] = [String: String](),
+        imageURLDict: [String: String] = [String: String](), // [imageID : imageURL]
         count: Int = 1,
         id: String = UUID().uuidString) {
         self.name = name

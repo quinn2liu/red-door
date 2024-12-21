@@ -100,6 +100,33 @@ class SharedViewModel {
         }
     }
     
+    func updateModelUIImagesFirebase(images: [UIImage]) async {
+        for (index, image) in images.enumerated() {
+            let imageID = "\(selectedModel.id)-\(index)"
+            let imageRef = storageRef.child(imageID)
+            selectedModel.imageIDs.append(imageID)
+            
+            // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
+            guard let imageData = image.jpegData(compressionQuality: 0.3) else {
+                print("Error converting UIImage to jpegData")
+                return
+            }
+            
+            let metaData = StorageMetadata()
+            metaData.contentType = "image/jpeg"
+
+            do {
+                let resultMetaData = try await imageRef.putDataAsync(imageData, metadata: metaData)
+                print("Upload finished. Metadata: \(resultMetaData)")
+                let imageURL = try await imageRef.downloadURL().absoluteString
+                print("imageURL = \(imageURL)")
+                selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
+            } catch {
+                print("Error occurred when uploading image \(error.localizedDescription)")
+            }
+        }
+    }
+    
     var colorOptions: [String] = [
         "Black",
         "White",

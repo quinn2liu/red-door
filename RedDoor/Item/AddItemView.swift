@@ -68,56 +68,11 @@ struct AddItemView: View {
                         }
                         .frame(maxWidth: .infinity)
                             
-                    if (!images.isEmpty) {
-                        AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen)
-                            .padding(.top, 8)
+                        if (!images.isEmpty) {
+                            AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen)
+                                .padding(.top, 8)
+                        }
                     }
-                }
-                    
-    //                VStack {
-    //                    ScrollView(.horizontal, showsIndicators: false) {
-    //                        HStack(spacing: 16) {
-    //                            if (!selectedImages.isEmpty) {
-    //                                ForEach(Array(selectedImages.keys), id: \.self) { imageName in
-    //                                    if let image = selectedImages[imageName] {
-    //                                        Image(uiImage: image)
-    //                                            .resizable()
-    //                                            .scaledToFill()
-    //                                            .frame(width: 200, height: 200)
-    //                                            .background(Color(.systemGray5))
-    //                                            .clipShape(RoundedRectangle(cornerRadius: 20))
-    //                                    } else {
-    //                                        Text("Unable to load image")
-    //                                        Image("photo.badge.exclamationmark")
-    //                                    }
-    //                                }
-    //                            }
-    //                            PhotosPicker(selection: $selectedItems, maxSelectionCount: 3, matching: .any(of: [.images, .not(.screenshots)])) {
-    //                                Label(selectedItems.count <= 2 ? "Select a photo" : "Edit photos", systemImage: "photo")
-    //                            }
-    //                            .frame(width: 200, height: 200)
-    //                            .background(Color(.systemGray5))
-    //                            .clipShape(RoundedRectangle(cornerRadius: 20))
-    //                        }
-    //                    }
-    //                    .padding(.vertical, 10)
-    //                }
-    //                .onChange(of: selectedItems) {
-    //                    Task {
-    //                        selectedImages.removeAll()
-    //                        viewModel.selectedModel.imageIDs = []
-    //                        for (index, photoPickerItem) in selectedItems.enumerated() {
-    //                            if let data = try? await photoPickerItem.loadTransferable(type: Data.self) {
-    //                                if let loadedImage = UIImage(data: data) {
-    //                                    let imageID = viewModel.selectedModel.id + "-\(index)"
-    //                                    viewModel.selectedModel.imageIDs.append(imageID)
-    //                                    selectedImages[imageID] = loadedImage
-    //                                    print("imageID: \(imageID)")
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-    //                }
                 }
                     
                 Section(header: Text("Options")) {
@@ -189,7 +144,7 @@ struct AddItemView: View {
                 Spacer()
                 Button("Add Item to Inventory") {
                     Task {
-                        await viewModel.updateModelImagesFirebase(imageDict: selectedImages)
+                        await viewModel.updateModelUIImagesFirebase(images: images)
                         await withCheckedContinuation { continuation in
                             viewModel.updateModelDataFirebase()
                             continuation.resume()
