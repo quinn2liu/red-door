@@ -113,8 +113,7 @@ struct AddItemView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     TextField("Item Name", text: $viewModel.selectedModel.name)
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 8)
+                    .padding(6)
                     .foregroundStyle(isImageFullScreen ? Color.white : Color.black)
                     .background(isImageFullScreen ? Color.black.opacity(0.0) : Color(.systemGray5))
                     .cornerRadius(8)
@@ -207,9 +206,17 @@ struct ImagePickerWrapper: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
+                UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
                 parent.images.append(image) // Append to the array
             }
             parent.isPresented = false
+        }
+        
+        @objc func image(_ image: UIImage,
+            didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+            if let error = error {
+                print("ERROR: \(error)")
+            }
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {

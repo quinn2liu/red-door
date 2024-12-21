@@ -15,17 +15,23 @@ struct CachedImageView: View {
     var body: some View {
         ForEach(Array(imageURLDict), id: \.value) { (imageID, imageURL) in
             CachedAsyncImage(url: URL(string: imageURL)) { phase in
-                if let image = phase.image {
+
+                switch phase {
+                case .empty:
+                    ProgressView()
+                case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
                         .frame(width: 200, height: 200)
                         .background(Color(.systemGray5))
                         .clipShape(RoundedRectangle(cornerRadius: 20))
-                } else if phase.error != nil {
+                    
+                case .failure:
                     Text("Error loading image.")
-                } else {
-                    Text("Loading image.")
+                    
+                @unknown default:
+                    Text("Error loading image.")
                 }
             }
         }
