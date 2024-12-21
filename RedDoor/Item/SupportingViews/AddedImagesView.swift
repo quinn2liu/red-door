@@ -15,6 +15,7 @@ struct AddedImagesView: View {
     
     @Binding var selectedImage: UIImage?
     @Binding var isImageFullScreen: Bool
+    @Binding var isEditing: Bool
     
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
@@ -31,20 +32,22 @@ struct AddedImagesView: View {
                             selectedImage = images[index]
                             isImageFullScreen = true
                         }
-                    
-                    Button(action: {
-                        selectedImageIndex = index
-                        showDeleteConfirmation = true
-                    }) {
-                        Image(systemName: "xmark.circle.fill") // X icon
-                            .foregroundColor(.gray)
-                            .background(.white)
-                            .font(.system(size: 16))
-                            .clipShape(Circle())
-                            .padding(.top, -8)
-                            .padding(.trailing, -8)
+                    if (isEditing) {
+                        Button(action: {
+                            selectedImageIndex = index
+                            showDeleteConfirmation = true
+                        }) {
+                            Image(systemName: "xmark.circle.fill") // X icon
+                                .foregroundColor(.gray)
+                                .background(.white)
+                                .font(.system(size: 16))
+                                .clipShape(Circle())
+                                .padding(.top, -8)
+                                .padding(.trailing, -8)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    
                 }
                 
             }

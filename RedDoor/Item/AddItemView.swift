@@ -11,8 +11,6 @@ import PhotosUI
 struct AddItemView: View {
     
     @State private var viewModel: ViewModel = ViewModel()
-    @State private var selectedItems: [PhotosPickerItem] = [PhotosPickerItem]()
-    @State private var selectedImages: [String: UIImage] = [:]
     @Environment(\.dismiss) var dismiss
 
     @State private var isImagePickerPresented = false
@@ -21,14 +19,12 @@ struct AddItemView: View {
     
     @State private var selectedImage: UIImage?
     @State private var isImageFullScreen: Bool = false
+    @State private var isEditing: Bool = true
     
     var body: some View {
     
         VStack {
             Form {
-    //            Section(header: Text("Name")) {
-    //                TextField("Item Name", text: $viewModel.selectedModel.name)
-    //            }
                 Section(header: Text("Images")) {
                     
                     VStack {
@@ -69,7 +65,7 @@ struct AddItemView: View {
                         .frame(maxWidth: .infinity)
                             
                         if (!images.isEmpty) {
-                            AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen)
+                            AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                                 .padding(.top, 8)
                         }
                     }
@@ -177,52 +173,6 @@ struct AddItemView: View {
     }
     
     
-}
-
-struct ImagePickerWrapper: UIViewControllerRepresentable {
-    @Binding var images: [UIImage]
-    @Binding var isPresented: Bool
-    var sourceType: UIImagePickerController.SourceType
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = sourceType
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: ImagePickerWrapper
-
-        init(_ parent: ImagePickerWrapper) {
-            self.parent = parent
-        }
-
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
-                parent.images.append(image) // Append to the array
-            }
-            parent.isPresented = false
-        }
-        
-        @objc func image(_ image: UIImage,
-            didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-            if let error = error {
-                print("ERROR: \(error)")
-            }
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.isPresented = false
-        }
-    }
 }
 
 #Preview {
