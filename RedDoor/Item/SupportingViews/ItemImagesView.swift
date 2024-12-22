@@ -1,5 +1,5 @@
 //
-//  AddedImagesView.swift
+//  ItemImagesView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 12/20/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddedImagesView: View {
+struct ItemImagesView: View {
     
     @Binding var images: [UIImage]
     @State private var showDeleteConfirmation: Bool = false

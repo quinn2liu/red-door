@@ -38,7 +38,7 @@ struct ItemView: View {
                     if (isEditing) {
                         AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                     }
-                    AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ItemImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                 }
 
                 Section("Details"){

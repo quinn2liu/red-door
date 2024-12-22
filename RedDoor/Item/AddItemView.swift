@@ -32,7 +32,7 @@ struct AddItemView: View {
                         AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                             
                         if (!images.isEmpty) {
-                            AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                            ItemImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                                 .padding(.top, 8)
                         }
                     }
