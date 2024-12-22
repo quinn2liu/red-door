@@ -101,6 +101,11 @@ class SharedViewModel {
     }
     
     func updateModelUIImagesFirebase(images: [UIImage]) async {
+        
+        if (images.count != selectedModel.imageURLDict.count) {
+            // THIS IS THE ISSUE ! ! !
+        }
+        
         for (index, image) in images.enumerated() {
             let imageID = "\(selectedModel.id)-\(index)"
             let imageRef = storageRef.child(imageID)

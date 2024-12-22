@@ -36,13 +36,12 @@
 		5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */; };
 		5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011BC2E2C75525F00A82219 /* InventoryItemView.swift */; };
 		5012C7CF2D165BD8003964C5 /* AddedImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7CE2D165BD8003964C5 /* AddedImagesView.swift */; };
-		5012C7D12D17741A003964C5 /* CachedImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7D02D17741A003964C5 /* CachedImagesView.swift */; };
 		5012C7DF2D178BBD003964C5 /* ImagePickerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7DE2D178BBD003964C5 /* ImagePickerWrapper.swift */; };
+		5012C7E32D17935F003964C5 /* ItemDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7E22D17935F003964C5 /* ItemDetailsView.swift */; };
+		5012C7E52D17953E003964C5 /* AddImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7E42D17953E003964C5 /* AddImagesView.swift */; };
 		501B59A22C7811460097A966 /* AddItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A12C7811460097A966 /* AddItemView.swift */; };
 		501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */; };
 		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
-		501B59AF2C7942270097A966 /* CachedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59AE2C7942270097A966 /* CachedImageView.swift */; };
-		501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59B02C79429E0097A966 /* MemoryImageView.swift */; };
 		508373902C7D73C8004291AA /* PullList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5083738F2C7D73C8004291AA /* PullList.swift */; };
 /* End PBXBuildFile section */
 
@@ -70,12 +69,11 @@
 		5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanItemViewModel.swift; sourceTree = "<group>"; };
 		5011BC2E2C75525F00A82219 /* InventoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemView.swift; sourceTree = "<group>"; };
 		5012C7CE2D165BD8003964C5 /* AddedImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddedImagesView.swift; sourceTree = "<group>"; };
-		5012C7D02D17741A003964C5 /* CachedImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImagesView.swift; sourceTree = "<group>"; };
 		5012C7DE2D178BBD003964C5 /* ImagePickerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerWrapper.swift; sourceTree = "<group>"; };
+		5012C7E22D17935F003964C5 /* ItemDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailsView.swift; sourceTree = "<group>"; };
+		5012C7E42D17953E003964C5 /* AddImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddImagesView.swift; sourceTree = "<group>"; };
 		501B59A12C7811460097A966 /* AddItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemView.swift; sourceTree = "<group>"; };
 		501B59A72C7816E30097A966 /* ItemViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModelProvider.swift; sourceTree = "<group>"; };
-		501B59AE2C7942270097A966 /* CachedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImageView.swift; sourceTree = "<group>"; };
-		501B59B02C79429E0097A966 /* MemoryImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryImageView.swift; sourceTree = "<group>"; };
 		5083738F2C7D73C8004291AA /* PullList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -230,10 +228,9 @@
 		501B59B32C7942B70097A966 /* SupportingViews */ = {
 			isa = PBXGroup;
 			children = (
-				501B59AE2C7942270097A966 /* CachedImageView.swift */,
-				501B59B02C79429E0097A966 /* MemoryImageView.swift */,
 				5012C7CE2D165BD8003964C5 /* AddedImagesView.swift */,
-				5012C7D02D17741A003964C5 /* CachedImagesView.swift */,
+				5012C7E22D17935F003964C5 /* ItemDetailsView.swift */,
+				5012C7E42D17953E003964C5 /* AddImagesView.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -329,22 +326,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5012C7E32D17935F003964C5 /* ItemDetailsView.swift in Sources */,
 				5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */,
-				501B59AF2C7942270097A966 /* CachedImageView.swift in Sources */,
 				5012C7CF2D165BD8003964C5 /* AddedImagesView.swift in Sources */,
 				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ItemView.swift in Sources */,
 				5011BC2F2C75525F00A82219 /* InventoryItemView.swift in Sources */,
-				501B59B12C79429E0097A966 /* MemoryImageView.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
+				5012C7E52D17953E003964C5 /* AddImagesView.swift in Sources */,
 				501B59A82C7816E30097A966 /* ItemViewModelProvider.swift in Sources */,
 				508373902C7D73C8004291AA /* PullList.swift in Sources */,
 				5011BBD82C631B4100A82219 /* PullListViewModel.swift in Sources */,
 				5011BBE02C631D2F00A82219 /* InstalledListViewModel.swift in Sources */,
 				5011BBD42C631B3300A82219 /* HomeViewModel.swift in Sources */,
 				5011BC012C6BCEDF00A82219 /* Model.swift in Sources */,
-				5012C7D12D17741A003964C5 /* CachedImagesView.swift in Sources */,
 				5011BBCC2C631AEB00A82219 /* HomeView.swift in Sources */,
 				5011BC152C70FE1F00A82219 /* ScanItemView.swift in Sources */,
 				5011BBBE2C63159200A82219 /* ContentView.swift in Sources */,

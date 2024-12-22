@@ -12,10 +12,11 @@ struct AddItemView: View {
     
     @State private var viewModel: ViewModel = ViewModel()
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
 
     @State private var isImagePickerPresented = false
-    @State private var images: [UIImage] = [] // Array to store multiple images
     @State private var sourceType: UIImagePickerController.SourceType?
+    @State private var images: [UIImage] = [] // Array to store multiple images
     
     @State private var selectedImage: UIImage?
     @State private var isImageFullScreen: Bool = false
@@ -28,41 +29,7 @@ struct AddItemView: View {
                 Section(header: Text("Images")) {
                     
                     VStack {
-                        HStack {
-                            
-                            HStack {
-                                Image(systemName: "photo")
-                                Text("Album")
-                            }
-                            .transparentButtonStyle(backgroundColor: .clear, foregroundColor: .blue)
-                            .padding(.horizontal)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue.opacity(0.2))
-                            .cornerRadius(8)
-                            .onTapGesture {
-                                sourceType = .photoLibrary
-                                isImagePickerPresented = true
-                            }
-                            
-                            Spacer()
-                            
-                            HStack {
-                                Image(systemName: "camera")
-                                Text("Camera")
-                            }
-                            .transparentButtonStyle(backgroundColor: .clear, foregroundColor: .gray)
-                            .padding(.horizontal)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                            .onTapGesture {
-                                
-                                sourceType = .camera
-                                isImagePickerPresented = true
-                            }
-                            
-                        }
-                        .frame(maxWidth: .infinity)
+                        AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                             
                         if (!images.isEmpty) {
                             AddedImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
@@ -72,46 +39,14 @@ struct AddItemView: View {
                 }
                     
                 Section(header: Text("Options")) {
-                    Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
-                        ForEach(viewModel.colorOptions, id: \.self) { option in
-                            HStack {
-                                Text(option)
-                                Image(systemName: "circle.fill")
-                                    .foregroundStyle(viewModel.colorMap[option] ?? .black)
-                                    .overlay(
-                                        Image(systemName: "circle")
-                                            .foregroundColor(.black.opacity(0.5))
-                                    )
-                            }
-                        }
-                    }
-                    .pickerStyle(.navigationLink)
-                        
-                        
-                    Picker("Item Type", selection: $viewModel.selectedModel.type) {
-                        ForEach(viewModel.typeOptions, id: \.self) { option in
-                            HStack {
-                                Text("\(option)")
-                                Image(systemName: viewModel.typeMap[option] ?? "camera.metering.unknown")
-                            }
-                        }
-                    }
-                            
-                    Picker("Material", selection: $viewModel.selectedModel.primaryMaterial) {
-                        ForEach(viewModel.materialOptions, id: \.self) { material in
-                            Text(material)
-                        }
-                    }
-                    
-                    Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
+                    ItemDetailsView(isEditing: $isEditing, viewModel: $viewModel)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     TextField("Item Name", text: $viewModel.selectedModel.name)
                     .padding(6)
-                    .foregroundStyle(isImageFullScreen ? Color.white : Color.black)
-                    .background(isImageFullScreen ? Color.black.opacity(0.0) : Color(.systemGray5))
+                    .background(isImageFullScreen ? Color.clear : Color(.systemGray5))
                     .cornerRadius(8)
                     .multilineTextAlignment(.center)
                 }
@@ -169,7 +104,7 @@ struct AddItemView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
-            )
+        )
     }
     
     
