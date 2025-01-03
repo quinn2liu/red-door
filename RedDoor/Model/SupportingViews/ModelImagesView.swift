@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ItemImagesView: View {
+struct ModelImagesView: View {
     
     @Binding var images: [UIImage]
     @State private var showDeleteConfirmation: Bool = false
@@ -73,5 +73,5 @@ struct ItemImagesView: View {
 
 //
 //#Preview {
-//    AddedImagesView()
+//    ModelImagesView()
 //}

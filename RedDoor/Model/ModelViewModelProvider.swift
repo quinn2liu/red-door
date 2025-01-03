@@ -14,11 +14,13 @@ import FirebaseStorage
 
 
 @Observable
-class SharedItemViewModel {
+class SharedModelViewModel {
     let db = Firestore.firestore()
     let storageRef = Storage.storage().reference().child("model_images")
     
     var selectedModel: Model
+    
+    var images: [UIImage] = []
     
     init(selectedModel: Model = Model()) {
         self.selectedModel = selectedModel
@@ -83,7 +85,7 @@ class SharedItemViewModel {
                         }
                     }
                 }
-                    
+                
                 try await group.waitForAll()
             }
         } catch {
@@ -138,6 +140,31 @@ class SharedItemViewModel {
             }
         } catch {
             print("Error updating images: \(error.localizedDescription)")
+        }
+    }
+    
+    func loadImages() {
+        let dispatchGroup = DispatchGroup()
+        var loadedImages: [UIImage] = []
+        
+        for (_, urlString) in selectedModel.imageURLDict {
+            guard let url = URL(string: urlString) else { continue }
+            print("Attempting to load imageURL: \(urlString)")
+            dispatchGroup.enter()
+            
+            URLSession.shared.dataTask(with: url) { data, _, error in
+                defer { dispatchGroup.leave() }
+                
+                if let data = data, let image = UIImage(data: data) {
+                    loadedImages.append(image)
+                } else {
+                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
+                }
+            }.resume()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.images = loadedImages
         }
     }
     
@@ -217,13 +244,13 @@ class SharedItemViewModel {
         "Cane",
         "Stainless Steel"
     ]
-
+    
 }
 
-extension ItemView  {
-    typealias ViewModel = SharedItemViewModel
+extension ModelView  {
+    typealias ViewModel = SharedModelViewModel
 }
 
-extension AddItemView  {
-    typealias ViewModel = SharedItemViewModel
+extension CreateModelView  {
+    typealias ViewModel = SharedModelViewModel
 }

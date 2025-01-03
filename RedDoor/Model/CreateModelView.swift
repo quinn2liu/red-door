@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 
-struct AddItemView: View {
+struct CreateModelView: View {
     
     @State private var viewModel: ViewModel = ViewModel()
     @Environment(\.dismiss) var dismiss
@@ -32,14 +32,14 @@ struct AddItemView: View {
                         AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                             
                         if (!images.isEmpty) {
-                            ItemImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                            ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                                 .padding(.top, 8)
                         }
                     }
                 }
                     
                 Section(header: Text("Options")) {
-                    ItemDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                    ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
                 }
             }
             .toolbar {
@@ -111,5 +111,5 @@ struct AddItemView: View {
 }
 
 #Preview {
-    AddItemView()
+    CreateModelView()
 }
