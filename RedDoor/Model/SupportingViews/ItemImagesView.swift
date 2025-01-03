@@ -1,5 +1,5 @@
 //
-//  AddedImagesView.swift
+//  ItemImagesView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 12/20/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddedImagesView: View {
+struct ItemImagesView: View {
     
     @Binding var images: [UIImage]
     @State private var showDeleteConfirmation: Bool = false
@@ -64,16 +64,12 @@ struct AddedImagesView: View {
     
     private func deletePhoto() {
         if let index = selectedImageIndex {
-            print("# images before delete: \(images.count)")
             images.remove(at: index)
-            print("# images after delete: \(images.count)")
         }
     }
 }
 
-struct AddedImageView {
-    
-}
+
 
 //
 //#Preview {
