@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct InventoryItemView: View {
+struct InventoryItemListView: View {
     
     var model: Model
     
@@ -28,5 +28,5 @@ struct InventoryItemView: View {
 }
 
 #Preview {
-    InventoryItemView(model: Model())
+    InventoryItemListView(model: Model())
 }

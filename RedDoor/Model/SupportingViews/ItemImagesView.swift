@@ -64,16 +64,12 @@ struct ItemImagesView: View {
     
     private func deletePhoto() {
         if let index = selectedImageIndex {
-            print("# images before delete: \(images.count)")
             images.remove(at: index)
-            print("# images after delete: \(images.count)")
         }
     }
 }
 
-struct AddedImageView {
-    
-}
+
 
 //
 //#Preview {

@@ -40,9 +40,8 @@ extension InventoryView {
                 }
             }
             
-            func stopListening() {
-                listener?.remove()
-            }
-
+        func stopListening() {
+            listener?.remove()
+        }
     }
 }

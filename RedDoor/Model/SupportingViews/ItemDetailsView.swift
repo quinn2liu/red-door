@@ -10,7 +10,7 @@ import SwiftUI
 struct ItemDetailsView: View {
     
     @Binding var isEditing: Bool
-    @Binding var viewModel: SharedViewModel
+    @Binding var viewModel: SharedItemViewModel
     
     var body: some View {
         if (isEditing) {

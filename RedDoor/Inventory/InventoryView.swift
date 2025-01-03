@@ -11,13 +11,26 @@ struct InventoryView: View {
     
     @State private var viewModel = ViewModel()
     @State private var modelsArray: [Model] = []
-    @State private var isEditing = false
+    @Binding var isEditing: Bool
     var TESTMODEL = Model()
-    @State private var path = NavigationPath()
+    @State private var path: NavigationPath = NavigationPath()
+    @Binding var searchText: String  // Add this
+    
+    var filteredModels: [Model] {
+        if searchText.isEmpty {
+            return modelsArray
+        } else {
+            return modelsArray.filter { model in
+                // Modify this based on what properties you want to search
+                model.name.localizedCaseInsensitiveContains(searchText)
+                // Add other properties as needed
+            }
+        }
+    }
 
     var body: some View {
-        VStack(spacing: 0) {
-            NavigationStack(path: $path) {
+        NavigationStack(path: $path) {
+            VStack(spacing: 0) {
                 HStack {
                     ZStack {
                         Menu {
@@ -31,9 +44,9 @@ struct InventoryView: View {
                             }
                         } label: {
                             Image(systemName: "ellipsis")
-                                .padding(.horizontal)
                         }
                         .frame(maxWidth: .infinity,  alignment: .topTrailing)
+                        .padding(.horizontal)
                         
                         Text("Inventory")
                             .font(.system(.title2, design: .default))
@@ -44,38 +57,34 @@ struct InventoryView: View {
                 .padding(.bottom)
                 
                 InventoryLegendView()
-
+                
                 List {
-                    ForEach(modelsArray) { model in
+                    ForEach(filteredModels) { model in
                         NavigationLink(value: model) {
-                            InventoryItemView(model: model)
+                            InventoryItemListView(model: model)
                         }
                     }
                 }
-                .navigationDestination(for: Model.self) { model in
-                    ItemView(path: $path, model: model, isEditing: $isEditing)
-                }
-                .onAppear {
-                    viewModel.getInventoryModels { fetchedModels in
-                        self.modelsArray = fetchedModels
-                    }
-                }
-                
-
+                .searchable(text: $searchText, prompt: "Search inventory")
             }
-            .navigationViewStyle(StackNavigationViewStyle())
-            .padding(.bottom)
-        }
-        .onAppear {
-            isEditing = false
-        }
-        .onDisappear {
-            viewModel.stopListening()
+            .onAppear {
+                isEditing = false
+                viewModel.getInventoryModels { fetchedModels in
+                    self.modelsArray = fetchedModels
+                }
+            }
+            .onDisappear {
+                viewModel.stopListening()
+            }
+            .navigationDestination(for: Model.self) { model in
+                ItemView(path: $path, model: model, isEditing: $isEditing)
+            }
+            
         }
     }
-        
+    
 }
 
-#Preview {
-    InventoryView()
-}
+//#Preview {
+//    InventoryView()
+//}

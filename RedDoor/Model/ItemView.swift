@@ -28,13 +28,12 @@ struct ItemView: View {
         self.viewModel = ViewModel(selectedModel: model)
         self._path = path
         self._isEditing = isEditing
-//        self.selectedImagesURLs = model.imageURLDict
     }
 
     var body: some View {
         VStack {
             Form {
-                Section("Images"){
+                Section("Images") {
                     if (isEditing) {
                         AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                     }
@@ -73,7 +72,6 @@ struct ItemView: View {
                         if (isEditing) { // edit mode -> view mode
                             isEditing = false
                             Task {
-//                                await viewModel.updateModelImagesFirebase(imageDict: selectedImages)
                                 await viewModel.updateModelUIImagesFirebase(images: images)
                                 await withCheckedContinuation { continuation in
                                     viewModel.updateModelDataFirebase()
@@ -103,16 +101,7 @@ struct ItemView: View {
                             primaryButton: .cancel(Text("Cancel")),
                             secondaryButton: .destructive(Text("Delete")) {
                                 Task {
-                                    try await withThrowingTaskGroup(of: Void.self) { group in
-                                        group.addTask {
-                                            await viewModel.deleteModelImagesFirebase()
-                                        }
-                                        group.addTask {
-                                            await viewModel.deleteModelFirebase()
-                                            
-                                        }
-                                        try await group.waitForAll()
-                                    }
+                                    await viewModel.deleteModelFirebase()
                                     path = NavigationPath()
                                     isEditing = false
                                 }
@@ -126,7 +115,6 @@ struct ItemView: View {
                             
                         }
                     }
-                    
                 }
             }
             .padding(.top) // delete button
@@ -178,6 +166,7 @@ struct ItemView: View {
         
         for (_, urlString) in imageURLDict {
             guard let url = URL(string: urlString) else { continue }
+            print("attempting to load imageURL: \(urlString)")
             dispatchGroup.enter()
             
             URLSession.shared.dataTask(with: url) { data, _, error in
