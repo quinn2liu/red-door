@@ -34,7 +34,7 @@ struct InventoryView: View {
                 HStack {
                     ZStack {
                         Menu {
-                            NavigationLink(destination: AddItemView()) {
+                            NavigationLink(destination: CreateModelView()) {
                                 Text("Add Item")
                                 Image(systemName: "plus")
                             }
@@ -77,7 +77,7 @@ struct InventoryView: View {
                 viewModel.stopListening()
             }
             .navigationDestination(for: Model.self) { model in
-                ItemView(path: $path, model: model, isEditing: $isEditing)
+                ModelView(path: $path, model: model, isEditing: $isEditing)
             }
             
         }

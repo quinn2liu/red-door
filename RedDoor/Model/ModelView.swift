@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 import CachedAsyncImage
 
-struct ItemView: View {
+struct ModelView: View {
     
     @State private var viewModel: ViewModel
     @Binding var path: NavigationPath
@@ -17,7 +17,7 @@ struct ItemView: View {
     
     @State private var showingDeleteAlert = false
     
-    @State private var images: [UIImage] = []
+//    @State private var images: [UIImage] = []
     @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen: Bool = false
     @State private var isImagePickerPresented = false
@@ -35,13 +35,13 @@ struct ItemView: View {
             Form {
                 Section("Images") {
                     if (isEditing) {
-                        AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
+                        AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                     }
-                    ItemImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                 }
 
                 Section("Details"){
-                    ItemDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                    ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
                 }
             }
             .toolbar {
@@ -72,7 +72,7 @@ struct ItemView: View {
                         if (isEditing) { // edit mode -> view mode
                             isEditing = false
                             Task {
-                                await viewModel.updateModelUIImagesFirebase(images: images)
+                                await viewModel.updateModelUIImagesFirebase(images: viewModel.images)
                                 await withCheckedContinuation { continuation in
                                     viewModel.updateModelDataFirebase()
                                     continuation.resume()
@@ -123,14 +123,14 @@ struct ItemView: View {
         .sheet(isPresented: $isImagePickerPresented) {
             if sourceType == .camera {
                 ImagePickerWrapper(
-                    images: $images,
+                    images: $viewModel.images,
                     isPresented: $isImagePickerPresented,
                     sourceType: .camera
                 )
                 .background(Color.black)
             } else {
                 ImagePickerWrapper(
-                    images: $images,
+                    images: $viewModel.images,
                     isPresented: $isImagePickerPresented,
                     sourceType: .photoLibrary
                 )
@@ -155,35 +155,10 @@ struct ItemView: View {
             .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
         .onAppear {
-            loadImages(from: viewModel.selectedModel.imageURLDict)
+            viewModel.loadImages()
         }
     
     } // view
-    
-    private func loadImages(from imageURLDict: [String:String]) {
-        let dispatchGroup = DispatchGroup()
-        var loadedImages: [UIImage] = []
-        
-        for (_, urlString) in imageURLDict {
-            guard let url = URL(string: urlString) else { continue }
-            print("attempting to load imageURL: \(urlString)")
-            dispatchGroup.enter()
-            
-            URLSession.shared.dataTask(with: url) { data, _, error in
-                defer { dispatchGroup.leave() }
-                
-                if let data = data, let image = UIImage(data: data) {
-                    loadedImages.append(image)
-                } else {
-                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
-                }
-            }.resume()
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            images = loadedImages
-        }
-    }
     
 } // struct
     
