@@ -210,7 +210,9 @@ class SharedModelViewModel {
         "Table",
         "Couch",
         "Lamp",
-        "Art"
+        "Art",
+        "Decor",
+        "Miscellaneous"
     ]
     
     var typeMap: [String: String] = [

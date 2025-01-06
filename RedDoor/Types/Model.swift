@@ -10,7 +10,6 @@ import SwiftUI
 
 struct Model: Identifiable, Codable, Hashable {
     
-    
     var name: String
     var item_ids: [Int]
     var type: String

@@ -1,13 +1,17 @@
 import SwiftUI
 
+
 struct InventoryView: View {
     
     @State private var viewModel = ViewModel()
     @State private var modelsArray: [Model] = []
-    @Binding var isEditing: Bool
-    var TESTMODEL = Model()
     @State private var path: NavigationPath = NavigationPath()
-    @Binding var searchText: String
+    @State var searchText: String = ""
+    @State var isEditing: Bool = false
+    
+    @State var activeType: ModelType?
+    var TESTMODEL = Model()
+    
     
     var filteredModels: [Model] {
         if searchText.isEmpty {
@@ -21,8 +25,8 @@ struct InventoryView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 0) {
-                InventoryLegendView()
+            VStack{
+                InventoryFilterView(activeType: $activeType)
                 
                 List {
                     ForEach(filteredModels) { model in
@@ -45,8 +49,13 @@ struct InventoryView: View {
             .navigationDestination(for: Model.self) { model in
                 ModelView(path: $path, model: model, isEditing: $isEditing)
             }
-            .navigationTitle("Inventory") // Set as the navigation title
             .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    Text("Inventory")
+                        .font(.system(.title2, design: .default))
+                        .bold()
+                        .foregroundStyle(.red)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         NavigationLink(destination: CreateModelView()) {
@@ -64,6 +73,6 @@ struct InventoryView: View {
     }
 }
 
-//#Preview {
-//    InventoryView()
-//}
+#Preview {
+    InventoryView()
+}
