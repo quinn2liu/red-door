@@ -9,7 +9,9 @@ struct InventoryView: View {
     @State var searchText: String = ""
     @State var isEditing: Bool = false
     
-    @State var activeType: ModelType?
+    @State var selectedType: ModelType?
+    
+    private let fetchLimit = 20
     var TESTMODEL = Model()
     
     
@@ -26,25 +28,39 @@ struct InventoryView: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
-                InventoryFilterView(activeType: $activeType)
+                InventoryFilterView(selectedType: $selectedType)
                 
                 List {
-                    ForEach(filteredModels) { model in
+                    ForEach(filteredModels.indices, id: \.self) { index in
+                        let model = modelsArray[index]
                         NavigationLink(value: model) {
                             InventoryItemListView(model: model)
                         }
+//                        .onAppear {
+//                            if index == filteredModels.count - 1 {
+//                                loadMoreItems()
+//                            }
+//                        }
                     }
                 }
             }
-            .searchable(text: $searchText, prompt: "Search inventory")
+            
+            .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
             .onAppear {
                 isEditing = false
-                viewModel.getInventoryModels { fetchedModels in
+                viewModel.getInventoryModels(selectedType: selectedType) { fetchedModels in
                     self.modelsArray = fetchedModels
                 }
+//                viewModel.resetPagination()
+//                loadMoreItems()
             }
             .onDisappear {
                 viewModel.stopListening()
+            }
+            .onChange(of: selectedType) {
+                viewModel.getInventoryModels(selectedType: selectedType) { fetchedModels in
+                    self.modelsArray = fetchedModels
+                }
             }
             .navigationDestination(for: Model.self) { model in
                 ModelView(path: $path, model: model, isEditing: $isEditing)
@@ -71,6 +87,13 @@ struct InventoryView: View {
             }
         }
     }
+    
+//    private func loadMoreItems() {
+//        viewModel.getInventoryModels(limit: fetchLimit) { newModels in
+//            self.modelsArray.append(contentsOf: newModels)
+//        }
+//    }
+    
 }
 
 #Preview {

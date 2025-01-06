@@ -16,10 +16,18 @@ extension InventoryView {
         let db = Firestore.firestore()
         private var listener: ListenerRegistration?
         
-        func getInventoryModels(completion: @escaping ([Model]) -> Void) {
+        func getInventoryModels(selectedType: ModelType?, completion: @escaping ([Model]) -> Void) {
                 let collectionRef = db.collection("unique_models")
-                
-                listener = collectionRef.addSnapshotListener { querySnapshot, error in
+            
+                var query : Query
+            
+                if let selectedType {
+                    query = collectionRef.whereField("type", isEqualTo: selectedType.rawValue)
+                } else {
+                    query = collectionRef
+                }
+            
+                listener = query.addSnapshotListener { querySnapshot, error in
                     guard let documents = querySnapshot?.documents else {
                         print("Error fetching documents: \(error?.localizedDescription ?? "Unknown error")")
                         return

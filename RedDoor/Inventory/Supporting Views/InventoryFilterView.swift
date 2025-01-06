@@ -11,7 +11,7 @@ import SwiftUI
 struct InventoryFilterView: View {
     
     @Environment(\.colorScheme) private var scheme
-    @Binding var activeType: ModelType?
+    @Binding var selectedType: ModelType?
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -19,10 +19,10 @@ struct InventoryFilterView: View {
                 ForEach(ModelType.allCases, id: \.rawValue) { type in
                     Button(action: {
                         withAnimation(.snappy) {
-                            if (activeType == type) {
-                                activeType = nil
+                            if (selectedType == type) {
+                                selectedType = nil
                             } else {
-                                activeType = type
+                                selectedType = type
                             }
                         }
                     }) {
@@ -40,11 +40,11 @@ struct InventoryFilterView: View {
     }
     
     private func foregroundColor(for type: ModelType) -> Color {
-        activeType == type ? /*(scheme == .dark ? Color.black : Color.white)*/ Color.white : Color.primary
+        selectedType == type ? /*(scheme == .dark ? Color.black : Color.white)*/ Color.white : Color.primary
     }
     
     private func backgroundView(for type: ModelType) -> some View {
         Capsule()
-            .fill(activeType == type ? Color.accentColor : Color(.systemGray5))
+            .fill(selectedType == type ? Color.accentColor : Color(.systemGray5))
     }
 }
