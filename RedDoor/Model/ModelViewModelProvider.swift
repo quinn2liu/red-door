@@ -94,52 +94,55 @@ class SharedModelViewModel {
     }
     
     func updateModelUIImagesFirebase(images: [UIImage]) async {
-        do {
-            try await withThrowingTaskGroup(of: Void.self) { group in
-                
-                // delete og images
-                group.addTask {
-                    await self.deleteModelImagesFirebase()
-                }
-                
-                group.addTask {
+        
+        if images.count > 0 {
+            do {
+                try await withThrowingTaskGroup(of: Void.self) { group in
                     
-                    self.selectedModel.imageURLDict.removeAll()
-                    self.selectedModel.imageIDs.removeAll()
-                    
-                    // now update the images
-                    for (index, image) in images.enumerated() {
-                        let imageID = "\(self.selectedModel.id)-\(index)"
-                        let imageRef = self.storageRef.child(imageID)
-                        self.selectedModel.imageIDs.append(imageID)
-                        
-                        // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
-                        guard let imageData = image.jpegData(compressionQuality: 0.3) else {
-                            print("Error converting UIImage to jpegData")
-                            return
-                        }
-                        
-                        let metaData = StorageMetadata()
-                        metaData.contentType = "image/jpeg"
-                        
-                        do {
-                            let resultMetaData = try await imageRef.putDataAsync(imageData, metadata: metaData)
-                            print("Upload finished. Metadata: \(resultMetaData)")
-                            let imageURL = try await imageRef.downloadURL().absoluteString
-                            print("imageURL = \(imageURL)")
-                            self.selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
-                        } catch {
-                            print("Error occurred when uploading image \(error.localizedDescription)")
-                        }
+                    // delete og images
+                    group.addTask {
+                        await self.deleteModelImagesFirebase()
                     }
-                    print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
+                    
+                    group.addTask {
+                        
+                        self.selectedModel.imageURLDict.removeAll()
+                        self.selectedModel.imageIDs.removeAll()
+                        
+                        // now update the images
+                        for (index, image) in images.enumerated() {
+                            let imageID = "\(self.selectedModel.id)-\(index)"
+                            let imageRef = self.storageRef.child(imageID)
+                            self.selectedModel.imageIDs.append(imageID)
+                            
+                            // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
+                            guard let imageData = image.jpegData(compressionQuality: 0.3) else {
+                                print("Error converting UIImage to jpegData")
+                                return
+                            }
+                            
+                            let metaData = StorageMetadata()
+                            metaData.contentType = "image/jpeg"
+                            
+                            do {
+                                let resultMetaData = try await imageRef.putDataAsync(imageData, metadata: metaData)
+                                print("Upload finished. Metadata: \(resultMetaData)")
+                                let imageURL = try await imageRef.downloadURL().absoluteString
+                                print("imageURL = \(imageURL)")
+                                self.selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
+                            } catch {
+                                print("Error occurred when uploading image \(error.localizedDescription)")
+                            }
+                        }
+                        print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
+                        
+                    }
+                    try await group.waitForAll()
                     
                 }
-                try await group.waitForAll()
-                
+            } catch {
+                print("Error updating images: \(error.localizedDescription)")
             }
-        } catch {
-            print("Error updating images: \(error.localizedDescription)")
         }
     }
     
@@ -210,7 +213,9 @@ class SharedModelViewModel {
         "Table",
         "Couch",
         "Lamp",
-        "Art"
+        "Art",
+        "Decor",
+        "Miscellaneous"
     ]
     
     var typeMap: [String: String] = [
