@@ -8,8 +8,8 @@ struct InventoryView: View {
     @State private var path: NavigationPath = NavigationPath()
     @State var searchText: String = ""
     @State var isEditing: Bool = false
-    
     @State var selectedType: ModelType?
+    @State private var isLoading: Bool = false
     
     private let fetchLimit = 20
     var TESTMODEL = Model()
@@ -24,42 +24,53 @@ struct InventoryView: View {
             }
         }
     }
-
+    
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
                 InventoryFilterView(selectedType: $selectedType)
                 
                 List {
-                    ForEach(filteredModels.indices, id: \.self) { index in
-                        let model = modelsArray[index]
+                    ForEach(filteredModels, id: \.self) { model in
                         NavigationLink(value: model) {
                             InventoryItemListView(model: model)
                         }
-//                        .onAppear {
-//                            if index == filteredModels.count - 1 {
-//                                loadMoreItems()
-//                            }
-//                        }
+                        .onAppear {
+                            if model == filteredModels.last {
+                                Task {
+                                    isLoading = true
+                                    await loadMoreModels()
+                                    isLoading = false
+                                }
+                            }
+                        }
+                    }
+                    
+                    if isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
                     }
                 }
             }
-            
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
             .onAppear {
                 isEditing = false
-                viewModel.getInventoryModels(selectedType: selectedType) { fetchedModels in
-                    self.modelsArray = fetchedModels
+                Task {
+                    isLoading = true
+                    await loadInitialModels()
+                    isLoading = false
                 }
-//                viewModel.resetPagination()
-//                loadMoreItems()
             }
-            .onDisappear {
-                viewModel.stopListening()
-            }
+//            .onDisappear {
+//                viewModel.stopListening()
+//            }
             .onChange(of: selectedType) {
-                viewModel.getInventoryModels(selectedType: selectedType) { fetchedModels in
-                    self.modelsArray = fetchedModels
+                modelsArray = []
+                Task {
+                    isLoading = true
+                    await loadInitialModels()
+                    isLoading = false
                 }
             }
             .navigationDestination(for: Model.self) { model in
@@ -88,11 +99,20 @@ struct InventoryView: View {
         }
     }
     
-//    private func loadMoreItems() {
-//        viewModel.getInventoryModels(limit: fetchLimit) { newModels in
-//            self.modelsArray.append(contentsOf: newModels)
+    private func loadInitialModels() async {
+        await viewModel.getInitialInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
+            modelsArray = fetchedModels
+        }
+//        for model in modelsArray {
+//            print("model.name = \(model.name)")
 //        }
-//    }
+    }
+    
+    private func loadMoreModels() async {
+        await viewModel.getMoreInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
+            modelsArray.append(contentsOf: fetchedModels)
+        }
+    }
     
 }
 
