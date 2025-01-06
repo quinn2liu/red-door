@@ -1,10 +1,3 @@
-//
-//  InventoryView.swift
-//  RedDoor
-//
-//  Created by Quinn Liu on 8/6/24.
-//
-
 import SwiftUI
 
 struct InventoryView: View {
@@ -14,16 +7,14 @@ struct InventoryView: View {
     @Binding var isEditing: Bool
     var TESTMODEL = Model()
     @State private var path: NavigationPath = NavigationPath()
-    @Binding var searchText: String  // Add this
+    @Binding var searchText: String
     
     var filteredModels: [Model] {
         if searchText.isEmpty {
             return modelsArray
         } else {
             return modelsArray.filter { model in
-                // Modify this based on what properties you want to search
                 model.name.localizedCaseInsensitiveContains(searchText)
-                // Add other properties as needed
             }
         }
     }
@@ -31,31 +22,6 @@ struct InventoryView: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                HStack {
-                    ZStack {
-                        Menu {
-                            NavigationLink(destination: CreateModelView()) {
-                                Text("Add Item")
-                                Image(systemName: "plus")
-                            }
-                            NavigationLink(destination: ScanItemView()) {
-                                Text("Scan Item")
-                                Image(systemName: "qrcode.viewfinder")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                        }
-                        .frame(maxWidth: .infinity,  alignment: .topTrailing)
-                        .padding(.horizontal)
-                        
-                        Text("Inventory")
-                            .font(.system(.title2, design: .default))
-                            .bold()
-                            .foregroundStyle(.red)
-                    }
-                }
-                .padding(.bottom)
-                
                 InventoryLegendView()
                 
                 List {
@@ -65,8 +31,8 @@ struct InventoryView: View {
                         }
                     }
                 }
-                .searchable(text: $searchText, prompt: "Search inventory")
             }
+            .searchable(text: $searchText, prompt: "Search inventory")
             .onAppear {
                 isEditing = false
                 viewModel.getInventoryModels { fetchedModels in
@@ -79,10 +45,23 @@ struct InventoryView: View {
             .navigationDestination(for: Model.self) { model in
                 ModelView(path: $path, model: model, isEditing: $isEditing)
             }
-            
+            .navigationTitle("Inventory") // Set as the navigation title
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        NavigationLink(destination: CreateModelView()) {
+                            Label("Add Item", systemImage: "plus")
+                        }
+                        NavigationLink(destination: ScanItemView()) {
+                            Label("Scan Item", systemImage: "qrcode.viewfinder")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                    }
+                }
+            }
         }
     }
-    
 }
 
 //#Preview {
