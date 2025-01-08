@@ -42,6 +42,11 @@
 		5012C7F12D262080003964C5 /* InstalledToPullBrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7F02D262080003964C5 /* InstalledToPullBrowseView.swift */; };
 		5012C7F32D262D14003964C5 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C7F22D262D14003964C5 /* Item.swift */; };
 		5012C8312D2B6AE3003964C5 /* ModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C8302D2B6AE3003964C5 /* ModelType.swift */; };
+		5012C8422D2C874E003964C5 /* TransparentButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012C8402D2C874E003964C5 /* TransparentButtonStyle.swift */; };
+		501434C12D2CA960008F1B3B /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501434C02D2CA960008F1B3B /* Address.swift */; };
+		501434C52D2E21F5008F1B3B /* ItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501434C42D2E21F5008F1B3B /* ItemViewModel.swift */; };
+		501434C72D2EDE2C008F1B3B /* ItemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501434C62D2EDE2C008F1B3B /* ItemListView.swift */; };
+		501434C92D2F164F008F1B3B /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501434C82D2F164F008F1B3B /* ItemDetailView.swift */; };
 		501B59A22C7811460097A966 /* CreateModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A12C7811460097A966 /* CreateModelView.swift */; };
 		501B59A82C7816E30097A966 /* ModelViewModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501B59A72C7816E30097A966 /* ModelViewModelProvider.swift */; };
 		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
@@ -78,6 +83,11 @@
 		5012C7F02D262080003964C5 /* InstalledToPullBrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledToPullBrowseView.swift; sourceTree = "<group>"; };
 		5012C7F22D262D14003964C5 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		5012C8302D2B6AE3003964C5 /* ModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelType.swift; sourceTree = "<group>"; };
+		5012C8402D2C874E003964C5 /* TransparentButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentButtonStyle.swift; sourceTree = "<group>"; };
+		501434C02D2CA960008F1B3B /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
+		501434C42D2E21F5008F1B3B /* ItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModel.swift; sourceTree = "<group>"; };
+		501434C62D2EDE2C008F1B3B /* ItemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListView.swift; sourceTree = "<group>"; };
+		501434C82D2F164F008F1B3B /* ItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailView.swift; sourceTree = "<group>"; };
 		501B59A12C7811460097A966 /* CreateModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateModelView.swift; sourceTree = "<group>"; };
 		501B59A72C7816E30097A966 /* ModelViewModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelViewModelProvider.swift; sourceTree = "<group>"; };
 		5083738F2C7D73C8004291AA /* PullList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullList.swift; sourceTree = "<group>"; };
@@ -85,7 +95,6 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5012C7972D13B8E5003964C5 /* Supporting Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Supporting Views"; sourceTree = "<group>"; };
-		5012C7CB2D1657B6003964C5 /* Styles */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Styles; sourceTree = "<group>"; };
 		5012C7EF2D261E61003964C5 /* Supporting Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Supporting Views"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -128,19 +137,20 @@
 		5011BBBA2C63159200A82219 /* RedDoor */ = {
 			isa = PBXGroup;
 			children = (
-				5012C7CB2D1657B6003964C5 /* Styles */,
+				5011BBFC2C63320900A82219 /* GoogleService-Info.plist */,
+				5012C8412D2C874E003964C5 /* Styles */,
 				5011BBBB2C63159200A82219 /* RedDoorApp.swift */,
 				5011BBBD2C63159200A82219 /* ContentView.swift */,
-				5011BC132C70FE1200A82219 /* ScanItem */,
-				5011BC072C6BD63200A82219 /* Model */,
 				5011BBFF2C6BC83A00A82219 /* Types */,
-				5011BBFC2C63320900A82219 /* GoogleService-Info.plist */,
-				5011BBE12C631E2800A82219 /* Account */,
 				5011BBDC2C631B6800A82219 /* Inventory */,
+				5012C83F2D2C874A003964C5 /* Item */,
+				5011BC072C6BD63200A82219 /* Model */,
+				5011BBE12C631E2800A82219 /* Account */,
 				5011BBDD2C631CEB00A82219 /* PullList */,
 				5011BBDE2C631D0D00A82219 /* InstalledList */,
 				5011BBBF2C63159200A82219 /* Assets.xcassets */,
 				5011BBC12C63159200A82219 /* Preview Content */,
+				5011BC132C70FE1200A82219 /* ScanItem */,
 				5011BBFE2C6AFC7F00A82219 /* README.md */,
 				5012C7E62D261871003964C5 /* LocationManager.swift */,
 			);
@@ -203,6 +213,7 @@
 				5083738F2C7D73C8004291AA /* PullList.swift */,
 				5012C7F22D262D14003964C5 /* Item.swift */,
 				5012C8302D2B6AE3003964C5 /* ModelType.swift */,
+				501434C02D2CA960008F1B3B /* Address.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -225,6 +236,24 @@
 				5011BC162C70FE2D00A82219 /* ScanItemViewModel.swift */,
 			);
 			path = ScanItem;
+			sourceTree = "<group>";
+		};
+		5012C83F2D2C874A003964C5 /* Item */ = {
+			isa = PBXGroup;
+			children = (
+				501434C42D2E21F5008F1B3B /* ItemViewModel.swift */,
+				501434C62D2EDE2C008F1B3B /* ItemListView.swift */,
+				501434C82D2F164F008F1B3B /* ItemDetailView.swift */,
+			);
+			path = Item;
+			sourceTree = "<group>";
+		};
+		5012C8412D2C874E003964C5 /* Styles */ = {
+			isa = PBXGroup;
+			children = (
+				5012C8402D2C874E003964C5 /* TransparentButtonStyle.swift */,
+			);
+			path = Styles;
 			sourceTree = "<group>";
 		};
 		501B59B32C7942B70097A966 /* SupportingViews */ = {
@@ -255,7 +284,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				5012C7972D13B8E5003964C5 /* Supporting Views */,
-				5012C7CB2D1657B6003964C5 /* Styles */,
 				5012C7EF2D261E61003964C5 /* Supporting Views */,
 			);
 			name = RedDoor;
@@ -332,14 +360,18 @@
 			files = (
 				5012C7E32D17935F003964C5 /* ModelDetailsView.swift in Sources */,
 				5011BBE52C631E3D00A82219 /* AccountView.swift in Sources */,
+				501434C52D2E21F5008F1B3B /* ItemViewModel.swift in Sources */,
 				5012C7CF2D165BD8003964C5 /* ModelImagesView.swift in Sources */,
 				5011BBD02C631B0400A82219 /* PullListView.swift in Sources */,
 				5011BBD22C631B2400A82219 /* InstalledListView.swift in Sources */,
 				5012C7F32D262D14003964C5 /* Item.swift in Sources */,
 				5011BC092C6BD64900A82219 /* ModelView.swift in Sources */,
+				5012C8422D2C874E003964C5 /* TransparentButtonStyle.swift in Sources */,
 				5011BC172C70FE2D00A82219 /* ScanItemViewModel.swift in Sources */,
 				5012C7E52D17953E003964C5 /* AddImagesView.swift in Sources */,
+				501434C12D2CA960008F1B3B /* Address.swift in Sources */,
 				501B59A82C7816E30097A966 /* ModelViewModelProvider.swift in Sources */,
+				501434C92D2F164F008F1B3B /* ItemDetailView.swift in Sources */,
 				508373902C7D73C8004291AA /* PullList.swift in Sources */,
 				5012C8312D2B6AE3003964C5 /* ModelType.swift in Sources */,
 				5011BBD82C631B4100A82219 /* PullListViewModelProvider.swift in Sources */,
@@ -353,6 +385,7 @@
 				5012C7EA2D261CEB003964C5 /* CreatePullListView.swift in Sources */,
 				5011BBBC2C63159200A82219 /* RedDoorApp.swift in Sources */,
 				501B59A22C7811460097A966 /* CreateModelView.swift in Sources */,
+				501434C72D2EDE2C008F1B3B /* ItemListView.swift in Sources */,
 				5012C7EC2D261DCD003964C5 /* PullListDetailsView.swift in Sources */,
 				5011BBE72C631E4A00A82219 /* AccountViewModel.swift in Sources */,
 				5011BBCE2C631AF600A82219 /* InventoryView.swift in Sources */,

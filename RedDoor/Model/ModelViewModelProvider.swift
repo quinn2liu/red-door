@@ -40,56 +40,85 @@ class SharedModelViewModel {
         }
     }
     
-    func updateModelDataFirebase()  {
+    func loadImages() {
+        let dispatchGroup = DispatchGroup()
+        var loadedImages: [UIImage] = []
         
+        for (_, urlString) in selectedModel.imageURLDict {
+            guard let url = URL(string: urlString) else { continue }
+            print("Attempting to load imageURL: \(urlString)")
+            dispatchGroup.enter()
+            
+            URLSession.shared.dataTask(with: url) { data, _, error in
+                defer { dispatchGroup.leave() }
+                
+                if let data = data, let image = UIImage(data: data) {
+                    loadedImages.append(image)
+                } else {
+                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
+                }
+            }.resume()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.images = loadedImages
+        }
+    }
+    
+    func getModelItems(completion: @escaping (Result<[Item], Error>) -> Void) {
+        let query: Query = db.collection("items").whereField("modelId", isEqualTo: selectedModel.id)
+        
+        query.getDocuments { snapshot, error in
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let documents = snapshot?.documents else {
+                completion(.success([])) // no documents were found
+                return
+            }
+            
+            do {
+                let items = try documents.map { document in
+                    try document.data(as: Item.self)
+                }
+                completion(.success(items))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func updateModelDataFirebase()  {
         do {
             try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
+            updateModelItemsFirebase()
             print("MODEL ADDED/EDITED")
         } catch {
             print("Error adding document: \(error)")
         }
     }
     
-    func deleteModelFirebase() async {
-        await withThrowingTaskGroup(of: Void.self) { group in
-            
-            group.addTask {
-                await self.deleteModelImagesFirebase()
+    func updateModelItemsFirebase()  {
+        let batch = db.batch()
+        
+        for index in (1...selectedModel.count) {
+            let itemId = selectedModel.id+"-\(index)"
+            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
+            let documentRef = db.collection("items").document(itemId)
+            do {
+                try batch.setData(from: item, forDocument: documentRef)
+            } catch {
+                print("Error adding item: \(itemId): \(error)")
             }
-            
-            group.addTask {
-                do {
-                    try await self.db.collection("unique_models").document(self.selectedModel.id).delete()
-                    print("Document \(self.selectedModel.id) successfully removed!")
-                } catch {
-                    print("Error removing document: \(error)")
-                }
-            }
-            
         }
-    }
-    
-    func deleteModelImagesFirebase() async {
-        do {
-            print("deleteModelImagesFirebase triggered")
-            try await withThrowingTaskGroup(of: Void.self) { group in
-                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
-                for imageID in selectedModel.imageIDs {
-                    group.addTask {
-                        let deleteRef = self.storageRef.child(imageID)
-                        do {
-                            try await deleteRef.delete()
-                            print("Successfully deleted imageID: \(imageID)")
-                        } catch {
-                            print("Error deleting imageID \(imageID): \(error)")
-                        }
-                    }
-                }
-                
-                try await group.waitForAll()
+        batch.commit { err in
+            if let err {
+                print("Error writing batch: \(err)")
+            } else {
+                print("Batch write successful")
             }
-        } catch {
-            print("Error removing image: \(error)")
         }
     }
     
@@ -146,28 +175,46 @@ class SharedModelViewModel {
         }
     }
     
-    func loadImages() {
-        let dispatchGroup = DispatchGroup()
-        var loadedImages: [UIImage] = []
-        
-        for (_, urlString) in selectedModel.imageURLDict {
-            guard let url = URL(string: urlString) else { continue }
-            print("Attempting to load imageURL: \(urlString)")
-            dispatchGroup.enter()
+    func deleteModelFirebase() async {
+        await withThrowingTaskGroup(of: Void.self) { group in
             
-            URLSession.shared.dataTask(with: url) { data, _, error in
-                defer { dispatchGroup.leave() }
-                
-                if let data = data, let image = UIImage(data: data) {
-                    loadedImages.append(image)
-                } else {
-                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
+            group.addTask {
+                await self.deleteModelImagesFirebase()
+            }
+            
+            group.addTask {
+                do {
+                    try await self.db.collection("unique_models").document(self.selectedModel.id).delete()
+                    print("Document \(self.selectedModel.id) successfully removed!")
+                } catch {
+                    print("Error removing document: \(error)")
                 }
-            }.resume()
+            }
+            
         }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.images = loadedImages
+    }
+    
+    func deleteModelImagesFirebase() async {
+        do {
+            print("deleteModelImagesFirebase triggered")
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
+                for imageID in selectedModel.imageIDs {
+                    group.addTask {
+                        let deleteRef = self.storageRef.child(imageID)
+                        do {
+                            try await deleteRef.delete()
+                            print("Successfully deleted imageID: \(imageID)")
+                        } catch {
+                            print("Error deleting imageID \(imageID): \(error)")
+                        }
+                    }
+                }
+                
+                try await group.waitForAll()
+            }
+        } catch {
+            print("Error removing image: \(error)")
         }
     }
     

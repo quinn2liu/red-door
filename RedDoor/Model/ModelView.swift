@@ -17,19 +17,19 @@ struct ModelView: View {
     
     @State private var showingDeleteAlert = false
     
-//    @State private var images: [UIImage] = []
+    //    @State private var images: [UIImage] = []
     @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen: Bool = false
     @State private var isImagePickerPresented = false
     @State private var sourceType: UIImagePickerController.SourceType?
+    @State private var items: [Item] = []
     
-
     init(path: Binding<NavigationPath>, model: Model, isEditing: Binding<Bool>) {
         self.viewModel = ViewModel(selectedModel: model)
         self._path = path
         self._isEditing = isEditing
     }
-
+    
     var body: some View {
         VStack {
             Form {
@@ -39,9 +39,22 @@ struct ModelView: View {
                     }
                     ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                 }
-
+                
                 Section("Details"){
                     ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                }
+                Section("Items") {
+                    if items.isEmpty {
+                        ProgressView()
+                    } else {
+                        List {
+                            ForEach(items, id: \.self) { item in
+                                NavigationLink(value: item) {
+                                    ItemListView(item: item, model: viewModel.selectedModel)
+                                }
+                            }
+                        }
+                    }
                 }
             }
             .toolbar {
@@ -52,8 +65,7 @@ struct ModelView: View {
                                 Text("Editing:")
                                     .font(.headline)
                                 TextField("", text: $viewModel.selectedModel.name)
-                                    .padding(.vertical, 6)
-                                    .padding(.horizontal, 6)
+                                    .padding(6)
                                     .background(Color(.systemGray5))
                                     .cornerRadius(8)
                             }
@@ -87,7 +99,7 @@ struct ModelView: View {
                 
             }
             .navigationBarTitleDisplayMode(.inline)
-        
+            
             HStack {
                 if (isEditing) {
                     Button("Delete Item") {
@@ -152,18 +164,29 @@ struct ModelView: View {
                         .shadow(radius: 10)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
+                .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
         .onAppear {
             viewModel.loadImages()
+            viewModel.getModelItems { result in
+                switch result {
+                case .success(let items):
+                    self.items = items
+                    print("Items for model model (\(viewModel.selectedModel.id)) successfully retrieved.")
+                case .failure(let error):
+                    print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+                }
+            }
         }
-    
+        .navigationDestination(for: Item.self) { item in
+            ItemDetailView(item: item)
+        }
     } // view
     
 } // struct
-    
 
-                                                    
+
+
 
 //#Preview {
 //    ItemView(path: Binding<NavigationPath>, model: Model(), isAdding: true, isEditing: true)

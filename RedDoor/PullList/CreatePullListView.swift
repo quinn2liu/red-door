@@ -32,7 +32,7 @@ struct CreatePullListView: View {
                     Text("Client:")
                     TextField("", text: $viewModel.selectedPullList.client)
                         .padding(6)
-                        .background(Color(.systemGray5))
+                        .background(Color(.systemGray6))
                         .cornerRadius(8)
                 }
                 
@@ -40,13 +40,9 @@ struct CreatePullListView: View {
                 Section("Rooms:") {
                     ScrollView {
                         LazyVStack {
-                            ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
-                                RoomListView(roomName: room.key, items: room.value)
-                            }
-                            RoomListView(roomName: "test room", items: [])
-                            RoomListView(roomName: "test room", items: [])
-                            RoomListView(roomName: "test room", items: [])
-                            RoomListView(roomName: "test room", items: [])
+//                            ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
+//                                RoomListView(roomName: room.key, items: room.value)
+//                            }
                         }
                     }
                 }
