@@ -12,7 +12,13 @@ struct ItemListView: View {
     var item: Item
     @State var model: Model?
     @State private var errorMessage: String?
-    var viewModel: ViewModel = ViewModel()
+    var viewModel: ViewModel
+    
+    init(item: Item, model: Model) {
+        self.item = item
+        self.model = model
+        self.viewModel = ViewModel(selectedItem: item)
+    }
     
     var body: some View {
         Group {

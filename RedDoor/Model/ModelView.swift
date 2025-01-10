@@ -102,14 +102,13 @@ struct ModelView: View {
             
             HStack {
                 if (isEditing) {
-                    Button("Delete Item") {
+                    Button("Delete Model") {
                         showingDeleteAlert = true
                     }
                     .foregroundColor(.red)
                     .alert(isPresented: $showingDeleteAlert) {
                         Alert(
-                            title: Text("Delete Confirmation"),
-                            message: Text("Please confirm if you want to delete this item."),
+                            title: Text("Confirm Delete"),
                             primaryButton: .cancel(Text("Cancel")),
                             secondaryButton: .destructive(Text("Delete")) {
                                 Task {
@@ -179,7 +178,7 @@ struct ModelView: View {
             }
         }
         .navigationDestination(for: Item.self) { item in
-            ItemDetailView(item: item)
+            ItemDetailView(item: item, path: $path)
         }
     } // view
     

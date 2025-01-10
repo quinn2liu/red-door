@@ -76,6 +76,10 @@ struct CreateModelView: View {
                     Task {
                         await viewModel.updateModelUIImagesFirebase(images: images)
                         await withCheckedContinuation { continuation in
+                            viewModel.createModelItemsFirebase()
+                            continuation.resume()
+                        }
+                        await withCheckedContinuation { continuation in
                             viewModel.updateModelDataFirebase()
                             continuation.resume()
                         }

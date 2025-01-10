@@ -11,7 +11,7 @@ struct ModelDetailsView: View {
     
     @Binding var isEditing: Bool
     @Binding var viewModel: SharedModelViewModel
-    
+        
     var body: some View {
         if (isEditing) {
             Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {

@@ -40,28 +40,37 @@ class SharedModelViewModel {
         }
     }
     
-    func loadImages() {
-        let dispatchGroup = DispatchGroup()
-        var loadedImages: [UIImage] = []
-        
-        for (_, urlString) in selectedModel.imageURLDict {
-            guard let url = URL(string: urlString) else { continue }
-            print("Attempting to load imageURL: \(urlString)")
-            dispatchGroup.enter()
-            
-            URLSession.shared.dataTask(with: url) { data, _, error in
-                defer { dispatchGroup.leave() }
-                
-                if let data = data, let image = UIImage(data: data) {
-                    loadedImages.append(image)
-                } else {
-                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
-                }
-            }.resume()
+    func updateModelDataFirebase()  {
+        do {
+            try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
+            print("MODEL ADDED/EDITED")
+        } catch {
+            print("Error adding document: \(error)")
         }
+    }
+    
+    /// ITEMS
+    
+    func createModelItemsFirebase() {
+        let batch = db.batch()
         
-        dispatchGroup.notify(queue: .main) {
-            self.images = loadedImages
+        for _ in (1...selectedModel.count) {
+            let itemId = "item-\(UUID().uuidString)"
+            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
+            selectedModel.item_ids.append(itemId)
+            let documentRef = db.collection("items").document(itemId)
+            do {
+                try batch.setData(from: item, forDocument: documentRef)
+            } catch {
+                print("Error adding item: \(itemId): \(error)")
+            }
+        }
+        batch.commit { err in
+            if let err {
+                print("Error writing batch: \(err)")
+            } else {
+                print("Batch write successful")
+            }
         }
     }
     
@@ -90,35 +99,52 @@ class SharedModelViewModel {
         }
     }
     
-    func updateModelDataFirebase()  {
-        do {
-            try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
-            updateModelItemsFirebase()
-            print("MODEL ADDED/EDITED")
-        } catch {
-            print("Error adding document: \(error)")
-        }
-    }
+//    func updateModelItemsFirebase()  {
+//        let batch = db.batch()
+//        
+//        for itemId in (selectedModel.item_ids) {
+//            selectedModel.item_ids.append(itemId)
+//            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
+//            let documentRef = db.collection("items").document(itemId)
+//            do {
+//                try batch.setData(from: item, forDocument: documentRef)
+//            } catch {
+//                print("Error adding item: \(itemId): \(error)")
+//            }
+//        }
+//        batch.commit { err in
+//            if let err {
+//                print("Error writing batch: \(err)")
+//            } else {
+//                print("Batch write successful")
+//            }
+//        }
+//    }
     
-    func updateModelItemsFirebase()  {
-        let batch = db.batch()
+    /// IMAGES
+    
+    func loadImages() {
+        let dispatchGroup = DispatchGroup()
+        var loadedImages: [UIImage] = []
         
-        for index in (1...selectedModel.count) {
-            let itemId = selectedModel.id+"-\(index)"
-            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
-            let documentRef = db.collection("items").document(itemId)
-            do {
-                try batch.setData(from: item, forDocument: documentRef)
-            } catch {
-                print("Error adding item: \(itemId): \(error)")
-            }
+        for (_, urlString) in selectedModel.imageURLDict {
+            guard let url = URL(string: urlString) else { continue }
+            print("Attempting to load imageURL: \(urlString)")
+            dispatchGroup.enter()
+            
+            URLSession.shared.dataTask(with: url) { data, _, error in
+                defer { dispatchGroup.leave() }
+                
+                if let data = data, let image = UIImage(data: data) {
+                    loadedImages.append(image)
+                } else {
+                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
+                }
+            }.resume()
         }
-        batch.commit { err in
-            if let err {
-                print("Error writing batch: \(err)")
-            } else {
-                print("Batch write successful")
-            }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.images = loadedImages
         }
     }
     
@@ -175,25 +201,6 @@ class SharedModelViewModel {
         }
     }
     
-    func deleteModelFirebase() async {
-        await withThrowingTaskGroup(of: Void.self) { group in
-            
-            group.addTask {
-                await self.deleteModelImagesFirebase()
-            }
-            
-            group.addTask {
-                do {
-                    try await self.db.collection("unique_models").document(self.selectedModel.id).delete()
-                    print("Document \(self.selectedModel.id) successfully removed!")
-                } catch {
-                    print("Error removing document: \(error)")
-                }
-            }
-            
-        }
-    }
-    
     func deleteModelImagesFirebase() async {
         do {
             print("deleteModelImagesFirebase triggered")
@@ -217,6 +224,30 @@ class SharedModelViewModel {
             print("Error removing image: \(error)")
         }
     }
+    
+    func deleteModelFirebase() async {
+        await withThrowingTaskGroup(of: Void.self) { group in
+            
+            group.addTask {
+                await self.deleteModelImagesFirebase()
+            }
+            
+            group.addTask {
+                do {
+                    try await self.db.collection("unique_models").document(self.selectedModel.id).delete()
+                    
+                    for itemId in self.selectedModel.item_ids {
+                        try await self.db.collection("items").document(itemId).delete()
+                    }
+                    print("Document \(self.selectedModel.id) successfully removed!")
+                } catch {
+                    print("Error removing document: \(error)")
+                }
+            }
+            
+        }
+    }
+    
     
     var colorOptions: [String] = [
         "Black",

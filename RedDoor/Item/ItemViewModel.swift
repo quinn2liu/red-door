@@ -13,6 +13,12 @@ import FirebaseCore
 class SharedItemViewModel {
     let db = Firestore.firestore()
     
+    var selectedItem: Item
+    
+    init(selectedItem: Item) {
+        self.selectedItem = selectedItem
+    }
+    
     func getItemModel(modelId: String, completion: @escaping (Result<Model, Error>) -> Void) {
         db.collection("unique_models").document(modelId).getDocument() { documentSnapshot, error in
             if let error = error {
@@ -34,9 +40,36 @@ class SharedItemViewModel {
             }
         }
     }
+    
+    func deleteItem() async {
+        // delete from "items" collection
+        do {
+            try await db.collection("items").document(selectedItem.id).delete()
+            print("Item successfully removed from Firestore")
+        } catch {
+            print("Error removing item \(selectedItem.id): \(error)")
+        }
+        
+        // delete from "models" collection
+        let modelRef = db.collection("unique_models").document(selectedItem.modelId)
+        do {
+            try await modelRef.updateData([
+                "item_ids": FieldValue.arrayRemove([selectedItem.id]),
+                "count": FieldValue.increment(Int64(-1))
+            ])
+            print("item successfully removed from Item")
+        } catch {
+            print("Error removing item \(selectedItem.id) from it's model: \(error)")
+        }
+    }
+    
 }
 
 extension ItemListView {
+    typealias ViewModel  = SharedItemViewModel
+}
+
+extension ItemDetailView {
     typealias ViewModel  = SharedItemViewModel
 }
 
