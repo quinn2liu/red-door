@@ -74,6 +74,22 @@ class SharedModelViewModel {
         }
     }
     
+    func createSingleModelItem() {
+        let itemId = "item-\(UUID().uuidString)"
+        let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
+        selectedModel.item_ids.append(itemId)
+        selectedModel.count += 1
+        let itemRef = db.collection("items").document(itemId)
+        let modelRef = db.collection("unique_modles").document(selectedModel.id)
+        do {
+            try itemRef.setData(from: item)
+            modelRef.updateData(["count": selectedModel.count])
+            print("single item added")
+        } catch {
+            print("Error adding item: \(itemId): \(error)")
+        }
+    }
+    
     func getModelItems(completion: @escaping (Result<[Item], Error>) -> Void) {
         let query: Query = db.collection("items").whereField("modelId", isEqualTo: selectedModel.id)
         
@@ -335,5 +351,9 @@ extension ModelView  {
 }
 
 extension CreateModelView  {
+    typealias ViewModel = SharedModelViewModel
+}
+
+extension ItemListView {
     typealias ViewModel = SharedModelViewModel
 }

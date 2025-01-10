@@ -40,6 +40,7 @@ struct CreateModelView: View {
                     
                 Section(header: Text("Options")) {
                     ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                    Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
                 }
             }
             .toolbar {

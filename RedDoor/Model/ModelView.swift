@@ -17,7 +17,6 @@ struct ModelView: View {
     
     @State private var showingDeleteAlert = false
     
-    //    @State private var images: [UIImage] = []
     @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen: Bool = false
     @State private var isImagePickerPresented = false
@@ -37,24 +36,18 @@ struct ModelView: View {
                     if (isEditing) {
                         AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                     }
-                    ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    if (!viewModel.images.isEmpty) {
+                        ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    } else {
+                        Text("No Images")
+                    }
                 }
                 
                 Section("Details"){
                     ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
                 }
                 Section("Items") {
-                    if items.isEmpty {
-                        ProgressView()
-                    } else {
-                        List {
-                            ForEach(items, id: \.self) { item in
-                                NavigationLink(value: item) {
-                                    ItemListView(item: item, model: viewModel.selectedModel)
-                                }
-                            }
-                        }
-                    }
+                    ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
                 }
             }
             .toolbar {
@@ -88,6 +81,16 @@ struct ModelView: View {
                                 await withCheckedContinuation { continuation in
                                     viewModel.updateModelDataFirebase()
                                     continuation.resume()
+                                }
+                                viewModel.loadImages()
+                                viewModel.getModelItems { result in
+                                    switch result {
+                                    case .success(let items):
+                                        self.items = items
+                                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+                                    case .failure(let error):
+                                        print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+                                    }
                                 }
                             }
                         } else { // view mode -> edit mode
@@ -165,22 +168,26 @@ struct ModelView: View {
             }
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
-        .onAppear {
-            viewModel.loadImages()
-            viewModel.getModelItems { result in
-                switch result {
-                case .success(let items):
-                    self.items = items
-                    print("Items for model model (\(viewModel.selectedModel.id)) successfully retrieved.")
-                case .failure(let error):
-                    print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
-                }
-            }
+        .onAppear() {
+            getInitialData()
         }
         .navigationDestination(for: Item.self) { item in
             ItemDetailView(item: item, path: $path)
         }
     } // view
+    
+    func getInitialData() {
+        viewModel.loadImages()
+        viewModel.getModelItems { result in
+            switch result {
+            case .success(let items):
+                self.items = items
+                print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+            case .failure(let error):
+                print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+            }
+        }
+    }
     
 } // struct
 

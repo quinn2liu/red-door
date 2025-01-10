@@ -25,6 +25,7 @@ struct ItemDetailView: View {
             Task {
                 await viewModel.deleteItem()
             }
+            path.removeLast()
         }
     }
 }

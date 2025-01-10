@@ -42,7 +42,6 @@ struct AddImagesView: View {
             .background(Color.gray.opacity(0.2))
             .cornerRadius(8)
             .onTapGesture {
-                
                 sourceType = .camera
                 isImagePickerPresented = true
             }

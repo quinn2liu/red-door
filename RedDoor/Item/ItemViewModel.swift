@@ -65,7 +65,7 @@ class SharedItemViewModel {
     
 }
 
-extension ItemListView {
+extension ItemListItemView {
     typealias ViewModel  = SharedItemViewModel
 }
 

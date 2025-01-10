@@ -2,63 +2,54 @@
 //  ItemListView.swift
 //  RedDoor
 //
-//  Created by Quinn Liu on 1/8/25.
+//  Created by Quinn Liu on 1/9/25.
 //
 
 import SwiftUI
 
 struct ItemListView: View {
     
-    var item: Item
-    @State var model: Model?
-    @State private var errorMessage: String?
+    var items: [Item]
+    var isEditing: Bool
     var viewModel: ViewModel
-    
-    init(item: Item, model: Model) {
-        self.item = item
-        self.model = model
-        self.viewModel = ViewModel(selectedItem: item)
-    }
+    @State var listExpanded: Bool = false
     
     var body: some View {
-        Group {
-            if let model {
-                HStack {
-                    Text(model.name)
-                    Text(item.id)
-                    Text(model.type)
-                    Text(item.repair.description)
-                    Text(item.pullListId)
-                }
-            } else if let errorMessage {
-                HStack {
-                    Text("Error:")
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                }
-            } else {
-                ProgressView("Loading...")
+        
+        if isEditing {
+            HStack {
+                Image(systemName: "plus")
+                Text("Add Item")
             }
+            .transparentButtonStyle(backgroundColor: .green, foregroundColor: .green)
+            .frame(maxWidth: .infinity)
+            .onTapGesture {
+                viewModel.createSingleModelItem()
+            }
+        } else {
+            HStack {
+                Text("Item Count: \(viewModel.selectedModel.count)")
+                Spacer()
+                Image(systemName: listExpanded ? "minus" : "plus")
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                listExpanded.toggle()
+            }
+          
         }
-        .onAppear {
-            guard self.model != nil else {
-                getItemModel()
-                return
+        
+        if !items.isEmpty && listExpanded {
+            List {
+                ForEach(items, id: \.self) { item in
+                    NavigationLink(value: item) {
+                        ItemListItemView(item: item, model: viewModel.selectedModel)
+                    }
+                }
             }
         }
     }
-    
-    private func getItemModel() {
-        viewModel.getItemModel(modelId: item.modelId) { result in
-            switch result {
-            case .success(let model):
-                self.model = model
-            case .failure(let error):
-                self.errorMessage = error.localizedDescription
-            }
-        }
-    }
-    
 }
 
 //#Preview {

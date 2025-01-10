@@ -45,7 +45,6 @@ struct ModelDetailsView: View {
                 }
             }
 
-            Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
         } else {
             HStack {
                 Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
@@ -62,8 +61,6 @@ struct ModelDetailsView: View {
             }
 
             Text("Material: \(viewModel.selectedModel.primaryMaterial)")
-
-            Text("Item Count: \(viewModel.selectedModel.count)")
         }
     }
 }
