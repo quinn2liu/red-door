@@ -11,7 +11,7 @@ import SwiftUI
 struct Model: Identifiable, Codable, Hashable {
     
     var name: String
-    var item_ids: [Int]
+    var item_ids: [String]
     var type: String
     var primaryColor: String
     var primaryMaterial: String
@@ -22,7 +22,7 @@ struct Model: Identifiable, Codable, Hashable {
     
     init(
         name: String = "",
-        item_ids: [Int] = [],
+        item_ids: [String] = [],
         type: String = "Chair",
         primaryColor: String = "Red",
         primaryMaterial: String = "Wood",
@@ -63,7 +63,7 @@ struct Model: Identifiable, Codable, Hashable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
-        item_ids = try container.decode([Int].self, forKey: .item_ids)
+        item_ids = try container.decode([String].self, forKey: .item_ids)
         type = try container.decode(String.self, forKey: .type)
         primaryColor = try container.decode(String.self, forKey: .primaryColor)
         primaryMaterial = try container.decode(String.self, forKey: .primaryMaterial)

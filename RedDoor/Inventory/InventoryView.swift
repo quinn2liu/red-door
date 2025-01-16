@@ -14,29 +14,24 @@ struct InventoryView: View {
     private let fetchLimit = 20
     var TESTMODEL = Model()
     
-    
-    var filteredModels: [Model] {
-        if searchText.isEmpty {
-            return modelsArray
-        } else {
-            return modelsArray.filter { model in
-                model.name.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
-    
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
                 InventoryFilterView(selectedType: $selectedType)
                 
                 List {
-                    ForEach(filteredModels, id: \.self) { model in
+                    ForEach(modelsArray, id: \.self) { model in
                         NavigationLink(value: model) {
                             InventoryItemListView(model: model)
                         }
                         .onAppear {
-                            if model == filteredModels.last {
+                            if model == modelsArray.last && !searchText.isEmpty {
+                                Task {
+                                    isLoading = true
+                                    await loadMoreSearchResults()
+                                    isLoading = false
+                                }
+                            } else if model == modelsArray.last {
                                 Task {
                                     isLoading = true
                                     await loadMoreModels()
@@ -54,6 +49,14 @@ struct InventoryView: View {
                 }
             }
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+            .onSubmit(of: .search) {
+                Task {
+                    print("search submitted")
+                    isLoading = true
+                    await searchModels()
+                    isLoading = false
+                }
+            }
             .onAppear {
                 isEditing = false
                 Task {
@@ -62,15 +65,22 @@ struct InventoryView: View {
                     isLoading = false
                 }
             }
-//            .onDisappear {
-//                viewModel.stopListening()
-//            }
             .onChange(of: selectedType) {
                 modelsArray = []
                 Task {
                     isLoading = true
                     await loadInitialModels()
                     isLoading = false
+                }
+            }
+            .onChange(of: searchText) {
+                if (searchText.isEmpty) {
+                    Task {
+                        modelsArray = []
+                        isLoading = true
+                        await loadInitialModels()
+                        isLoading = false
+                    }
                 }
             }
             .navigationDestination(for: Model.self) { model in
@@ -99,17 +109,26 @@ struct InventoryView: View {
         }
     }
     
+    private func searchModels() async {
+        await viewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
+            modelsArray = fetchedModels
+        }
+    }
+    
+    private func loadMoreSearchResults() async {
+        await viewModel.getMoreInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
+            modelsArray.append(contentsOf: fetchedModels)
+        }
+    }
+    
     private func loadInitialModels() async {
         await viewModel.getInitialInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
             modelsArray = fetchedModels
         }
-//        for model in modelsArray {
-//            print("model.name = \(model.name)")
-//        }
     }
     
     private func loadMoreModels() async {
-        await viewModel.getMoreInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
+        await viewModel.getMoreInventoryModels(searchText: nil, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
             modelsArray.append(contentsOf: fetchedModels)
         }
     }

@@ -17,19 +17,18 @@ struct ModelView: View {
     
     @State private var showingDeleteAlert = false
     
-//    @State private var images: [UIImage] = []
     @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen: Bool = false
     @State private var isImagePickerPresented = false
     @State private var sourceType: UIImagePickerController.SourceType?
+    @State private var items: [Item] = []
     
-
     init(path: Binding<NavigationPath>, model: Model, isEditing: Binding<Bool>) {
         self.viewModel = ViewModel(selectedModel: model)
         self._path = path
         self._isEditing = isEditing
     }
-
+    
     var body: some View {
         VStack {
             Form {
@@ -37,11 +36,18 @@ struct ModelView: View {
                     if (isEditing) {
                         AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                     }
-                    ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    if (!viewModel.images.isEmpty) {
+                        ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    } else {
+                        Text("No Images")
+                    }
                 }
-
+                
                 Section("Details"){
                     ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                }
+                Section("Items") {
+                    ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
                 }
             }
             .toolbar {
@@ -52,8 +58,7 @@ struct ModelView: View {
                                 Text("Editing:")
                                     .font(.headline)
                                 TextField("", text: $viewModel.selectedModel.name)
-                                    .padding(.vertical, 6)
-                                    .padding(.horizontal, 6)
+                                    .padding(6)
                                     .background(Color(.systemGray5))
                                     .cornerRadius(8)
                             }
@@ -77,6 +82,16 @@ struct ModelView: View {
                                     viewModel.updateModelDataFirebase()
                                     continuation.resume()
                                 }
+                                viewModel.loadImages()
+                                viewModel.getModelItems { result in
+                                    switch result {
+                                    case .success(let items):
+                                        self.items = items
+                                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+                                    case .failure(let error):
+                                        print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+                                    }
+                                }
                             }
                         } else { // view mode -> edit mode
                             isEditing = true
@@ -87,17 +102,16 @@ struct ModelView: View {
                 
             }
             .navigationBarTitleDisplayMode(.inline)
-        
+            
             HStack {
                 if (isEditing) {
-                    Button("Delete Item") {
+                    Button("Delete Model") {
                         showingDeleteAlert = true
                     }
                     .foregroundColor(.red)
                     .alert(isPresented: $showingDeleteAlert) {
                         Alert(
-                            title: Text("Delete Confirmation"),
-                            message: Text("Please confirm if you want to delete this item."),
+                            title: Text("Confirm Delete"),
                             primaryButton: .cancel(Text("Cancel")),
                             secondaryButton: .destructive(Text("Delete")) {
                                 Task {
@@ -152,18 +166,33 @@ struct ModelView: View {
                         .shadow(radius: 10)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
+                .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
-        .onAppear {
-            viewModel.loadImages()
+        .onAppear() {
+            getInitialData()
         }
-    
+        .navigationDestination(for: Item.self) { item in
+            ItemDetailView(item: item, path: $path)
+        }
     } // view
     
-} // struct
+    func getInitialData() {
+        viewModel.loadImages()
+        viewModel.getModelItems { result in
+            switch result {
+            case .success(let items):
+                self.items = items
+                print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+            case .failure(let error):
+                print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+            }
+        }
+    }
     
+} // struct
 
-                                                    
+
+
 
 //#Preview {
 //    ItemView(path: Binding<NavigationPath>, model: Model(), isAdding: true, isEditing: true)

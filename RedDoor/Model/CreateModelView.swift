@@ -40,6 +40,7 @@ struct CreateModelView: View {
                     
                 Section(header: Text("Options")) {
                     ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                    Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
                 }
             }
             .toolbar {
@@ -75,6 +76,10 @@ struct CreateModelView: View {
                 Button("Add Item to Inventory") {
                     Task {
                         await viewModel.updateModelUIImagesFirebase(images: images)
+                        await withCheckedContinuation { continuation in
+                            viewModel.createModelItemsFirebase()
+                            continuation.resume()
+                        }
                         await withCheckedContinuation { continuation in
                             viewModel.updateModelDataFirebase()
                             continuation.resume()

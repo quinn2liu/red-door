@@ -10,7 +10,7 @@ import SwiftUI
 struct RoomListView: View {
     
     var roomName: String
-    var items: [Item]
+    var itemIds: [String]
     
     var body: some View {
         HStack {
@@ -22,5 +22,5 @@ struct RoomListView: View {
 }
 
 #Preview {
-    RoomListView(roomName: "testing room", items: [])
+    RoomListView(roomName: "testing room", itemIds: [])
 }
