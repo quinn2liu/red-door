@@ -9,10 +9,11 @@ import SwiftUI
 
 struct CreatePullListView: View {
     
-    @State private var viewModel: ViewModel = ViewModel()
-    
-    @State private var addressQuery: String = ""
     @Binding var path: NavigationPath
+
+    
+    @State private var viewModel: ViewModel = ViewModel()
+    @State private var addressQuery: String = ""
     @State var date: Date = Date()
     
     var body: some View {
@@ -36,7 +37,6 @@ struct CreatePullListView: View {
                         .cornerRadius(8)
                 }
                 
-                
                 Section("Rooms:") {
                     ScrollView {
                         LazyVStack {
@@ -47,6 +47,7 @@ struct CreatePullListView: View {
                     }
                 }
                 
+                
             }
             
             HStack {
@@ -56,7 +57,7 @@ struct CreatePullListView: View {
                 }
                 
                 Button("Save Pull List") {
-                    // do stuff
+                    viewModel.createPullList()
                 }
             }
         }
@@ -70,7 +71,9 @@ struct CreatePullListView: View {
                     .cornerRadius(8)
                     .multilineTextAlignment(.center)
                     .onSubmit {
-                        // do the address searching stuff
+                        // do the address searching stuff (use a sheet?)
+                        let address = Address(fullAddress: addressQuery)
+                        viewModel.selectedPullList.id = address.toUniqueID()
                     }
             }
         }

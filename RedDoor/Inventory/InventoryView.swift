@@ -19,39 +19,11 @@ struct InventoryView: View {
             VStack{
                 InventoryFilterView(selectedType: $selectedType)
                 
-                List {
-                    ForEach(modelsArray, id: \.self) { model in
-                        NavigationLink(value: model) {
-                            InventoryItemListView(model: model)
-                        }
-                        .onAppear {
-                            if model == modelsArray.last && !searchText.isEmpty {
-                                Task {
-                                    isLoading = true
-                                    await loadMoreSearchResults()
-                                    isLoading = false
-                                }
-                            } else if model == modelsArray.last {
-                                Task {
-                                    isLoading = true
-                                    await loadMoreModels()
-                                    isLoading = false
-                                }
-                            }
-                        }
-                    }
-                    
-                    if isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
-                    }
-                }
+                InventoryList()
             }
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
             .onSubmit(of: .search) {
                 Task {
-                    print("search submitted")
                     isLoading = true
                     await searchModels()
                     isLoading = false
@@ -105,6 +77,38 @@ struct InventoryView: View {
                         Image(systemName: "ellipsis")
                     }
                 }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func InventoryList() -> some View {
+        List {
+            ForEach(modelsArray, id: \.self) { model in
+                NavigationLink(value: model) {
+                    InventoryItemListView(model: model)
+                }
+                .onAppear {
+                    if model == modelsArray.last && !searchText.isEmpty {
+                        Task {
+                            isLoading = true
+                            await loadMoreSearchResults()
+                            isLoading = false
+                        }
+                    } else if model == modelsArray.last {
+                        Task {
+                            isLoading = true
+                            await loadMoreModels()
+                            isLoading = false
+                        }
+                    }
+                }
+            }
+            
+            if isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding()
             }
         }
     }

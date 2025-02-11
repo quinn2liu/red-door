@@ -8,11 +8,23 @@
 import SwiftUI
 
 struct PullListDetailsView: View {
+    
+    @State var viewModel: ViewModel
+    @Binding var path: NavigationPath
+    @Binding var isEditing: Bool
+
+    init(path: Binding<NavigationPath>, pullList: PullList, isEditing: Binding<Bool>) {
+        self.viewModel = ViewModel(selectedPullList: pullList)
+        self._path = path
+        self._isEditing = isEditing
+    }
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text("Address: \(viewModel.selectedPullList.id)")
     }
 }
 
-#Preview {
-    PullListDetailsView()
-}
+// MARK: CREATE MOCK DATA
+//#Preview {
+//    PullListDetailsView()
+//}
