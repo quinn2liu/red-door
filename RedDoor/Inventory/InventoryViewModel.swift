@@ -9,6 +9,7 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 
+//  MARK: Could be abstracted for all lists
 extension InventoryView {
     @Observable
     class ViewModel {

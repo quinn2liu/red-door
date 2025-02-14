@@ -15,6 +15,12 @@ struct Address {
     let state: String = ""
     let zipcode: String = ""
     let warehouseNumber: String?
+    let fullAddress: String?
+    
+    init(warehouseNumber: String? = "", fullAddress: String? = "") {
+        self.warehouseNumber = warehouseNumber
+        self.fullAddress = fullAddress
+    }
     
     // Normalize the street type using a dictionary
     static let streetTypeMapping: [String: String] = [
@@ -39,9 +45,15 @@ struct Address {
         if let warehouseNumber {
             return "warehouse-\(warehouseNumber)"
         } else {
-            let normalizedStreetType = Address.normalizeStreetType(streetType)
-            
-            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
+            // MARK: FIX WITH ACTUAL ADDRESS PARSING
+            if let address = fullAddress {
+                return address
+            } else {
+                return "ERROR: see Address"
+            }
+//            let normalizedStreetType = Address.normalizeStreetType(streetType)
+//            
+//            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
         }
     }
 }

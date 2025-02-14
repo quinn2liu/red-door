@@ -24,8 +24,7 @@ struct PullListView: View {
                                 Text("From Scratch")
                                 Image(systemName: "checklist")
                             }
-                           
-                            
+                    
                             NavigationLink(destination: InstalledToPullBrowseView()) {
                                 Text("From Installed List")
                                 Image(systemName: "document.on.document")
@@ -47,31 +46,35 @@ struct PullListView: View {
                 .padding(.bottom)
                 
                 List {
-                    ForEach(pullListArray) { model in
-                        NavigationLink(value: model) {
-                            PullListListView()
+                    ForEach(pullListArray) { pullList in
+                        NavigationLink(value: pullList) {
+                            PullListListView(pullList)
                         }
                     }
-                }
-                .onAppear {
-    //                    viewModel.getPullLists { pullLists in
-    //                        self.modelsArray = pullLists
-    //                    }
                 }
                 .navigationViewStyle(StackNavigationViewStyle())
                 .padding(.bottom)
             }
             .onAppear {
                 isEditing = false
+                Task {
+                    await loadInitialPullLists()
+                }
             }
             .onDisappear {
     //            viewModel.stopListening()
             }
-            .navigationDestination(for: PullList.self) { model in
-                // PullListDetailsView(path: $path, model: model, isEditing: $isEditing)
+            .navigationDestination(for: PullList.self) { pullList in
+                 PullListDetailsView(path: $path, pullList: pullList, isEditing: $isEditing)
             }
         }
         
+    }
+    
+    private func loadInitialPullLists() async {
+        await viewModel.loadPullLists() { fetchedLists in
+            pullListArray = fetchedLists
+        }
     }
         
 }

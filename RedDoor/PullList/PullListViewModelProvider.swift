@@ -14,14 +14,63 @@ import FirebaseStorage
 
 @Observable
 class SharedPullListViewModel {
-    
     var selectedPullList: PullList
+    
+    let db = Firestore.firestore()
+    private var lastDocument: DocumentSnapshot?
+    private var hasMoreData = true
     
     init(selectedPullList: PullList = PullList()) {
         self.selectedPullList = selectedPullList
     }
     
+ 
+    func createPullList() {
+        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
+        do {
+            try pullListRef.setData(from: selectedPullList)
+            print("pull list added")
+        } catch {
+            print("Error adding pull list: \(selectedPullList.id): \(error)")
+        }
+    }
+    
 
+    func loadPullLists(limit: Int = 20, completion: @escaping ([PullList]) -> Void) async {
+        lastDocument = nil
+        hasMoreData = true
+        
+        let collectionRef = db.collection("pull_lists")
+
+        let query: Query = collectionRef.limit(to: limit).order(by: "id", descending: false)
+        
+        do {
+            let querySnapshot = try await query.getDocuments()
+            lastDocument = querySnapshot.documents.last
+            
+            let pullLists = querySnapshot.documents.compactMap { document -> PullList? in
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
+                    return try JSONDecoder().decode(PullList.self, from: jsonData)
+                } catch {
+                    print("Error decoding document: \(error)")
+                    return nil
+                }
+            }
+            
+            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
+            
+            await MainActor.run {
+                completion(pullLists)
+            }
+        } catch {
+            print("Error fetching documents: \(error.localizedDescription)")
+            await MainActor.run {
+                completion([])
+            }
+        }
+    }
+    
 }
 
 extension PullListView {
@@ -29,5 +78,9 @@ extension PullListView {
 }
 
 extension CreatePullListView {
+    typealias ViewModel = SharedPullListViewModel
+}
+
+extension PullListDetailsView {
     typealias ViewModel = SharedPullListViewModel
 }

@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct PullListListView: View {
+    let pullList: PullList
+    
+    init(_ pullList: PullList) { // Underscore removes the argument label
+        self.pullList = pullList
+    }
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text(pullList.id)
     }
 }
 
-#Preview {
-    PullListListView()
-}
+// MARK: MAKE MOCK DATA
+//#Preview {
+//    PullListListView()
+//}

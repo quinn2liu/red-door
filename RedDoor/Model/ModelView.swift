@@ -30,7 +30,7 @@ struct ModelView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Form {
                 Section("Images") {
                     if (isEditing) {
@@ -52,54 +52,16 @@ struct ModelView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    HStack {
-                        if isEditing {
-                            HStack {
-                                Text("Editing:")
-                                    .font(.headline)
-                                TextField("", text: $viewModel.selectedModel.name)
-                                    .padding(6)
-                                    .background(Color(.systemGray5))
-                                    .cornerRadius(8)
-                            }
-                        } else {
-                            HStack {
-                                Text("Viewing:")
-                                    .font(.headline)
-                                Text(viewModel.selectedModel.name)
-                            }
-                        }
-                    }
+                    ModelNameView()
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isEditing ? "Done" : "Edit") {
-                        if (isEditing) { // edit mode -> view mode
-                            isEditing = false
-                            Task {
-                                await viewModel.updateModelUIImagesFirebase(images: viewModel.images)
-                                await withCheckedContinuation { continuation in
-                                    viewModel.updateModelDataFirebase()
-                                    continuation.resume()
-                                }
-                                viewModel.loadImages()
-                                viewModel.getModelItems { result in
-                                    switch result {
-                                    case .success(let items):
-                                        self.items = items
-                                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
-                                    case .failure(let error):
-                                        print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
-                                    }
-                                }
-                            }
-                        } else { // view mode -> edit mode
-                            isEditing = true
-                        }
+                    Button {
+                        saveModel()
+                    } label: {
+                        Text(isEditing ? "Done" : "Edit")
                     }
-                    
                 }
-                
             }
             .navigationBarTitleDisplayMode(.inline)
             
@@ -176,7 +138,52 @@ struct ModelView: View {
         }
     } // view
     
-    func getInitialData() {
+    @ViewBuilder
+    private func ModelNameView() -> some View {
+        if isEditing {
+            HStack {
+                Text("Editing:")
+                    .font(.headline)
+                TextField("", text: $viewModel.selectedModel.name)
+                    .padding(6)
+                    .background(Color(.systemGray5))
+                    .cornerRadius(8)
+            }
+        } else {
+            HStack {
+                Text("Viewing:")
+                    .font(.headline)
+                Text(viewModel.selectedModel.name)
+            }
+        }
+    }
+    
+    private func saveModel() {
+        if (isEditing) { // edit mode -> view mode
+            isEditing = false
+            Task {
+                await viewModel.updateModelUIImagesFirebase(images: viewModel.images)
+                await withCheckedContinuation { continuation in
+                    viewModel.updateModelDataFirebase()
+                    continuation.resume()
+                }
+                viewModel.loadImages()
+                viewModel.getModelItems { result in
+                    switch result {
+                    case .success(let items):
+                        self.items = items
+                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+                    case .failure(let error):
+                        print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+                    }
+                }
+            }
+        } else { // view mode -> edit mode
+            isEditing = true
+        }
+    }
+    
+    private func getInitialData() {
         viewModel.loadImages()
         viewModel.getModelItems { result in
             switch result {

@@ -49,7 +49,7 @@ class SharedModelViewModel {
         }
     }
     
-    /// ITEMS
+    // MARK: ITEMS
     
     func createModelItemsFirebase() {
         let batch = db.batch()
@@ -80,7 +80,7 @@ class SharedModelViewModel {
         selectedModel.item_ids.append(itemId)
         selectedModel.count += 1
         let itemRef = db.collection("items").document(itemId)
-        let modelRef = db.collection("unique_modles").document(selectedModel.id)
+        let modelRef = db.collection("unique_models").document(selectedModel.id)
         do {
             try itemRef.setData(from: item)
             modelRef.updateData(["count": selectedModel.count])
@@ -137,7 +137,7 @@ class SharedModelViewModel {
 //        }
 //    }
     
-    /// IMAGES
+    // MARK: IMAGES
     
     func loadImages() {
         let dispatchGroup = DispatchGroup()
@@ -163,6 +163,8 @@ class SharedModelViewModel {
             self.images = loadedImages
         }
     }
+    
+    // MARK: UPDATES
     
     func updateModelUIImagesFirebase(images: [UIImage]) async {
         
