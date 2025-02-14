@@ -15,37 +15,18 @@ struct AddImagesView: View {
     
     var body: some View {
         HStack {
-            
-            HStack {
-                Image(systemName: "photo")
-                Text("Album")
-            }
-            .transparentButtonStyle(backgroundColor: .clear, foregroundColor: .blue)
-            .padding(.horizontal)
-            .frame(maxWidth: .infinity)
-            .background(Color.blue.opacity(0.2))
-            .cornerRadius(8)
-            .onTapGesture {
+            TransparentButton(backgroundColor: .blue, foregroundColor: .blue, leadingIcon: "photo", text: "Album", fullWidth: true) {
                 sourceType = .photoLibrary
                 isImagePickerPresented = true
             }
             
             Spacer()
             
-            HStack {
-                Image(systemName: "camera")
-                Text("Camera")
-            }
-            .transparentButtonStyle(backgroundColor: .clear, foregroundColor: .gray)
-            .padding(.horizontal)
-            .frame(maxWidth: .infinity)
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(8)
-            .onTapGesture {
+            TransparentButton(backgroundColor: .gray, foregroundColor: .gray, leadingIcon: "camera", text: "Camera", fullWidth: true) {
                 sourceType = .camera
                 isImagePickerPresented = true
             }
-            
+
         }
         .frame(maxWidth: .infinity)
     }

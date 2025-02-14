@@ -24,8 +24,12 @@ class PullListViewModel {
         self.selectedPullList = selectedPullList
     }
     
+    func createEmptyRoom(_ roomName: String) {
+        self.selectedPullList.roomContents[roomName] = []
+        updatePullList()
+    }
  
-    func uploadPullList() {
+    func updatePullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {
             try pullListRef.setData(from: selectedPullList)

@@ -25,8 +25,6 @@ struct CreateModelView: View {
     var body: some View {
         
         VStack(spacing: 0) {
-            Form {
-                Section(header: Text("Images")) {
                     VStack(spacing: 8) {
                         AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                         
@@ -34,15 +32,11 @@ struct CreateModelView: View {
                             ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                         }
                     }
-                }
                 
-                Section(header: Text("Options")) {
                     ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
                     
                     Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
-                }
                 
-            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     ModelNameEntry()
@@ -53,14 +47,10 @@ struct CreateModelView: View {
                 ImagePickerSheetView()
             }
             
-            Button {
+            
+            RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Item to Inventory", semibold: true) {
                 createModel()
-            } label: {
-                Text("Add Item to Inventory")
-                    .transparentButtonStyle(backgroundColor: .green, foregroundColor: .green)
-                    .padding(.vertical)
             }
-            .frame(maxWidth: .infinity, alignment: .center)
             
         }
         .ignoresSafeArea(.keyboard)

@@ -21,7 +21,7 @@ struct NavigationDestinationsModifier: ViewModifier {
             .navigationDestination(for: PullList.self) { pullList in
                 PullListDetailsView(pullList: pullList)
             }
-//            .navigationDestination(for: Model.self) { model in
+//            .navigationDestination(for: InstalledList.self) { installedList in
 //                InstalledListView()
 //            } not used yet
             .navigationDestination(for: String.self) { string in

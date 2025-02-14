@@ -17,13 +17,7 @@ struct ItemListView: View {
     var body: some View {
         
         if isEditing {
-            HStack {
-                Image(systemName: "plus")
-                Text("Add Item")
-            }
-            .transparentButtonStyle(backgroundColor: .green, foregroundColor: .green)
-            .frame(maxWidth: .infinity)
-            .onTapGesture {
+            TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "plus", text: "Add Item") {
                 viewModel.createSingleModelItem()
             }
         } else {
