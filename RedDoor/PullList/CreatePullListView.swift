@@ -57,7 +57,7 @@ struct CreatePullListView: View {
                 }
                 
                 Button("Save Pull List") {
-                    viewModel.createPullList()
+                    viewModel.uploadPullList()
                 }
             }
         }
@@ -70,9 +70,9 @@ struct CreatePullListView: View {
                     .background(Color(.systemGray5))
                     .cornerRadius(8)
                     .multilineTextAlignment(.center)
-                    .onSubmit {
+                    .onChange(of: addressQuery) { _, newValue in
                         // do the address searching stuff (use a sheet?)
-                        let address = Address(fullAddress: addressQuery)
+                        let address = Address(fullAddress: newValue)
                         viewModel.selectedPullList.id = address.toUniqueID()
                     }
             }

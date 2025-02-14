@@ -25,17 +25,22 @@ class SharedPullListViewModel {
     }
     
  
-    func createPullList() {
+    func uploadPullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {
             try pullListRef.setData(from: selectedPullList)
-            print("pull list added")
+//            print("pull list added")
         } catch {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
     }
     
-
+    func deletePullList() {
+        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
+        pullListRef.delete()
+//            print("pull list deleted")
+    }
+    
     func loadPullLists(limit: Int = 20, completion: @escaping ([PullList]) -> Void) async {
         lastDocument = nil
         hasMoreData = true

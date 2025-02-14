@@ -42,7 +42,7 @@ struct Address {
     
     func toUniqueID() -> String {
         
-        if let warehouseNumber {
+        if let warehouseNumber, warehouseNumber != "" {
             return "warehouse-\(warehouseNumber)"
         } else {
             // MARK: FIX WITH ACTUAL ADDRESS PARSING
