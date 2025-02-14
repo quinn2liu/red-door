@@ -9,31 +9,27 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var path = NavigationPath()
-    @State private var pullListSearch = ""
     
     var body: some View {
-        //        NavigationStack(path: $path) {
         TabView {
             InventoryView()
                 .tabItem {
                     Label("Inventory", systemImage: "square.stack.fill")
-                }
+                }.tint(.blue)
             PullListView()
-                .searchable(text: $pullListSearch, prompt: "Search Pull Lists")
                 .tabItem {
                     Label("Pull Lists", systemImage: "list.bullet")
-                }
+                }.tint(.blue)
             InstalledListView()
                 .tabItem {
                     Label("Installed Lists", systemImage: "list.bullet.clipboard")
-                }
+                }.tint(.blue)
             AccountView()
                 .tabItem {
                     Label("Account", systemImage: "person")
-                }
+                }.tint(.blue)
         }
-        .background(Color.white)
-        .accentColor(.red)
+        .tint(.red)
     }
 }
 

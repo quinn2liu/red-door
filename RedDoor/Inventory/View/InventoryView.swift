@@ -3,17 +3,18 @@ import SwiftUI
 
 struct InventoryView: View {
     
-    @State private var viewModel = ViewModel()
+    @State private var viewModel = InventoryViewModel()
     @State private var modelsArray: [Model] = []
     @State private var path: NavigationPath = NavigationPath()
-    @State var searchText: String = ""
-    @State var isEditing: Bool = false
-    @State var selectedType: ModelType?
+    @State private var searchText: String = ""
+    @State private var isEditing: Bool = false
+    @State private var selectedType: ModelType?
     @State private var isLoading: Bool = false
     
     private let fetchLimit = 20
     var TESTMODEL = Model()
     
+    // MARK: Body
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
@@ -22,6 +23,17 @@ struct InventoryView: View {
                 InventoryList()
             }
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    Text("Inventory")
+                        .font(.system(.title2, design: .default))
+                        .bold()
+                        .foregroundStyle(.red)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolBarMenu()
+                }
+            }
             .onSubmit(of: .search) {
                 Task {
                     isLoading = true
@@ -55,34 +67,13 @@ struct InventoryView: View {
                     }
                 }
             }
-            .navigationDestination(for: Model.self) { model in
-                ModelView(path: $path, model: model, isEditing: $isEditing)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    Text("Inventory")
-                        .font(.system(.title2, design: .default))
-                        .bold()
-                        .foregroundStyle(.red)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        NavigationLink(destination: CreateModelView()) {
-                            Label("Add Item", systemImage: "plus")
-                        }
-                        NavigationLink(destination: ScanItemView()) {
-                            Label("Scan Item", systemImage: "qrcode.viewfinder")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                    }
-                }
-            }
+            .rootNavigationDestinations()
+            
         }
     }
     
-    @ViewBuilder
-    private func InventoryList() -> some View {
+    // MARK: InventoryList
+    @ViewBuilder private func InventoryList() -> some View {
         List {
             ForEach(modelsArray, id: \.self) { model in
                 NavigationLink(value: model) {
@@ -113,24 +104,43 @@ struct InventoryView: View {
         }
     }
     
+    // MARK: ToolBarMenu
+    @ViewBuilder private func ToolBarMenu() -> some View {
+        Menu {
+            NavigationLink(destination: CreateModelView()) {
+                Label("Add Item", systemImage: "plus")
+            }
+            NavigationLink(destination: ScanItemView()) {
+                Label("Scan Item", systemImage: "qrcode.viewfinder")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(.red)
+        }
+    }
+    
+    // MARK: searchModels()
     private func searchModels() async {
         await viewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
             modelsArray = fetchedModels
         }
     }
     
+    // MARK: loadMoreSearchResults()
     private func loadMoreSearchResults() async {
         await viewModel.getMoreInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
             modelsArray.append(contentsOf: fetchedModels)
         }
     }
     
+    // MARK: loadInitialModels()
     private func loadInitialModels() async {
         await viewModel.getInitialInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
             modelsArray = fetchedModels
         }
     }
     
+    // MARK: loadMoreModels()
     private func loadMoreModels() async {
         await viewModel.getMoreInventoryModels(searchText: nil, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
             modelsArray.append(contentsOf: fetchedModels)

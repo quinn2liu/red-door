@@ -9,21 +9,19 @@ import SwiftUI
 
 struct PullListDetailsView: View {
     
-    @State var viewModel: ViewModel
-    @Binding var path: NavigationPath
-    @Binding var isEditing: Bool
+    @Environment(\.dismiss) private var dismiss
+    @State var viewModel: PullListViewModel
+    @State var isEditing: Bool = false
 
-    init(path: Binding<NavigationPath>, pullList: PullList, isEditing: Binding<Bool>) {
-        self.viewModel = ViewModel(selectedPullList: pullList)
-        self._path = path
-        self._isEditing = isEditing
+    init(pullList: PullList) {
+        self.viewModel = PullListViewModel(selectedPullList: pullList)
     }
     
     var body: some View {
         Text("Address: \(viewModel.selectedPullList.id)")
         Button {
             viewModel.deletePullList()
-            path = NavigationPath()
+            dismiss()
         } label: {
             Text("Delete Pull List")
         }

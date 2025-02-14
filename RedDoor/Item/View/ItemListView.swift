@@ -11,7 +11,7 @@ struct ItemListView: View {
     
     var items: [Item]
     var isEditing: Bool
-    var viewModel: ViewModel
+    var viewModel: ModelViewModel
     @State var listExpanded: Bool = false
     
     var body: some View {

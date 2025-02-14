@@ -5,14 +5,37 @@
 //  Created by Quinn Liu on 1/16/25.
 //
 
+import Foundation
+
 import SwiftUI
 
-struct NavigationDestinationModifier: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct NavigationDestinationsModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .navigationDestination(for: Model.self) { model in
+                ModelView(model: model)
+            }
+            .navigationDestination(for: Item.self) { item in
+                ItemDetailView(item: item)
+            }
+            .navigationDestination(for: PullList.self) { pullList in
+                PullListDetailsView(pullList: pullList)
+            }
+//            .navigationDestination(for: Model.self) { model in
+//                InstalledListView()
+//            } not used yet
+            .navigationDestination(for: String.self) { string in
+                Group {
+                    if string == "might be useful" {
+                        
+                    }
+                }
+            }
     }
 }
 
-#Preview {
-    NavigationDestinationModifier()
+extension View {
+    func rootNavigationDestinations() -> some View {
+        modifier(NavigationDestinationsModifier())
+    }
 }

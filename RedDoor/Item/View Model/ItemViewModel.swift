@@ -10,7 +10,7 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseCore
 
-class SharedItemViewModel {
+class ItemViewModel {
     let db = Firestore.firestore()
     
     var selectedItem: Item
@@ -65,11 +65,4 @@ class SharedItemViewModel {
     
 }
 
-extension ItemListItemView {
-    typealias ViewModel  = SharedItemViewModel
-}
-
-extension ItemDetailView {
-    typealias ViewModel  = SharedItemViewModel
-}
 

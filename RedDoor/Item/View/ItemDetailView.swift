@@ -8,15 +8,19 @@
 import SwiftUI
 
 struct ItemDetailView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @State var item: Item
-    @Binding var path: NavigationPath
-    var viewModel: ViewModel
+    var viewModel: ItemViewModel
 
-    init(item: Item, path: Binding<NavigationPath>) {
+//    init(item: Item, path: Binding<NavigationPath>) {
+//        self.item = item
+//        self._path = path
+//        self.viewModel = ViewModel(selectedItem: item)
+//    }
+    
+    init(item: Item) {
         self.item = item
-        self._path = path
-        self.viewModel = ViewModel(selectedItem: item)
+        self.viewModel = ItemViewModel(selectedItem: item)
     }
     
     var body: some View {
@@ -25,7 +29,7 @@ struct ItemDetailView: View {
             Task {
                 await viewModel.deleteItem()
             }
-            path.removeLast()
+            dismiss()
         }
     }
 }

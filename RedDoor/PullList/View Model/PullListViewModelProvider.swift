@@ -13,7 +13,7 @@ import SwiftUI
 import FirebaseStorage
 
 @Observable
-class SharedPullListViewModel {
+class PullListViewModel {
     var selectedPullList: PullList
     
     let db = Firestore.firestore()
@@ -76,16 +76,4 @@ class SharedPullListViewModel {
         }
     }
     
-}
-
-extension PullListView {
-    typealias ViewModel = SharedPullListViewModel
-}
-
-extension CreatePullListView {
-    typealias ViewModel = SharedPullListViewModel
-}
-
-extension PullListDetailsView {
-    typealias ViewModel = SharedPullListViewModel
 }

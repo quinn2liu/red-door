@@ -10,7 +10,7 @@ import SwiftUI
 struct ModelDetailsView: View {
     
     @Binding var isEditing: Bool
-    @Binding var viewModel: SharedModelViewModel
+    @Binding var viewModel: ModelViewModel
         
     var body: some View {
         if (isEditing) {

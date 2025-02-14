@@ -10,7 +10,7 @@ import PhotosUI
 
 struct CreateModelView: View {
     
-    @State private var viewModel: ViewModel = ViewModel()
+    @State private var viewModel: ModelViewModel = ModelViewModel()
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     

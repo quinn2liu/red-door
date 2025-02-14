@@ -8,11 +8,9 @@
 import SwiftUI
 
 struct CreatePullListView: View {
-    
-    @Binding var path: NavigationPath
+    @Environment(\.dismiss) private var dismiss
 
-    
-    @State private var viewModel: ViewModel = ViewModel()
+    @State private var viewModel: PullListViewModel = PullListViewModel()
     @State private var addressQuery: String = ""
     @State var date: Date = Date()
     
@@ -58,6 +56,7 @@ struct CreatePullListView: View {
                 
                 Button("Save Pull List") {
                     viewModel.uploadPullList()
+                    dismiss()
                 }
             }
         }
@@ -77,14 +76,11 @@ struct CreatePullListView: View {
                     }
             }
         }
-        .navigationDestination(for: Model.self) { model in
-            InstalledListView()
-        }
+        
     }
         
 }
 
 #Preview {
-    @Previewable @State var navPath = NavigationPath()
-    CreatePullListView(path: $navPath)
+    CreatePullListView()
 }

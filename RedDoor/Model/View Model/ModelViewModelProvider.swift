@@ -14,7 +14,7 @@ import FirebaseStorage
 
 
 @Observable
-class SharedModelViewModel {
+class ModelViewModel {
     let db = Firestore.firestore()
     let storageRef = Storage.storage().reference().child("model_images")
     
@@ -345,16 +345,4 @@ class SharedModelViewModel {
         "Stainless Steel"
     ]
     
-}
-
-extension ModelView  {
-    typealias ViewModel = SharedModelViewModel
-}
-
-extension CreateModelView  {
-    typealias ViewModel = SharedModelViewModel
-}
-
-extension ItemListView {
-    typealias ViewModel = SharedModelViewModel
 }

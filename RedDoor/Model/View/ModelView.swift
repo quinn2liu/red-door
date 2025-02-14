@@ -11,9 +11,10 @@ import CachedAsyncImage
 
 struct ModelView: View {
     
-    @State private var viewModel: ViewModel
-    @Binding var path: NavigationPath
-    @Binding private var isEditing: Bool
+    @State private var viewModel: ModelViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var isEditing: Bool = false
     
     @State private var showingDeleteAlert = false
     
@@ -23,10 +24,9 @@ struct ModelView: View {
     @State private var sourceType: UIImagePickerController.SourceType?
     @State private var items: [Item] = []
     
-    init(path: Binding<NavigationPath>, model: Model, isEditing: Binding<Bool>) {
-        self.viewModel = ViewModel(selectedModel: model)
-        self._path = path
-        self._isEditing = isEditing
+    
+    init(model: Model) {
+        self.viewModel = ModelViewModel(selectedModel: model)
     }
     
     var body: some View {
@@ -78,7 +78,8 @@ struct ModelView: View {
                             secondaryButton: .destructive(Text("Delete")) {
                                 Task {
                                     await viewModel.deleteModelFirebase()
-                                    path = NavigationPath()
+//                                    path = NavigationPath()
+                                    dismiss()
                                     isEditing = false
                                 }
                                 
@@ -133,9 +134,7 @@ struct ModelView: View {
         .onAppear() {
             getInitialData()
         }
-        .navigationDestination(for: Item.self) { item in
-            ItemDetailView(item: item, path: $path)
-        }
+        
     } // view
     
     @ViewBuilder
@@ -151,7 +150,7 @@ struct ModelView: View {
             }
         } else {
             HStack {
-                Text("Viewing:")
+                Text("Name:")
                     .font(.headline)
                 Text(viewModel.selectedModel.name)
             }
