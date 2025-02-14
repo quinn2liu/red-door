@@ -42,8 +42,9 @@ class SharedModelViewModel {
     
     func updateModelDataFirebase()  {
         do {
-            try db.collection("unique_models").document(selectedModel.id).setData(from: selectedModel)
-            print("MODEL ADDED/EDITED")
+            selectedModel.name_lowercased = selectedModel.name.lowercased()
+            try db.collection("models").document(selectedModel.id).setData(from: selectedModel)
+//            print("MODEL ADDED/EDITED")
         } catch {
             print("Error adding document: \(error)")
         }
@@ -68,8 +69,6 @@ class SharedModelViewModel {
         batch.commit { err in
             if let err {
                 print("Error writing batch: \(err)")
-            } else {
-                print("Batch write successful")
             }
         }
     }
@@ -80,11 +79,11 @@ class SharedModelViewModel {
         selectedModel.item_ids.append(itemId)
         selectedModel.count += 1
         let itemRef = db.collection("items").document(itemId)
-        let modelRef = db.collection("unique_models").document(selectedModel.id)
+        let modelRef = db.collection("models").document(selectedModel.id)
         do {
             try itemRef.setData(from: item)
             modelRef.updateData(["count": selectedModel.count])
-            print("single item added")
+//            print("single item added")
         } catch {
             print("Error adding item: \(itemId): \(error)")
         }
@@ -145,7 +144,7 @@ class SharedModelViewModel {
         
         for (_, urlString) in selectedModel.imageURLDict {
             guard let url = URL(string: urlString) else { continue }
-            print("Attempting to load imageURL: \(urlString)")
+//            print("Attempting to load imageURL: \(urlString)")
             dispatchGroup.enter()
             
             URLSession.shared.dataTask(with: url) { data, _, error in
@@ -199,15 +198,15 @@ class SharedModelViewModel {
                             
                             do {
                                 let resultMetaData = try await imageRef.putDataAsync(imageData, metadata: metaData)
-                                print("Upload finished. Metadata: \(resultMetaData)")
+//                                print("Upload finished. Metadata: \(resultMetaData)")
                                 let imageURL = try await imageRef.downloadURL().absoluteString
-                                print("imageURL = \(imageURL)")
+//                                print("imageURL = \(imageURL)")
                                 self.selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
                             } catch {
                                 print("Error occurred when uploading image \(error.localizedDescription)")
                             }
                         }
-                        print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
+//                        print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
                         
                     }
                     try await group.waitForAll()
@@ -221,15 +220,15 @@ class SharedModelViewModel {
     
     func deleteModelImagesFirebase() async {
         do {
-            print("deleteModelImagesFirebase triggered")
+//            print("deleteModelImagesFirebase triggered")
             try await withThrowingTaskGroup(of: Void.self) { group in
-                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
+//                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
                 for imageID in selectedModel.imageIDs {
                     group.addTask {
                         let deleteRef = self.storageRef.child(imageID)
                         do {
                             try await deleteRef.delete()
-                            print("Successfully deleted imageID: \(imageID)")
+//                            print("Successfully deleted imageID: \(imageID)")
                         } catch {
                             print("Error deleting imageID \(imageID): \(error)")
                         }
@@ -252,12 +251,12 @@ class SharedModelViewModel {
             
             group.addTask {
                 do {
-                    try await self.db.collection("unique_models").document(self.selectedModel.id).delete()
+                    try await self.db.collection("models").document(self.selectedModel.id).delete()
                     
                     for itemId in self.selectedModel.item_ids {
                         try await self.db.collection("items").document(itemId).delete()
                     }
-                    print("Document \(self.selectedModel.id) successfully removed!")
+//                    print("Document \(self.selectedModel.id) successfully removed!")
                 } catch {
                     print("Error removing document: \(error)")
                 }

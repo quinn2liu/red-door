@@ -21,6 +21,12 @@ struct PullListDetailsView: View {
     
     var body: some View {
         Text("Address: \(viewModel.selectedPullList.id)")
+        Button {
+            viewModel.deletePullList()
+            path = NavigationPath()
+        } label: {
+            Text("Delete Pull List")
+        }
     }
 }
 

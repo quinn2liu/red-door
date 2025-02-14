@@ -172,7 +172,7 @@ struct ModelView: View {
                     switch result {
                     case .success(let items):
                         self.items = items
-                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+//                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
                     case .failure(let error):
                         print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
                     }
@@ -189,7 +189,7 @@ struct ModelView: View {
             switch result {
             case .success(let items):
                 self.items = items
-                print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
+//                print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
             case .failure(let error):
                 print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
             }

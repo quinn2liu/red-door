@@ -19,7 +19,7 @@ extension InventoryView {
         private var hasMoreData = true
         
         //        func getInventoryModels(selectedType: ModelType?, completion: @escaping ([Model]) -> Void) {
-        //                let collectionRef = db.collection("unique_models")
+        //                let collectionRef = db.collection("models")
         //
         //                var query : Query
         //
@@ -57,14 +57,15 @@ extension InventoryView {
         func searchInventoryModels(searchText: String, selectedType: ModelType?, limit: Int, completion: @escaping ([Model]) -> Void) async {
             lastDocument = nil
             hasMoreData = true
+            
+            let searchLowercased = searchText.lowercased()
 
-            let collectionRef = db.collection("unique_models")
+            let collectionRef = db.collection("models")
             var query: Query = collectionRef
-                .whereField("name", isGreaterThanOrEqualTo: searchText)
-                .whereField("name", isLessThan: searchText + "\u{f8ff}")
+                .whereField("name_lowercased", isGreaterThanOrEqualTo: searchLowercased)
+                .whereField("name_lowercased", isLessThan: searchLowercased + "\u{f8ff}")
                 .limit(to: limit)
-                .order(by: "name", descending: false)
-
+                    
             if let selectedType {
                 query = query.whereField("type", isEqualTo: selectedType.rawValue)
             }
@@ -101,7 +102,7 @@ extension InventoryView {
             lastDocument = nil
             hasMoreData = true
             
-            let collectionRef = db.collection("unique_models")
+            let collectionRef = db.collection("models")
 
             var query: Query = collectionRef.limit(to: limit).order(by: "name", descending: false)
             
@@ -141,11 +142,11 @@ extension InventoryView {
                 await MainActor.run {
                     completion([])
                 }
-                print("hasMoreData = \(hasMoreData), getMoreModels returned EMPTY ARRAY []")
+//                print("hasMoreData = \(hasMoreData), getMoreModels returned EMPTY ARRAY []")
                 return
             }
             
-            let collectionRef = db.collection("unique_models").order(by: "name", descending: false)
+            let collectionRef = db.collection("models").order(by: "name", descending: false)
             var query: Query = collectionRef
                 .limit(to: limit)
                 .start(afterDocument: lastDocument)
@@ -174,7 +175,7 @@ extension InventoryView {
                     }
                 }
                 
-                print("getMoreModels RETURNED \(models.count) MODELS")
+//                print("getMoreModels RETURNED \(models.count) MODELS")
                 
                 hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
                 
