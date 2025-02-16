@@ -78,7 +78,7 @@ struct InventoryView: View {
         List {
             ForEach(modelsArray, id: \.self) { model in
                 NavigationLink(value: model) {
-                    InventoryItemListView(model: model)
+                    ModelListItemView(model: model)
                 }
                 .onAppear {
                     if model == modelsArray.last && !searchText.isEmpty {

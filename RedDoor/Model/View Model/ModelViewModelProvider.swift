@@ -137,7 +137,6 @@ class ModelViewModel {
 //    }
     
     // MARK: IMAGES
-    
     func loadImages() {
         let dispatchGroup = DispatchGroup()
         var loadedImages: [UIImage] = []

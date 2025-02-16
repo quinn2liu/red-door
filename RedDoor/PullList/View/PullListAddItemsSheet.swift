@@ -22,14 +22,12 @@ struct PullListAddItemsSheet: View {
     @State private var selectedType: ModelType?
     @State private var isLoading: Bool = false
     private let fetchLimit = 20
-    
-    var TESTMODEL = Model()
-    
+        
     // MARK: Body
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 0) {
-                Text("Inventory")
+                Text("Add Items")
                     .font(.system(.title2, design: .default))
                     .bold()
                     .foregroundStyle(.red)
@@ -46,14 +44,6 @@ struct PullListAddItemsSheet: View {
             }
             
             SearchBar()
-                .onSubmit {
-                    Task {
-                        print("search submitted")
-                        isLoading = true
-                        await searchModels()
-                        isLoading = false
-                    }
-                }
             
             InventoryFilterView(selectedType: $selectedType)
             
@@ -63,7 +53,6 @@ struct PullListAddItemsSheet: View {
         .rootNavigationDestinations()
         .frameHorizontalPadding()
         .frameVerticalPadding()
-        
         .onAppear {
             Task {
                 isLoading = true
@@ -137,6 +126,13 @@ struct PullListAddItemsSheet: View {
                 TextField("", text: $searchText, prompt: Text("Search..."))
                     .font(.footnote)
                     .focused($isSearchFocused)
+                    .onSubmit {
+                        Task {
+                            isLoading = true
+                            await searchModels()
+                            isLoading = false
+                        }
+                    }
             }
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
