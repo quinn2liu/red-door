@@ -20,6 +20,11 @@ extension View {
             self
         }
     }
+    
+    func onHighPriorityTap(action: @escaping () -> Void) -> some View {
+        self
+            .highPriorityGesture(TapGesture().onEnded({ action() }))
+    }
 }
 
 // MARK: Frame
@@ -32,6 +37,11 @@ extension View {
     func frameHorizontalPadding() -> some View {
         self
             .padding(.horizontal, 16)
+    }
+    
+    func frameVerticalPadding() -> some View {
+        self
+            .padding(.vertical, 16)
     }
     
     func frame(_ size: CGFloat) -> some View {

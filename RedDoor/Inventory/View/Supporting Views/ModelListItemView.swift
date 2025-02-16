@@ -1,19 +1,15 @@
 //
-//  InventoryItemView.swift
+//  ModelListItemView.swift
 //  RedDoor
 //
-//  Created by Quinn Liu on 8/20/24.
+//  Created by Quinn Liu on 2/16/25.
 //
 
 import SwiftUI
 
-struct InventoryItemListView: View {
+struct ModelListItemView: View {
     
     var model: Model
-    
-    init(model: Model) {
-        self.model = model
-    }
     
     var body: some View {
         HStack {
@@ -26,6 +22,6 @@ struct InventoryItemListView: View {
     }
 }
 
-#Preview {
-    InventoryItemListView(model: Model())
-}
+//#Preview {
+//    ModelListItemView(model: )
+//}

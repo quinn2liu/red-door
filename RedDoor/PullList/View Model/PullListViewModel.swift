@@ -26,7 +26,6 @@ class PullListViewModel {
     
     func createEmptyRoom(_ roomName: String) {
         self.selectedPullList.roomContents[roomName] = []
-        updatePullList()
     }
  
     func updatePullList() {

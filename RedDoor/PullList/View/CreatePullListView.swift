@@ -17,6 +17,7 @@ struct CreatePullListView: View {
     
     @State private var showCreateRoom: Bool = false
     
+    // MARK: Body
     var body: some View {
         VStack(spacing: 16) {
             TopAppBar(leadingIcon: {
@@ -60,7 +61,7 @@ struct CreatePullListView: View {
                 ScrollView {
                     LazyVStack {
                         ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
-                            RoomListView(roomName: room.key, itemIds: room.value)
+                            RoomListItemView(roomName: room.key, itemIds: room.value, showSheet: $showCreateRoom)
                         }
                     }
                 }
@@ -108,7 +109,7 @@ struct CreatePullListView: View {
 
                 Button {
                     viewModel.createEmptyRoom(newRoomName)
-                    dismiss()
+                    showCreateRoom = false
                 } label: {
                     Text("Add Room")
                         .fontWeight(.semibold)

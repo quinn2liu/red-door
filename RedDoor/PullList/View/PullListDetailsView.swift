@@ -10,8 +10,9 @@ import SwiftUI
 struct PullListDetailsView: View {
     
     @Environment(\.dismiss) private var dismiss
-    @State var viewModel: PullListViewModel
-    @State var isEditing: Bool = false
+    @State private var viewModel: PullListViewModel
+    @State private var isEditing: Bool = false
+    @State private var showSheet: Bool = false
 
     init(pullList: PullList) {
         self.viewModel = PullListViewModel(selectedPullList: pullList)
@@ -24,20 +25,10 @@ struct PullListDetailsView: View {
     
     @State private var showCreateRoom: Bool = false
     
+    // MARK: Body
     var body: some View {
         VStack(spacing: 16) {
-            TopAppBar(leadingIcon: {
-                BackButton()
-            }, header: {
-                TextField("Type Address", text: $addressQuery)
-                    .onChange(of: addressQuery) { _, newValue in
-                        // do the address searching stuff (use a sheet?)
-                        let address = Address(fullAddress: newValue)
-                        viewModel.selectedPullList.id = address.toUniqueID()
-                    }
-            }, trailingIcon: {
-                Spacer().frame(24)
-            })
+            TopBar()
             
             DatePicker(
                 "Install Date:",
@@ -53,26 +44,14 @@ struct PullListDetailsView: View {
                     .cornerRadius(8)
             }
             
-            VStack(spacing: 0) {
-                ScrollView {
-                    LazyVStack {
-                        ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
-                            RoomListView(roomName: room.key, itemIds: room.value)
-                        }
-                    }
-                }
-                
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
-                    showCreateRoom = true
-                }
-            }
+            RoomList()
             
             Spacer()
             
             HStack {
-                
-                Button("Add Room") {
-                    // do stuff
+                Button("Delete Pull List") {
+                    viewModel.deletePullList()
+                    dismiss()
                 }
                 
                 Button("Save Pull List") {
@@ -81,10 +60,61 @@ struct PullListDetailsView: View {
                 }
             }
         }
+        .sheet(isPresented: $showSheet) {
+            PullListAddItemsSheet(showSheet: $showSheet)
+        }
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
         .frameHorizontalPadding()
     }
+    
+    // MARK: TopBar
+    @ViewBuilder private func TopBar() -> some View {
+        TopAppBar(leadingIcon: {
+            BackButton()
+        }, header: {
+            if isEditing {
+                TextField(viewModel.selectedPullList.id, text: $addressQuery)
+                    .onChange(of: addressQuery) { _, newValue in
+                        // do the address searching stuff (use a sheet?)
+                        let address = Address(fullAddress: newValue)
+                        viewModel.selectedPullList.id = address.toUniqueID()
+                    }
+            } else {
+                Text(viewModel.selectedPullList.id)
+            }
+            
+        }, trailingIcon: {
+            Button {
+                if isEditing {
+                    viewModel.updatePullList()
+                }
+                isEditing.toggle()
+            } label: {
+                Text(isEditing ? "Save" : "Edit")
+                    .foregroundStyle(.red)
+                    .fontWeight(isEditing ? .semibold : .regular)
+            }
+        })
+    }
+    
+    // MARK: RoomList
+    @ViewBuilder private func RoomList() -> some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                LazyVStack {
+                    ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
+                        RoomListItemView(roomName: room.key, itemIds: room.value, showSheet: $showSheet)
+                    }
+                }
+            }
+            
+            TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
+                showCreateRoom = true
+            }
+        }
+    }
+    
 }
 
 // MARK: CREATE MOCK DATA

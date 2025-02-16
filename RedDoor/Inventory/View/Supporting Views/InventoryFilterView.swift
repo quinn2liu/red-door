@@ -36,7 +36,6 @@ struct InventoryFilterView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
     }
     
     private func foregroundColor(for type: ModelType) -> Color {

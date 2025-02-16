@@ -22,6 +22,7 @@ struct InventoryView: View {
                 
                 InventoryList()
             }
+            .frameHorizontalPadding()
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
             .toolbar {
                 ToolbarItem(placement: .navigation) {
