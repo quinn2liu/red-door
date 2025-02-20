@@ -22,6 +22,7 @@ struct RoomView: View {
     
     // MARK: State Variables
     @State private var isEditing: Bool = false
+    @State private var showAddItemsSheet: Bool = false
     
     // MARK: Body()
     var body: some View {
@@ -29,8 +30,17 @@ struct RoomView: View {
             
             TopBar()
             
+            Button {
+                showAddItemsSheet = true
+            } label: {
+                Text("Add Items")
+            }
+            
             RoomContents()
             
+        }
+        .sheet(isPresented: $showAddItemsSheet) {
+            PullListAddItemsSheet(showSheet: $showAddItemsSheet)
         }
         .frameTop()
         .frameHorizontalPadding()
