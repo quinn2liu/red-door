@@ -30,21 +30,23 @@ struct PullListDetailsView: View {
         VStack(spacing: 16) {
             TopBar()
             
-            ListDetails()
+            PullListDetails()
             
             RoomList()
             
             Spacer()
             
-            HStack {
-                Button("Delete Pull List") {
-                    viewModel.deletePullList()
-                    dismiss()
-                }
-                
-                Button("Save Pull List") {
-                    viewModel.updatePullList()
-                    dismiss()
+            if isEditing {
+                HStack {
+                    Button("Delete Pull List") {
+                        viewModel.deletePullList()
+                        dismiss()
+                    }
+                    
+                    Button("Save Pull List") {
+                        viewModel.updatePullList()
+                        dismiss()
+                    }
                 }
             }
         }
@@ -99,8 +101,8 @@ struct PullListDetailsView: View {
         })
     }
     
-    // MARK: ListDetails()
-    @ViewBuilder private func ListDetails() -> some View {
+    // MARK: PullListDetails()
+    @ViewBuilder private func PullListDetails() -> some View {
         
         VStack(spacing: 12) {
             if isEditing {
@@ -126,7 +128,7 @@ struct PullListDetailsView: View {
     
     // MARK: RoomList()
     @ViewBuilder private func RoomList() -> some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 12) {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.selectedPullList.roomMetadata, id: \.id) { roomData in

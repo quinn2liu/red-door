@@ -13,21 +13,22 @@ struct RoomMetadataListItemView: View {
     @State private var showItems: Bool = false
     
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text(roomMetadata.name)
+        HStack(spacing: 12) {
+            Text(roomMetadata.name)
+                .foregroundStyle(Color(.label))
+                    
+            Spacer()
+            
+            Group {
+                Text("Items: \(roomMetadata.itemCount)")
                 
-                Spacer()
-                
-                Button {
-                    showItems.toggle()
-                } label: {
-                    Image(systemName: showItems ? "minus" : "plus")
-                        .fontWeight(.semibold)
-                }
-            }
+                Image(systemName: "chevron.right")
+            }.foregroundStyle(Color(.systemGray))
         }
-        
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .background(Color(.systemGray5))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
 

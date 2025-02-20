@@ -22,7 +22,7 @@ struct NavigationDestinationsModifier: ViewModifier {
                 PullListDetailsView(pullList: pullList)
             }
             .navigationDestination(for: RoomMetadata.self) { roomData in
-                
+                RoomView(roomData: roomData)
             }
 //            .navigationDestination(for: InstalledList.self) { installedList in
 //                InstalledListView()

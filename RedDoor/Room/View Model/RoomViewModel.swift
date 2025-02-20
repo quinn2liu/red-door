@@ -10,38 +10,54 @@ import Firebase
 
 @Observable
 class RoomViewModel {
+    var selectedRoom: Room
+    let pullListId: String
     
-    var selectedRoom: Room?
-    
+    private var roomListener: ListenerRegistration?
     let db = Firestore.firestore()
  
-    private var roomListener: ListenerRegistration?
+    init(roomData: RoomMetadata) {
+        self.selectedRoom = Room(roomName: roomData.name, listId: String(roomData.id.split(separator: ";").first ?? ""))
+        self.pullListId = String(roomData.id.split(separator: ";").first ?? "")
         
-    func startListening(pullListId: String, roomId: String) {
+        startListening()
+    }
+    
+    deinit {
+        stopListening()
+    }
+        
+    private func startListening() {
         let roomRef = db.collection("pull_lists")
             .document(pullListId)
             .collection("rooms")
-            .document(roomId)
+            .document(selectedRoom.id)
         
         roomListener = roomRef
             .addSnapshotListener { [weak self] snapshot, error in
-                guard let data = snapshot?.data(),
-                      let updatedRoom = try? Firestore.Decoder().decode(Room.self, from: data) else { return }
+                guard let self,
+                      let data = snapshot?.data(),
+                      let updatedRoom = try? Firestore.Decoder().decode(Room.self, from: data)
+                else { return }
                 
-                self?.selectedRoom = updatedRoom
+                self.selectedRoom = updatedRoom
             }
     }
     
-    func stopListening() {
+    private func stopListening() {
         roomListener?.remove()
     }
     
-    func updateRoom(_ room: Room) {
-        let roomRef = db.collection("rooms").document(room.id)
+    func updateRoom() {
+        let roomRef = db.collection("pull_lists")
+            .document(pullListId)
+            .collection("rooms")
+            .document(selectedRoom.id)
+            
         do {
-            try roomRef.setData(from: room)
+            try roomRef.setData(from: selectedRoom)
         } catch {
-            print("Error adding pull list: \(room.id): \(error)")
+            print("Error updating room: \(selectedRoom.id): \(error)")
         }
     }
 }

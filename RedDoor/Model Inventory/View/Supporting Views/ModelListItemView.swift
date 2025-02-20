@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct ModelListItemView: View {
     
@@ -18,7 +19,7 @@ struct ModelListItemView: View {
     var body: some View {
         HStack {
             if urlString != "" {
-                AsyncImage(url: URL(string: urlString)) { phase in
+                CachedAsyncImage(url: URL(string: urlString)) { phase in
                     switch phase {
                     case .empty:
                         ProgressView() // Placeholder while loading
