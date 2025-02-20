@@ -35,14 +35,12 @@ class PullListViewModel {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
         
-        // storing rooms as their own type
-        
+        // Create rooms in the pull list's subcollection
         let batch = db.batch()
         selectedPullList.roomMetadata.forEach { roomData in
-            // creating the room from the roomMetadata
             let room = Room(roomName: roomData.name, listId: selectedPullList.id)
-
-            let roomRef = db.collection("rooms").document(room.id)
+            
+            let roomRef = pullListRef.collection("rooms").document(room.id)
             do {
                 try batch.setData(from: room, forDocument: roomRef)
             } catch {
@@ -56,7 +54,6 @@ class PullListViewModel {
             }
         }
     }
-    
     func updatePullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {

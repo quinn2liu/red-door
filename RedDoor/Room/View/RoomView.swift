@@ -8,11 +8,17 @@
 import SwiftUI
 
 struct RoomView: View {
+    
+    @State var viewModel: RoomViewModel = RoomViewModel()
+    var room: Room
+    
     var body: some View {
-        Text("Hello, World!")
+        VStack(spacing: 0) {
+            Text(room.roomName)
+        }.frameTop()
     }
 }
 
 #Preview {
-    RoomView()
+    RoomView(room: Room.MOCK_DATA[0])
 }

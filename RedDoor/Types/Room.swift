@@ -23,6 +23,12 @@ struct Room: Codable, Identifiable, Hashable {
     }
 }
 
+extension Room {
+    static var MOCK_DATA: [Room] = [
+        .init(roomName: "test room name", listId: "test list id")
+    ]
+}
+
 
 struct RoomMetadata: Codable, Identifiable, Hashable {
     var id: String // room id
