@@ -15,18 +15,45 @@ import FirebaseStorage
 @Observable
 class PullListViewModel {
     var selectedPullList: PullList
+    private var listener: ListenerRegistration?
+    private let isListening: Bool
     
     let db = Firestore.firestore()
     private var lastDocument: DocumentSnapshot?
     private var hasMoreData = true
     
-    init(selectedPullList: PullList = PullList()) {
+    init(selectedPullList: PullList = PullList(), isListening: Bool = false) {
         self.selectedPullList = selectedPullList
+        self.isListening = isListening
+        
+        if isListening {
+            setupListener()
+        }
+    }
+    
+    deinit {
+        // Clean up listener when view model is deallocated
+        listener?.remove()
+    }
+    
+    private func setupListener() {
+        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
+        
+        listener = pullListRef.addSnapshotListener { [weak self] documentSnapshot, error in
+            guard let self = self,
+                  let document = documentSnapshot,
+                  document.exists,
+                  let updatedPullList = try? document.data(as: PullList.self) else {
+                return
+            }
+            
+            self.selectedPullList = updatedPullList
+        }
     }
     
     // MARK: Pull List
-    
     func createPullList() {
+        // This will only create, not setup a listener
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         
         do {
@@ -35,7 +62,6 @@ class PullListViewModel {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
         
-        // Create rooms in the pull list's subcollection
         let batch = db.batch()
         selectedPullList.roomMetadata.forEach { roomData in
             let room = Room(roomName: roomData.name, listId: selectedPullList.id)
@@ -54,55 +80,21 @@ class PullListViewModel {
             }
         }
     }
-    func updatePullList() {
+    
+    func updatePullList() {        
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {
             try pullListRef.setData(from: selectedPullList)
-//            print("pull list added")
         } catch {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
     }
     
+    
     func deletePullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         pullListRef.delete()
 //            print("pull list deleted")
-    }
-    
-    func loadPullLists(limit: Int = 20, completion: @escaping ([PullList]) -> Void) async {
-        lastDocument = nil
-        hasMoreData = true
-        
-        let collectionRef = db.collection("pull_lists")
-
-        let query: Query = collectionRef.limit(to: limit).order(by: "id", descending: false)
-        
-        do {
-            let querySnapshot = try await query.getDocuments()
-            lastDocument = querySnapshot.documents.last
-            
-            let pullLists = querySnapshot.documents.compactMap { document -> PullList? in
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
-                    return try JSONDecoder().decode(PullList.self, from: jsonData)
-                } catch {
-                    print("Error decoding document: \(error)")
-                    return nil
-                }
-            }
-            
-            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
-            
-            await MainActor.run {
-                completion(pullLists)
-            }
-        } catch {
-            print("Error fetching documents: \(error.localizedDescription)")
-            await MainActor.run {
-                completion([])
-            }
-        }
     }
     
     // MARK: Room

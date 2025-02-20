@@ -81,6 +81,7 @@ struct CreatePullListView: View {
                 .multilineTextAlignment(.center)
         }, trailingIcon: {
             Button {
+                viewModel.selectedPullList.installDate = date.formatted(.dateTime.year().month().day())
                 viewModel.createPullList()
                 dismiss()
             } label: {

@@ -16,7 +16,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Inventory", systemImage: "square.stack.fill")
                 }.tint(.blue)
-            PullListView()
+            PullListInventoryView()
                 .tabItem {
                     Label("Pull Lists", systemImage: "list.bullet")
                 }.tint(.blue)

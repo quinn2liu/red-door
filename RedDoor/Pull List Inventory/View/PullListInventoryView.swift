@@ -7,18 +7,16 @@
 
 import SwiftUI
 
-struct PullListView: View {
+struct PullListInventoryView: View {
     
-    @State private var viewModel = PullListViewModel()
+    @State private var viewModel = PullListInventoryViewModel()
     @State private var pullListArray: [PullList] = []
-    @State private var isEditing = false
     @State private var path: NavigationPath = NavigationPath()
     @State private var searchText: String = ""
 
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                
                 List {
                     ForEach(pullListArray) { pullList in
                         NavigationLink(value: pullList) {
@@ -42,7 +40,6 @@ struct PullListView: View {
                 }
             }
             .onAppear {
-                isEditing = false
                 Task {
                     await loadInitialPullLists()
                 }
