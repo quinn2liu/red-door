@@ -39,8 +39,8 @@ struct CreatePullListView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
-                        ForEach(Array(viewModel.selectedPullList.rooms), id: \.id) { room in
-                            RoomListItemView(roomName: room.id, itemIds: room.contents, showSheet: $showCreateRoom)
+                        ForEach(viewModel.selectedPullList.roomMetadata, id: \.id) { roomData in
+                            RoomMetadataListItemView(roomMetadata: roomData)
                         }
                     }
                 }
@@ -112,8 +112,7 @@ struct CreatePullListView: View {
                 Spacer()
 
                 Button {
-                    existingRoomAlert = !viewModel.createEmptyRoom(newRoomName) // MARK: DOESN'T WORK
-                    // MARK: IF ROOM NOT CREATED, DISPLAY THE WARNING
+                    existingRoomAlert = !viewModel.createEmptyRoom(newRoomName)
                     if !existingRoomAlert {
                         showCreateRoom = false
                     }

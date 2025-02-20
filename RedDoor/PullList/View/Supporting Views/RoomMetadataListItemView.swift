@@ -7,20 +7,15 @@
 
 import SwiftUI
 
-struct RoomListItemView: View {
+struct RoomMetadataListItemView: View {
     
-    var roomName: String
-    var itemIds: [String]
+    var roomMetadata: RoomMetadata
     @State private var showItems: Bool = false
-    @Binding var showSheet: Bool
     
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(roomName)
-                    .onTapGesture {
-                        showSheet = true
-                    }
+                Text(roomMetadata.name)
                 
                 Spacer()
                 
@@ -31,19 +26,11 @@ struct RoomListItemView: View {
                         .fontWeight(.semibold)
                 }
             }
-            
-            if showItems {
-                ForEach(itemIds, id: \.self) { itemId in
-                    HStack(spacing: 0) {
-                        Text(itemId)
-                    }
-                }
-            }
         }
         
     }
 }
 
 #Preview {
-    RoomListItemView(roomName: "testing room", itemIds: [], showSheet: .constant(true))
+    RoomMetadataListItemView(roomMetadata: RoomMetadata.MOCK_DATA[0])
 }

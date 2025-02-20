@@ -35,21 +35,26 @@ class PullListViewModel {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
         
-//        let batch = db.batch()
-//        selectedPullList.rooms.forEach { room in
-//            let roomRef = db.collection("rooms").document(room.id)
-//            do {
-//                try batch.setData(from: room, forDocument: roomRef)
-//            } catch {
-//                print("Error adding item: \(room.id): \(error)")
-//            }
-//        }
-//        
-//        batch.commit { err in
-//            if let err {
-//                print("Error writing batch: \(err)")
-//            }
-//        }
+        // storing rooms as their own type
+        
+        let batch = db.batch()
+        selectedPullList.roomMetadata.forEach { roomData in
+            // creating the room from the roomMetadata
+            let room = Room(roomName: roomData.name, listId: selectedPullList.id)
+
+            let roomRef = db.collection("rooms").document(room.id)
+            do {
+                try batch.setData(from: room, forDocument: roomRef)
+            } catch {
+                print("Error adding item: \(room.id): \(error)")
+            }
+        }
+        
+        batch.commit { err in
+            if let err {
+                print("Error writing batch: \(err)")
+            }
+        }
     }
     
     func updatePullList() {
@@ -105,21 +110,21 @@ class PullListViewModel {
     
     // MARK: Room
     func createEmptyRoom(_ roomName: String) -> Bool {
-        if roomExists(newRoomName: roomName, existingRooms: self.selectedPullList.rooms) {
+        if roomExists(newRoomName: roomName, existingRooms: self.selectedPullList.roomMetadata) {
             return false // room not added
         } else {
-            self.selectedPullList.rooms.append(Room(roomName: roomName, listId: selectedPullList.id))
+            self.selectedPullList.roomMetadata.append(RoomMetadata(roomName: roomName, listId: selectedPullList.id))
             return true // room successfully added
         }
     }
     
-    func roomExists(newRoomName: String, existingRooms: [Room]) -> Bool {
+    func roomExists(newRoomName: String, existingRooms: [RoomMetadata]) -> Bool {
         let trimmedNewRoom = newRoomName.lowercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: " ", with: "")
         
         return existingRooms.contains { room in
-            let trimmedRoom = room.roomName.lowercased()
+            let trimmedRoom = room.name.lowercased()
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .replacingOccurrences(of: " ", with: "")
             

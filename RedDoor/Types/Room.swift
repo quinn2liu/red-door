@@ -22,3 +22,22 @@ struct Room: Codable, Identifiable, Hashable {
         self.contents = contents
     }
 }
+
+
+struct RoomMetadata: Codable, Identifiable, Hashable {
+    var id: String // room id
+    var name: String // roomName
+    var itemCount: Int // number of items
+    
+    init(roomName: String, listId: String, itemCount: Int = 0) {
+        self.id = listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
+        self.name = roomName
+        self.itemCount = itemCount
+    }
+}
+
+extension RoomMetadata {
+    static var MOCK_DATA: [RoomMetadata] = [
+        .init(roomName: "Mock Living Room", listId: "Test List ID", itemCount: 5)
+    ]
+}

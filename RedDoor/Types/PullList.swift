@@ -12,7 +12,7 @@ struct PullList: Codable, Identifiable, Hashable {
     
     var id: String = UUID().uuidString
     
-    var rooms: [Room] = []
+    var roomMetadata: [RoomMetadata] = []
     var installDate: String
     var client: String
     var isStorage: Bool
