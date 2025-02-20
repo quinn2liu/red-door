@@ -20,28 +20,7 @@ struct CreatePullListView: View {
     // MARK: Body
     var body: some View {
         VStack(spacing: 16) {
-            TopAppBar(leadingIcon: {
-                BackButton()
-            }, header: {
-                TextField("Type Address", text: $addressQuery)
-                    .onChange(of: addressQuery) { _, newValue in
-                        // do the address searching stuff (use a sheet?)
-                        let address = Address(fullAddress: newValue)
-                        viewModel.selectedPullList.id = address.toUniqueID()
-                    }
-                    .padding(6)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-                    .multilineTextAlignment(.center)
-            }, trailingIcon: {
-                Button {
-                    viewModel.updatePullList()
-                    dismiss()
-                } label: {
-                    Text("Save")
-                        .fontWeight(.bold)
-                }
-            })
+            TopBar()
             
             DatePicker(
                 "Install Date:",
@@ -60,8 +39,8 @@ struct CreatePullListView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
-                        ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
-                            RoomListItemView(roomName: room.key, itemIds: room.value, showSheet: $showCreateRoom)
+                        ForEach(Array(viewModel.selectedPullList.rooms), id: \.id) { room in
+                            RoomListItemView(roomName: room.id, itemIds: room.contents, showSheet: $showCreateRoom)
                         }
                     }
                 }
@@ -74,28 +53,53 @@ struct CreatePullListView: View {
             Spacer()
         }
         .ignoresSafeArea(.keyboard)
-        .sheet(isPresented: $showCreateRoom) {
-            CreateRoomSheet()
-                .onAppear {
-                    newRoomName = ""
-                }
-        }
         .toolbar(.hidden)
         .frameHorizontalPadding()
+        .sheet(isPresented: $showCreateRoom) {
+            CreateEmptyRoomSheet()
+                .onAppear {
+                    newRoomName = ""
+                    keyboardFocused = true
+                }
+        }
     }
     
-    // MARK: Create Room Sheet
+    // MARK: TopBar
+    @ViewBuilder private func TopBar() -> some View {
+        TopAppBar(leadingIcon: {
+            BackButton()
+        }, header: {
+            TextField("Type Address", text: $addressQuery)
+                .onChange(of: addressQuery) { _, newValue in
+                    // do the address searching stuff (use a sheet?)
+                    let address = Address(fullAddress: newValue)
+                    viewModel.selectedPullList.id = address.toUniqueID()
+                }
+                .padding(6)
+                .background(Color(.systemGray5))
+                .cornerRadius(8)
+                .multilineTextAlignment(.center)
+        }, trailingIcon: {
+            Button {
+                viewModel.createPullList()
+                dismiss()
+            } label: {
+                Text("Save")
+                    .fontWeight(.bold)
+            }
+        })
+    }
+    
+    // MARK: Create Empty Room Sheet ()
     @FocusState var keyboardFocused: Bool
     @State private var newRoomName: String = ""
-    @ViewBuilder private func CreateRoomSheet() -> some View {
+    @State private var existingRoomAlert: Bool = false
+    @ViewBuilder private func CreateEmptyRoomSheet() -> some View {
 
         VStack(spacing: 16) {
             TextField("Room Name", text: $newRoomName)
                 .focused($keyboardFocused)
                 .submitLabel(.done)
-                .onAppear {
-                    keyboardFocused = true
-                }
             
             HStack(spacing: 0) {
                 Button {
@@ -108,14 +112,20 @@ struct CreatePullListView: View {
                 Spacer()
 
                 Button {
-                    viewModel.createEmptyRoom(newRoomName)
-                    showCreateRoom = false
+                    existingRoomAlert = !viewModel.createEmptyRoom(newRoomName) // MARK: DOESN'T WORK
+                    // MARK: IF ROOM NOT CREATED, DISPLAY THE WARNING
+                    if !existingRoomAlert {
+                        showCreateRoom = false
+                    }
                 } label: {
                     Text("Add Room")
                         .fontWeight(.semibold)
                         .foregroundStyle(.blue)
                 }
             }
+        }
+        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
+            Button("Ok", role: .cancel) { }
         }
         .frameHorizontalPadding()
         .presentationDetents([.fraction(0.1)])

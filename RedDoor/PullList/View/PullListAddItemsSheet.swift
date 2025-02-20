@@ -13,7 +13,6 @@ struct PullListAddItemsSheet: View {
     
     @State private var viewModel = InventoryViewModel()
     @State private var modelsArray: [Model] = []
-    @State private var path: NavigationPath = NavigationPath()
     @Binding var showSheet: Bool
     @FocusState var isSearchFocused: Bool
     
@@ -22,7 +21,7 @@ struct PullListAddItemsSheet: View {
     @State private var selectedType: ModelType?
     @State private var isLoading: Bool = false
     private let fetchLimit = 20
-        
+    
     // MARK: Body
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -31,15 +30,13 @@ struct PullListAddItemsSheet: View {
                     .font(.system(.title2, design: .default))
                     .bold()
                     .foregroundStyle(.red)
-               
+                
                 Spacer()
                 
                 Button {
                     dismiss()
-                    // save the items to the room
                 } label: {
-                    Text("Done")
-                        .fontWeight(.semibold)
+                    Text("Cancel")
                 }
             }
             
@@ -48,9 +45,14 @@ struct PullListAddItemsSheet: View {
             InventoryFilterView(selectedType: $selectedType)
             
             InventoryList()
+            
+            Spacer()
+            
         }
+        
         .frameTop()
-        .rootNavigationDestinations()
+        
+        //        .rootNavigationDestinations()
         .frameHorizontalPadding()
         .frameVerticalPadding()
         .onAppear {

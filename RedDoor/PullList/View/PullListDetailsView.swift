@@ -103,8 +103,8 @@ struct PullListDetailsView: View {
         VStack(spacing: 0) {
             ScrollView {
                 LazyVStack {
-                    ForEach(Array(viewModel.selectedPullList.roomContents), id: \.key) { room in
-                        RoomListItemView(roomName: room.key, itemIds: room.value, showSheet: $showSheet)
+                    ForEach(Array(viewModel.selectedPullList.rooms), id: \.id) { room in
+                        RoomListItemView(roomName: room.id, itemIds: room.contents, showSheet: $showSheet)
                     }
                 }
             }

@@ -24,10 +24,34 @@ class PullListViewModel {
         self.selectedPullList = selectedPullList
     }
     
-    func createEmptyRoom(_ roomName: String) {
-        self.selectedPullList.roomContents[roomName] = []
+    // MARK: Pull List
+    
+    func createPullList() {
+        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
+        
+        do {
+            try pullListRef.setData(from: selectedPullList)
+        } catch {
+            print("Error adding pull list: \(selectedPullList.id): \(error)")
+        }
+        
+//        let batch = db.batch()
+//        selectedPullList.rooms.forEach { room in
+//            let roomRef = db.collection("rooms").document(room.id)
+//            do {
+//                try batch.setData(from: room, forDocument: roomRef)
+//            } catch {
+//                print("Error adding item: \(room.id): \(error)")
+//            }
+//        }
+//        
+//        batch.commit { err in
+//            if let err {
+//                print("Error writing batch: \(err)")
+//            }
+//        }
     }
- 
+    
     func updatePullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {
@@ -76,6 +100,30 @@ class PullListViewModel {
             await MainActor.run {
                 completion([])
             }
+        }
+    }
+    
+    // MARK: Room
+    func createEmptyRoom(_ roomName: String) -> Bool {
+        if roomExists(newRoomName: roomName, existingRooms: self.selectedPullList.rooms) {
+            return false // room not added
+        } else {
+            self.selectedPullList.rooms.append(Room(roomName: roomName, listId: selectedPullList.id))
+            return true // room successfully added
+        }
+    }
+    
+    func roomExists(newRoomName: String, existingRooms: [Room]) -> Bool {
+        let trimmedNewRoom = newRoomName.lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: " ", with: "")
+        
+        return existingRooms.contains { room in
+            let trimmedRoom = room.roomName.lowercased()
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: " ", with: "")
+            
+            return trimmedRoom == trimmedNewRoom
         }
     }
     
