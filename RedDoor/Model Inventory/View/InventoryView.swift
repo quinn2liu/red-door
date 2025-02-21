@@ -4,14 +4,14 @@ import SwiftUI
 struct InventoryView: View {
     
     @State private var viewModel = InventoryViewModel()
-    @State private var modelsArray: [Model] = []
     @State private var path: NavigationPath = NavigationPath()
+    
     @State private var searchText: String = ""
-    @State private var isEditing: Bool = false
+    
+    // MARK: View Modifier Variables
     @State private var selectedType: ModelType?
     @State private var isLoading: Bool = false
     
-    private let fetchLimit = 20
     var TESTMODEL = Model()
     
     // MARK: Body
@@ -38,59 +38,50 @@ struct InventoryView: View {
             .onSubmit(of: .search) {
                 Task {
                     isLoading = true
-                    await searchModels()
+                    await viewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType)
                     isLoading = false
                 }
             }
             .onAppear {
-                isEditing = false
                 Task {
                     isLoading = true
-                    await loadInitialModels()
+                    await viewModel.getInitialInventoryModels(selectedType: selectedType)
                     isLoading = false
                 }
             }
             .onChange(of: selectedType) {
-                modelsArray = []
+                searchText = ""
                 Task {
                     isLoading = true
-                    await loadInitialModels()
+                    await viewModel.getInitialInventoryModels(selectedType: selectedType)
                     isLoading = false
                 }
             }
             .onChange(of: searchText) {
-                if (searchText.isEmpty) {
+                if searchText.isEmpty {
                     Task {
-                        modelsArray = []
                         isLoading = true
-                        await loadInitialModels()
+                        await viewModel.getInitialInventoryModels(selectedType: selectedType)
                         isLoading = false
                     }
                 }
             }
             .rootNavigationDestinations()
-            
         }
     }
     
     // MARK: InventoryList
     @ViewBuilder private func InventoryList() -> some View {
         List {
-            ForEach(modelsArray, id: \.self) { model in
+            ForEach(viewModel.modelsArray, id: \.self) { model in
                 NavigationLink(value: model) {
                     ModelListItemView(model: model)
                 }
                 .onAppear {
-                    if model == modelsArray.last && !searchText.isEmpty {
+                    if model == viewModel.modelsArray.last {
                         Task {
                             isLoading = true
-                            await loadMoreSearchResults()
-                            isLoading = false
-                        }
-                    } else if model == modelsArray.last {
-                        Task {
-                            isLoading = true
-                            await loadMoreModels()
+                            await viewModel.getMoreInventoryModels(searchText: !searchText.isEmpty ? searchText : nil, selectedType: selectedType)
                             isLoading = false
                         }
                     }
@@ -117,34 +108,6 @@ struct InventoryView: View {
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.red)
-        }
-    }
-    
-    // MARK: searchModels()
-    private func searchModels() async {
-        await viewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray = fetchedModels
-        }
-    }
-    
-    // MARK: loadMoreSearchResults()
-    private func loadMoreSearchResults() async {
-        await viewModel.getMoreInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray.append(contentsOf: fetchedModels)
-        }
-    }
-    
-    // MARK: loadInitialModels()
-    private func loadInitialModels() async {
-        await viewModel.getInitialInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray = fetchedModels
-        }
-    }
-    
-    // MARK: loadMoreModels()
-    private func loadMoreModels() async {
-        await viewModel.getMoreInventoryModels(searchText: nil, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray.append(contentsOf: fetchedModels)
         }
     }
     

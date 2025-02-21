@@ -9,34 +9,39 @@ import SwiftUI
 
 
 struct PullListAddItemsSheet: View {
+    // MARK: Environment Variables
     @Environment(\.dismiss) private var dismiss
     
-    @State private var viewModel = InventoryViewModel()
-    @State private var modelsArray: [Model] = []
+    // MARK: View Parameters
+    @State private var inventoryViewModel: InventoryViewModel = InventoryViewModel()
+    @Binding var roomViewModel: RoomViewModel
     @Binding var showSheet: Bool
-    @FocusState var isSearchFocused: Bool
     
     // MARK: Filter Variables
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
     @State private var isLoading: Bool = false
-    private let fetchLimit = 20
+    
+    // MARK: State Variables
+    @FocusState var searchFocused: Bool
     
     // MARK: Body
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 0) {
-                Text("Add Items")
-                    .font(.system(.title2, design: .default))
-                    .bold()
-                    .foregroundStyle(.red)
-                
-                Spacer()
-                
-                Button {
-                    dismiss()
-                } label: {
-                    Text("Cancel")
+            if !searchFocused {
+                HStack(spacing: 0) {
+                    Text("Add Items: \(roomViewModel.selectedRoom.roomName)")
+                        .font(.system(.title2, design: .default))
+                        .bold()
+                        .foregroundStyle(.red)
+                    
+                    Spacer()
+                    
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Cancel")
+                    }
                 }
             }
             
@@ -58,7 +63,7 @@ struct PullListAddItemsSheet: View {
         .onAppear {
             Task {
                 isLoading = true
-                await loadInitialModels()
+                await inventoryViewModel.getInitialInventoryModels(selectedType: selectedType)
                 isLoading = false
             }
         }
@@ -66,19 +71,19 @@ struct PullListAddItemsSheet: View {
             showSheet = false
         }
         .onChange(of: selectedType) {
-            modelsArray = []
+            inventoryViewModel.modelsArray = []
             Task {
                 isLoading = true
-                await loadInitialModels()
+                await inventoryViewModel.getInitialInventoryModels(selectedType: selectedType)
                 isLoading = false
             }
         }
         .onChange(of: searchText) {
             if (searchText.isEmpty) {
                 Task {
-                    modelsArray = []
+                    inventoryViewModel.modelsArray = []
                     isLoading = true
-                    await loadInitialModels()
+                    await inventoryViewModel.getInitialInventoryModels(selectedType: selectedType)
                     isLoading = false
                 }
             }
@@ -89,21 +94,15 @@ struct PullListAddItemsSheet: View {
     @ViewBuilder private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(modelsArray, id: \.self) { model in
+                ForEach(inventoryViewModel.modelsArray, id: \.self) { model in
                     NavigationLink(value: model) {
                         ModelListItemView(model: model)
                     }
                     .onAppear {
-                        if model == modelsArray.last && !searchText.isEmpty {
+                        if model == inventoryViewModel.modelsArray.last {
                             Task {
                                 isLoading = true
-                                await loadMoreSearchResults()
-                                isLoading = false
-                            }
-                        } else if model == modelsArray.last {
-                            Task {
-                                isLoading = true
-                                await loadMoreModels()
+                                await inventoryViewModel.getMoreInventoryModels(searchText: !searchText.isEmpty ? searchText : nil, selectedType: selectedType)
                                 isLoading = false
                             }
                         }
@@ -127,11 +126,11 @@ struct PullListAddItemsSheet: View {
                 
                 TextField("", text: $searchText, prompt: Text("Search..."))
                     .font(.footnote)
-                    .focused($isSearchFocused)
+                    .focused($searchFocused)
                     .onSubmit {
                         Task {
                             isLoading = true
-                            await searchModels()
+                            await inventoryViewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType)
                             isLoading = false
                         }
                     }
@@ -139,44 +138,19 @@ struct PullListAddItemsSheet: View {
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
             
-            if isSearchFocused {
+            if searchFocused {
                 Button("Cancel") {
                     searchText = ""
-                    isSearchFocused = false
+                    searchFocused = false
                 }
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.bouncy(duration: 0.5), value: isSearchFocused)
+        .animation(.bouncy(duration: 0.5), value: searchFocused)
     }
-    
-    // MARK: Load Content Functions
-    private func searchModels() async {
-        await viewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray = fetchedModels
-        }
-    }
-    
-    private func loadMoreSearchResults() async {
-        await viewModel.getMoreInventoryModels(searchText: searchText, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray.append(contentsOf: fetchedModels)
-        }
-    }
-    
-    private func loadInitialModels() async {
-        await viewModel.getInitialInventoryModels(selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray = fetchedModels
-        }
-    }
-    
-    private func loadMoreModels() async {
-        await viewModel.getMoreInventoryModels(searchText: nil, selectedType: selectedType, limit: fetchLimit) { fetchedModels in
-            modelsArray.append(contentsOf: fetchedModels)
-        }
-    }
-    
 }
 
 #Preview {
-    PullListAddItemsSheet(showSheet: .constant(true))
+    @Previewable @State var viewModel = RoomViewModel(roomData: RoomMetadata.MOCK_DATA[0])
+    PullListAddItemsSheet(roomViewModel: $viewModel, showSheet: .constant(true))
 }

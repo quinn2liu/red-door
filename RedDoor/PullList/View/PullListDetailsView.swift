@@ -50,9 +50,7 @@ struct PullListDetailsView: View {
                 }
             }
         }
-        .sheet(isPresented: $showSheet) {
-            PullListAddItemsSheet(showSheet: $showSheet)
-        }
+
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
         .frameHorizontalPadding()
