@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ModelDetailsView: View {
     
-    @Binding var isEditing: Bool
+    var isEditing: Bool
     @Binding var viewModel: ModelViewModel
         
     var body: some View {

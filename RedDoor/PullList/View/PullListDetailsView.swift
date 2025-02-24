@@ -50,7 +50,6 @@ struct PullListDetailsView: View {
                 }
             }
         }
-
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
         .frameHorizontalPadding()

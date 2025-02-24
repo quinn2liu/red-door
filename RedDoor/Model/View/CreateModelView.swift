@@ -29,11 +29,11 @@ struct CreateModelView: View {
                         AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                         
                         if (!images.isEmpty) {
-                            ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                            ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
                         }
                     }
                 
-                    ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
                     
                     Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
                 
@@ -55,7 +55,7 @@ struct CreateModelView: View {
         }
         .ignoresSafeArea(.keyboard)
         .overlay(
-            ImageSelectedView()
+            ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
     }
@@ -85,22 +85,7 @@ struct CreateModelView: View {
         }
     }
     
-    @ViewBuilder private func ImageSelectedView() -> some View {
-        if isImageFullScreen, let selectedImage = selectedImage {
-            Color.black.opacity(0.8)
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    isImageFullScreen = false
-                }
-            Image(uiImage: selectedImage)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .cornerRadius(8)
-                .shadow(radius: 10)
-        }
-    }
-    
+    // TODO: move to model view model
     private func createModel() {
         Task {
             await viewModel.updateModelUIImagesFirebase(images: images)

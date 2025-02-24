@@ -1,31 +1,41 @@
 //
-//  ItemDetailView.swift
+//  RoomItemView.swift
 //  RedDoor
 //
-//  Created by Quinn Liu on 1/8/25.
+//  Created by Quinn Liu on 2/23/25.
 //
 
 import SwiftUI
 
-struct ItemDetailView: View {
+struct RoomItemView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ItemViewModel
+    var room: Room
     
-    init(item: Item) {
+    init(item: Item, room: Room) {
         self.viewModel = ItemViewModel(selectedItem: item)
+        self.room = room
     }
     
     var body: some View {
         Text("Item ID: \(viewModel.selectedItem.id)")
+        
         Button("Delete Item") {
             Task {
                 await viewModel.deleteItem()
             }
             dismiss()
         }
+        
+        Button {
+            viewModel.addItemToRoomDraft(room: room)
+            dismiss()
+        } label: {
+            Text("Add Item to room")
+        }
     }
 }
 
 //#Preview {
-//    ItemDetailView()
+//    RoomItemView()
 //}

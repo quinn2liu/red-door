@@ -1,5 +1,5 @@
 //
-//  ItemListView.swift
+//  ItemListItemView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/8/25.
@@ -28,7 +28,7 @@ struct ItemListItemView: View {
                     Text(item.id)
                     Text(model.type)
                     Text(item.repair.description)
-                    Text(item.pullListId)
+                    Text(item.listId)
                 }
             } else if let errorMessage {
                 HStack {
@@ -62,5 +62,5 @@ struct ItemListItemView: View {
 }
 
 //#Preview {
-//    ItemListView()
+//    ItemListItemView()
 //}

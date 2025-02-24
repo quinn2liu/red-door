@@ -10,13 +10,13 @@ struct Item: Identifiable, Codable, Hashable {
     var modelId: String // comes from the "parent" model
     var id: String // the item's id (a variation of the modelId
     var repair: Bool // whether the item needs to be repaired
-    var pullListId: String // "effective location"
+    var listId: String // "effective location"
     
-    init(modelId: String = "", id: String = "", repair: Bool = false, pullListId: String = "warehouse-1") {
+    init(modelId: String = "", id: String = "", repair: Bool = false, listId: String = "warehouse-1") {
         self.modelId = modelId
         self.id = id
         self.repair = repair
-        self.pullListId = pullListId
+        self.listId = listId
     }
 }
 

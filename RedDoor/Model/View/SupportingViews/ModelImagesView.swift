@@ -15,7 +15,7 @@ struct ModelImagesView: View {
     
     @Binding var selectedImage: UIImage?
     @Binding var isImageFullScreen: Bool
-    @Binding var isEditing: Bool
+    var isEditing: Bool
     
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {

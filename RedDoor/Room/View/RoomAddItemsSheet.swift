@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct PullListAddItemsSheet: View {
+struct RoomAddItemsSheet: View {
     // MARK: Environment Variables
     @Environment(\.dismiss) private var dismiss
     
@@ -24,40 +24,45 @@ struct PullListAddItemsSheet: View {
     
     // MARK: State Variables
     @FocusState var searchFocused: Bool
+    @State var path: NavigationPath = NavigationPath()
     
     // MARK: Body
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            if !searchFocused {
-                HStack(spacing: 0) {
-                    Text("Add Items: \(roomViewModel.selectedRoom.roomName)")
-                        .font(.system(.title2, design: .default))
-                        .bold()
-                        .foregroundStyle(.red)
-                    
-                    Spacer()
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Cancel")
+        NavigationStack(path: $path) {
+            VStack(alignment: .leading, spacing: 16) {
+                if !searchFocused {
+                    HStack(spacing: 0) {
+                        Text("Add Items: \(roomViewModel.selectedRoom.roomName)")
+                            .font(.system(.title2, design: .default))
+                            .bold()
+                            .foregroundStyle(.red)
+                        
+                        Spacer()
+                        
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("Cancel")
+                        }
                     }
                 }
+                
+                SearchBar()
+                
+                InventoryFilterView(selectedType: $selectedType)
+                
+                InventoryList()
+                
+                Spacer()
             }
-            
-            SearchBar()
-            
-            InventoryFilterView(selectedType: $selectedType)
-            
-            InventoryList()
-            
-            Spacer()
-            
+            .navigationDestination(for: Model.self) { model in
+                RoomModelView(model: model, roomViewModel: $roomViewModel)
+            }
+            .navigationDestination(for: Item.self) { item in
+                RoomItemView(item: item, room: roomViewModel.selectedRoom)
+            }
         }
-        
         .frameTop()
-        
-        //        .rootNavigationDestinations()
         .frameHorizontalPadding()
         .frameVerticalPadding()
         .onAppear {
@@ -152,5 +157,5 @@ struct PullListAddItemsSheet: View {
 
 #Preview {
     @Previewable @State var viewModel = RoomViewModel(roomData: RoomMetadata.MOCK_DATA[0])
-    PullListAddItemsSheet(roomViewModel: $viewModel, showSheet: .constant(true))
+    RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: .constant(true))
 }

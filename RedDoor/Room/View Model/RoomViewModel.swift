@@ -15,7 +15,8 @@ class RoomViewModel {
     
     private var roomListener: ListenerRegistration?
     let db = Firestore.firestore()
- 
+    
+    // MARK: init/deinit
     init(roomData: RoomMetadata) {
         self.selectedRoom = Room(roomName: roomData.name, listId: String(roomData.id.split(separator: ";").first ?? ""))
         self.pullListId = String(roomData.id.split(separator: ";").first ?? "")
@@ -26,7 +27,8 @@ class RoomViewModel {
     deinit {
         stopListening()
     }
-        
+     
+    // MARK: startListenint()
     private func startListening() {
         let roomRef = db.collection("pull_lists")
             .document(pullListId)
@@ -44,10 +46,12 @@ class RoomViewModel {
             }
     }
     
+    // MARK: stopListening()
     private func stopListening() {
         roomListener?.remove()
     }
     
+    // MARK: updateRoom
     func updateRoom() {
         let roomRef = db.collection("pull_lists")
             .document(pullListId)

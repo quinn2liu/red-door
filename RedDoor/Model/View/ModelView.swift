@@ -1,5 +1,5 @@
 //
-//  ItemView.swift
+//  ModelView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/13/24.
@@ -11,40 +11,43 @@ import CachedAsyncImage
 
 struct ModelView: View {
     
-    @State private var viewModel: ModelViewModel
+    // MARK: Environment variables
     @Environment(\.dismiss) private var dismiss
+    @State private var viewModel: ModelViewModel
 
-    @State private var isEditing: Bool = false
-    
-    @State private var showingDeleteAlert = false
-    
+    // MARK: Image variables
     @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen: Bool = false
     @State private var isImagePickerPresented = false
     @State private var sourceType: UIImagePickerController.SourceType?
+    
+    // MARK: State Variables
+    @State private var isEditing: Bool = false
     @State private var items: [Item] = []
-    
-    
-    init(model: Model) {
+    @State private var showingDeleteAlert = false
+
+    // MARK: Initializer
+    init(model: Model, editable: Bool = true) {
         self.viewModel = ModelViewModel(selectedModel: model)
     }
     
+    // MARK: Body
     var body: some View {
         VStack(spacing: 0) {
             Form {
                 Section("Images") {
-                    if (isEditing) {
+                    if isEditing {
                         AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
                     }
-                    if (!viewModel.images.isEmpty) {
-                        ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    if !viewModel.images.isEmpty {
+                        ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
                     } else {
                         Text("No Images")
                     }
                 }
                 
-                Section("Details"){
-                    ModelDetailsView(isEditing: $isEditing, viewModel: $viewModel)
+                Section("Details") {
+                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
                 }
                 Section("Items") {
                     ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
@@ -66,7 +69,7 @@ struct ModelView: View {
             .navigationBarTitleDisplayMode(.inline)
             
             HStack {
-                if (isEditing) {
+                if isEditing {
                     Button("Delete Model") {
                         showingDeleteAlert = true
                     }
@@ -78,67 +81,27 @@ struct ModelView: View {
                             secondaryButton: .destructive(Text("Delete")) {
                                 Task {
                                     await viewModel.deleteModelFirebase()
-//                                    path = NavigationPath()
                                     dismiss()
-                                    isEditing = false
                                 }
-                                
                             }
                         )
                     }
                 } else {
-                    HStack {
-                        Button("Add Item to Pull List") {
-                            
-                        }
-                    }
+                    Button("Add Item to Pull List") { }
                 }
-            }
-            .padding(.top) // delete button
-            
-        } // vstack
-        .sheet(isPresented: $isImagePickerPresented) {
-            if sourceType == .camera {
-                ImagePickerWrapper(
-                    images: $viewModel.images,
-                    isPresented: $isImagePickerPresented,
-                    sourceType: .camera
-                )
-                .background(Color.black)
-            } else {
-                ImagePickerWrapper(
-                    images: $viewModel.images,
-                    isPresented: $isImagePickerPresented,
-                    sourceType: .photoLibrary
-                )
-            }
+            }.padding(.top)
         }
         .overlay(
-            Group {
-                if isImageFullScreen, let selectedImage = selectedImage {
-                    Color.black.opacity(0.8)
-                        .edgesIgnoringSafeArea(.all)
-                        .onTapGesture {
-                            isImageFullScreen = false
-                        }
-                    Image(uiImage: selectedImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .cornerRadius(8)
-                        .shadow(radius: 10)
-                }
-            }
+            ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
-        .onAppear() {
+        .onAppear {
             getInitialData()
         }
-        
-    } // view
+    }
     
-    @ViewBuilder
-    private func ModelNameView() -> some View {
+    // MARK: ModelNameView()
+    @ViewBuilder private func ModelNameView() -> some View {
         if isEditing {
             HStack {
                 Text("Editing:")
@@ -157,8 +120,10 @@ struct ModelView: View {
         }
     }
     
+    // MARK: saveModel()
     private func saveModel() {
-        if (isEditing) { // edit mode -> view mode
+
+        if isEditing {
             isEditing = false
             Task {
                 await viewModel.updateModelUIImagesFirebase(images: viewModel.images)
@@ -171,13 +136,12 @@ struct ModelView: View {
                     switch result {
                     case .success(let items):
                         self.items = items
-//                        print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
                     case .failure(let error):
-                        print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+                        print("Error fetching items: \(error)")
                     }
                 }
             }
-        } else { // view mode -> edit mode
+        } else {
             isEditing = true
         }
     }
@@ -188,17 +152,12 @@ struct ModelView: View {
             switch result {
             case .success(let items):
                 self.items = items
-//                print("Items for model (\(viewModel.selectedModel.id)) successfully retrieved.")
             case .failure(let error):
-                print("Error fetching items for model (\(viewModel.selectedModel.id)): \(error)")
+                print("Error fetching items: \(error)")
             }
         }
     }
-    
 } // struct
-
-
-
 
 //#Preview {
 //    ItemView(path: Binding<NavigationPath>, model: Model(), isAdding: true, isEditing: true)

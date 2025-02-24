@@ -41,7 +41,7 @@ struct RoomView: View {
         }
         .sheet(isPresented: $showAddItemsSheet) {
             // TODO: rename this to room add items, and pass in the room
-            PullListAddItemsSheet(roomViewModel: $viewModel, showSheet: $showAddItemsSheet)
+            RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showAddItemsSheet)
         }
         .frameTop()
         .frameHorizontalPadding()
