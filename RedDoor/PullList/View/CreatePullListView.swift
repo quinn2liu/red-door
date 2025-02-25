@@ -16,6 +16,7 @@ struct CreatePullListView: View {
     @State private var date: Date = Date()
     
     @State private var showCreateRoom: Bool = false
+    private var rooms: [Room]?
     
     // MARK: Body
     var body: some View {
@@ -39,8 +40,8 @@ struct CreatePullListView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
-                        ForEach(viewModel.selectedPullList.roomMetadata, id: \.id) { roomData in
-                            RoomMetadataListItemView(roomMetadata: roomData)
+                        ForEach(viewModel.selectedPullList.roomNames, id: \.self) { roomId in
+                            EmptyRoomListItem(roomId)
                         }
                     }
                 }
@@ -131,6 +132,20 @@ struct CreatePullListView: View {
         .presentationDetents([.fraction(0.1)])
     }
     
+    // MARK: EmptyRoomListItem()
+    @ViewBuilder private func EmptyRoomListItem(_ roomName: String) -> some View {
+    
+        HStack(spacing: 0) {
+            Text(roomName)
+                .foregroundStyle(Color(.label))
+                    
+            Spacer()
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .background(Color(.systemGray5))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
 }
 
 

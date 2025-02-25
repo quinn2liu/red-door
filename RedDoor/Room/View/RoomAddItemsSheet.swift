@@ -156,6 +156,6 @@ struct RoomAddItemsSheet: View {
 }
 
 #Preview {
-    @Previewable @State var viewModel = RoomViewModel(roomData: RoomMetadata.MOCK_DATA[0])
+    @Previewable @State var viewModel = RoomViewModel(room: Room.MOCK_DATA[0])
     RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: .constant(true))
 }

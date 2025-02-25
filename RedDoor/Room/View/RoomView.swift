@@ -11,13 +11,11 @@ struct RoomView: View {
     @Environment(\.dismiss) private var dismiss
     
     // MARK: View Parameters
-    var roomData: RoomMetadata
     @State var viewModel: RoomViewModel
     
     // MARK: init()
-    init(roomData: RoomMetadata) {
-        self.roomData = roomData
-        self._viewModel = State(initialValue: RoomViewModel(roomData: roomData))
+    init(room: Room) {
+        self._viewModel = State(initialValue: RoomViewModel(room: room))
     }
     
     // MARK: State Variables
@@ -92,7 +90,7 @@ struct RoomView: View {
         
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(viewModel.selectedRoom.contents, id: \.self) { itemId in
+                ForEach(viewModel.selectedRoom.itemIds, id: \.self) { itemId in
                     Text("itemId: \(itemId)")
                 }
             }
@@ -103,5 +101,5 @@ struct RoomView: View {
 }
 
 #Preview {
-    RoomView(roomData: RoomMetadata.MOCK_DATA[0])
+    RoomView(room: Room.MOCK_DATA[0])
 }

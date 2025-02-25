@@ -15,6 +15,7 @@ import FirebaseStorage
 @Observable
 class PullListViewModel {
     var selectedPullList: PullList
+    var rooms: [Room] = [] // for the purpose of displaying the rooms
     private var listener: ListenerRegistration?
     private let isListening: Bool
     
@@ -25,10 +26,6 @@ class PullListViewModel {
     init(selectedPullList: PullList = PullList(), isListening: Bool = false) {
         self.selectedPullList = selectedPullList
         self.isListening = isListening
-        
-        if isListening {
-            setupListener()
-        }
     }
     
     deinit {
@@ -36,7 +33,10 @@ class PullListViewModel {
         listener?.remove()
     }
     
-    private func setupListener() {
+    func startListening() {
+        guard isListening else { return }
+        
+        listener?.remove()
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         
         listener = pullListRef.addSnapshotListener { [weak self] documentSnapshot, error in
@@ -46,14 +46,22 @@ class PullListViewModel {
                   let updatedPullList = try? document.data(as: PullList.self) else {
                 return
             }
-            
-            self.selectedPullList = updatedPullList
+
+            // Check if the updatedPullList is different from the current selectedPullList
+            if updatedPullList != self.selectedPullList {
+                DispatchQueue.main.async {
+                    self.selectedPullList = updatedPullList
+                    print("Firestore updated pull list, applying changes")
+                }
+            } else {
+                print("Firestore update ignored: No changes detected")
+            }
         }
     }
-    
+
     // MARK: Pull List
     func createPullList() {
-        // This will only create, not setup a listener
+        // This will only create pull list, not setup a listener
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         
         do {
@@ -62,11 +70,12 @@ class PullListViewModel {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
         
+        // creating the rooms
         let batch = db.batch()
-        selectedPullList.roomMetadata.forEach { roomData in
-            let room = Room(roomName: roomData.name, listId: selectedPullList.id)
-            
+        selectedPullList.roomNames.forEach { roomName in
+            let room = Room(roomName: roomName, listId: selectedPullList.id)
             let roomRef = pullListRef.collection("rooms").document(room.id)
+            
             do {
                 try batch.setData(from: room, forDocument: roomRef)
             } catch {
@@ -81,10 +90,10 @@ class PullListViewModel {
         }
     }
     
-    func updatePullList() {        
+    func updatePullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {
-            try pullListRef.setData(from: selectedPullList)
+            try pullListRef.setData(from: selectedPullList, merge: true)
         } catch {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
@@ -94,31 +103,56 @@ class PullListViewModel {
     func deletePullList() {
         let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         pullListRef.delete()
-//            print("pull list deleted")
+        for roomId in selectedPullList.roomNames {
+            let roomsRef = pullListRef.collection("rooms").document(roomId)
+            roomsRef.delete()
+        }
     }
     
     // MARK: Room
     func createEmptyRoom(_ roomName: String) -> Bool {
-        if roomExists(newRoomName: roomName, existingRooms: self.selectedPullList.roomMetadata) {
+        if roomExists(newRoomName: roomName, roomNames: self.selectedPullList.roomNames) {
             return false // room not added
         } else {
-            self.selectedPullList.roomMetadata.append(RoomMetadata(roomName: roomName, listId: selectedPullList.id))
+            self.selectedPullList.roomNames.append(roomName)
             return true // room successfully added
         }
     }
     
-    func roomExists(newRoomName: String, existingRooms: [RoomMetadata]) -> Bool {
+    func roomExists(newRoomName: String, roomNames: [String]) -> Bool {
         let trimmedNewRoom = newRoomName.lowercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: " ", with: "")
         
-        return existingRooms.contains { room in
-            let trimmedRoom = room.name.lowercased()
+        return roomNames.contains { roomName in
+            let trimmedRoomName = roomName
+                .lowercased()
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .replacingOccurrences(of: " ", with: "")
-            
-            return trimmedRoom == trimmedNewRoom
+            return trimmedRoomName == trimmedNewRoom
         }
     }
     
+    func loadRooms() async {
+        guard rooms.isEmpty else { return }
+        
+        let roomRef = db.collection("pull_lists").document(selectedPullList.id).collection("rooms")
+        
+        do {
+            let roomDocuments = try await roomRef.getDocuments()
+            
+            let rooms = roomDocuments.documents.compactMap { roomDocument -> Room? in
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: roomDocument.data(), options: [])
+                    return try JSONDecoder().decode(Room.self, from: jsonData)
+                } catch {
+                    print("Error decoding document: \(error)")
+                    return nil
+                }
+            }
+            self.rooms = rooms
+        } catch {
+            print("Error fetching documents: \(error.localizedDescription)")
+        }
+    }
 }

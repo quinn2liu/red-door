@@ -25,7 +25,6 @@ struct PullListDetailsView: View {
     
     @State private var showCreateRoom: Bool = false
     
-    // MARK: Body
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
@@ -48,6 +47,12 @@ struct PullListDetailsView: View {
                         dismiss()
                     }
                 }
+            }
+        }
+        .onAppear {
+            viewModel.startListening()
+            Task {
+                await viewModel.loadRooms()
             }
         }
         .ignoresSafeArea(.keyboard)
@@ -128,9 +133,9 @@ struct PullListDetailsView: View {
         VStack(spacing: 12) {
             ScrollView {
                 LazyVStack {
-                    ForEach(viewModel.selectedPullList.roomMetadata, id: \.id) { roomData in
-                        NavigationLink(value: roomData) {
-                            RoomMetadataListItemView(roomMetadata: roomData)
+                    ForEach(viewModel.rooms, id: \.self) { room in
+                        NavigationLink(value: room) {
+                            RoomListItemView(room: room)
                         }
                     }
                 }
@@ -143,9 +148,7 @@ struct PullListDetailsView: View {
             }
         }
     }
-    
 }
-
 // MARK: CREATE MOCK DATA
 //#Preview {
 //    PullListDetailsView()

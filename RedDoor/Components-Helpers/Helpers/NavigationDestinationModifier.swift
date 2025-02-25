@@ -21,8 +21,8 @@ struct NavigationDestinationsModifier: ViewModifier {
             .navigationDestination(for: PullList.self) { pullList in
                 PullListDetailsView(pullList: pullList)
             }
-            .navigationDestination(for: RoomMetadata.self) { roomData in
-                RoomView(roomData: roomData)
+            .navigationDestination(for: Room.self) { room in
+                RoomView(room: room)
             }
 //            .navigationDestination(for: InstalledList.self) { installedList in
 //                InstalledListView()

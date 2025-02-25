@@ -49,7 +49,7 @@ class ItemViewModel {
 
         // update the room with the new item
         roomRef.updateData([
-            "contents": FieldValue.arrayUnion([selectedItem.id])
+            "itemIds": FieldValue.arrayUnion([selectedItem.id])
         ]) { error in
             if let error = error {
                 print("Error adding item to room: \(error)")
