@@ -48,6 +48,25 @@ class RoomViewModel {
 // MARK: Models + Items
 extension RoomViewModel {
     
+    // MARK: addItemToRoomDraft()
+    func addItemToRoomDraft(item: Item) {
+        let pullListRef = db.collection("pull_lists").document(selectedRoom.listId)
+        let roomRef = pullListRef.collection("rooms").document(selectedRoom.id)
+
+        // update the room with the new item
+        roomRef.updateData([
+            "itemIds": FieldValue.arrayUnion([item.id])
+        ]) { error in
+            if let error = error {
+                print("Error adding item to room: \(error)")
+            }
+        }
+        
+        var itemIdsSet = Set(selectedRoom.itemIds)
+        itemIdsSet.insert(item.id)
+        selectedRoom.itemIds = Array(itemIdsSet)
+    }
+    
     // MARK: Load Items and Models
     func loadItemsAndModels() async {
         if !selectedRoom.itemIds.isEmpty {
@@ -113,6 +132,7 @@ extension RoomViewModel {
             print("Error loading models for items: \(error)")
         }
     }
+    
     // MARK: Get Model for Item
     // Helper function to easily get a model for a given item
     func getModelForItem(_ item: Item) -> Model? {

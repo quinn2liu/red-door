@@ -65,7 +65,7 @@ struct RoomAddItemsSheet: View {
                 RoomModelView(model: model, roomViewModel: $roomViewModel)
             }
             .navigationDestination(for: Item.self) { item in
-                RoomItemView(item: item, room: roomViewModel.selectedRoom)
+                RoomItemView(item: item, roomViewModel: $roomViewModel)
             }
         }
         .frameTop()

@@ -42,24 +42,6 @@ class ItemViewModel {
         }
     }
     
-    // MARK: addItemToRoomDraft()
-    func addItemToRoomDraft(room: Room) {
-        let pullListRef = db.collection("pull_lists").document(room.listId)
-        let roomRef = pullListRef.collection("rooms").document(room.id)
-
-        // update the room with the new item
-        roomRef.updateData([
-            "itemIds": FieldValue.arrayUnion([selectedItem.id])
-        ]) { error in
-            if let error = error {
-                print("Error adding item to room: \(error)")
-            }
-        }
-        
-        // update roomMetadata in pull list
-    }
-    
-    
     
 //    TODO: this code should only run from turning a pull list into an installed list
     
