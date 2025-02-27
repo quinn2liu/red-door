@@ -8,77 +8,22 @@
 import Foundation
 import Firebase
 
+@MainActor
 @Observable
 class RoomViewModel {
     var selectedRoom: Room
     var items: [Item] = [] // for display
     var models: [String: Model] = [:] // mapping modelId to model, for display
     
-    private var roomListener: ListenerRegistration?
     let db = Firestore.firestore()
     
     // MARK: init/deinit
     init(room: Room) {
         self.selectedRoom = room
-        
-        startListening()
     }
     
     init(roomName: String, listId: String) {
         self.selectedRoom = Room(roomName: roomName, listId: listId)
-        
-        startListening()
-    }
-    
-    deinit {
-        stopListening()
-    }
-     
-    // MARK: startListenint()
-    private func startListening() {
-        let roomRef = db.collection("pull_lists")
-            .document(selectedRoom.listId)
-            .collection("rooms")
-            .document(selectedRoom.id)
-        
-        roomListener = roomRef
-            .addSnapshotListener { [weak self] snapshot, error in
-                guard let self,
-                      let data = snapshot?.data(),
-                      let updatedRoom = try? Firestore.Decoder().decode(Room.self, from: data)
-                else { return }
-                
-                // Check if itemIds changed BEFORE updating selectedRoom
-                let currentItemIds = Set(self.selectedRoom.itemIds)
-                let newItemIds = Set(updatedRoom.itemIds)
-                let itemIdsChanged = currentItemIds != newItemIds
-                
-                print("selectedRoom.ids: \(self.selectedRoom.itemIds), updatedRoom.ids: \(updatedRoom.itemIds)")
-                print("itemIdsChanged: \(itemIdsChanged)")
-                
-                if itemIdsChanged {
-                    print("itemIds changed from \(currentItemIds) to \(newItemIds)")
-                    
-                    // Update room
-                    if self.selectedRoom != updatedRoom {
-                        self.selectedRoom = updatedRoom
-                        
-                    }
-                    // Reload items and models
-                    Task {
-                        await self.loadItemsAndModels()
-                    }
-                } else {
-                    // Just update the room without triggering a reload
-                    if self.selectedRoom != updatedRoom {
-                        self.selectedRoom = updatedRoom
-                    }
-                }
-            }
-    }
-    // MARK: stopListening()
-    private func stopListening() {
-        roomListener?.remove()
     }
     
     // MARK: updateRoom

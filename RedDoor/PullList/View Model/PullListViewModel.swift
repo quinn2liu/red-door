@@ -12,53 +12,54 @@ import PhotosUI
 import SwiftUI
 import FirebaseStorage
 
+@MainActor
 @Observable
 class PullListViewModel {
-    var selectedPullList: PullList
-    var rooms: [Room] = [] // for the purpose of displaying the rooms
+    var selectedPullList: PullList {
+        didSet {
+            print("selectedPullList updated: \(selectedPullList)")
+        }
+    }
+    var rooms: [Room] = [] {
+        didSet {
+            print("updatedRooms \(rooms)")
+        }
+    }
     private var listener: ListenerRegistration?
-    private let isListening: Bool
     
     let db = Firestore.firestore()
     private var lastDocument: DocumentSnapshot?
     private var hasMoreData = true
     
-    init(selectedPullList: PullList = PullList(), isListening: Bool = false) {
+    init(selectedPullList: PullList = PullList()) {
         self.selectedPullList = selectedPullList
-        self.isListening = isListening
     }
-    
-    deinit {
-        // Clean up listener when view model is deallocated
-        listener?.remove()
-    }
-    
-    func startListening() {
-        guard isListening else { return }
-        
-        listener?.remove()
-        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
-        
-        listener = pullListRef.addSnapshotListener { [weak self] documentSnapshot, error in
-            guard let self = self,
-                  let document = documentSnapshot,
-                  document.exists,
-                  let updatedPullList = try? document.data(as: PullList.self) else {
-                return
-            }
 
-            // Check if the updatedPullList is different from the current selectedPullList
-            if updatedPullList != self.selectedPullList {
-                DispatchQueue.main.async {
-                    self.selectedPullList = updatedPullList
-                    print("Firestore updated pull list, applying changes")
+    func refreshPullList() async {
+        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
+        print("refreshPullList() called")
+        do {
+            let document = try await pullListRef.getDocument()
+            
+            if let data = document.data() {
+                let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
+                let updatedPullList = try JSONDecoder().decode(PullList.self, from: jsonData)
+                
+                // Update selectedPullList on the main thread
+                if self.selectedPullList != updatedPullList {
+                    DispatchQueue.main.async {
+                        self.selectedPullList = updatedPullList
+                    }
                 }
-            } else {
-                print("Firestore update ignored: No changes detected")
+
+                // Refresh rooms
+                await loadRooms()
             }
+        } catch {
+            print("Error refreshing pull list: \(error.localizedDescription)")
         }
     }
-
+    
     // MARK: Pull List
     func createPullList() {
         // This will only create pull list, not setup a listener
@@ -134,7 +135,6 @@ class PullListViewModel {
     }
     
     func loadRooms() async {
-        guard rooms.isEmpty else { return }
         
         let roomRef = db.collection("pull_lists").document(selectedPullList.id).collection("rooms")
         

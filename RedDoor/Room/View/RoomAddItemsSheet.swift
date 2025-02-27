@@ -17,6 +17,12 @@ struct RoomAddItemsSheet: View {
     @Binding var roomViewModel: RoomViewModel
     @Binding var showSheet: Bool
     
+    // MARK: init()
+    init(roomViewModel: Binding<RoomViewModel>, showSheet: Binding<Bool>) {
+        self._roomViewModel = roomViewModel
+        self._showSheet = showSheet
+    }
+    
     // MARK: Filter Variables
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
@@ -155,7 +161,6 @@ struct RoomAddItemsSheet: View {
     }
 }
 
-#Preview {
-    @Previewable @State var viewModel = RoomViewModel(room: Room.MOCK_DATA[0])
-    RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: .constant(true))
-}
+//#Preview {
+//    RoomAddItemsSheet(room: Room.MOCK_DATA[0], showSheet: .constant(true))
+//}

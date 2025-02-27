@@ -15,7 +15,7 @@ struct PullListDetailsView: View {
     @State private var showSheet: Bool = false
 
     init(pullList: PullList) {
-        self.viewModel = PullListViewModel(selectedPullList: pullList, isListening: true)
+        self.viewModel = PullListViewModel(selectedPullList: pullList)
     }
     
     @FocusState private var keyboardFocused: Bool
@@ -50,7 +50,6 @@ struct PullListDetailsView: View {
             }
         }
         .onAppear {
-            viewModel.startListening()
             Task {
                 await viewModel.loadRooms()
             }
@@ -134,10 +133,13 @@ struct PullListDetailsView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        NavigationLink(value: room) {
-                            RoomListItemView(room: room)
-                        }
+                        RoomListItemView(room: room)
                     }
+                }
+            }
+            .refreshable {
+                Task {
+                    await viewModel.refreshPullList()
                 }
             }
             

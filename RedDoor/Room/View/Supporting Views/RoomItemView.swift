@@ -20,13 +20,6 @@ struct RoomItemView: View {
     var body: some View {
         Text("Item ID: \(viewModel.selectedItem.id)")
         
-        Button("Delete Item") {
-            Task {
-                await viewModel.deleteItem()
-            }
-            dismiss()
-        }
-        
         Button {
             viewModel.addItemToRoomDraft(room: room)
             dismiss()

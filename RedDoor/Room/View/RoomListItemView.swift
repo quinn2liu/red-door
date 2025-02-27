@@ -19,27 +19,45 @@ struct RoomListItemView: View {
     
     // MARK: State Variables
     @State private var showItems: Bool = false
+    @State private var showSheet: Bool = false
+    @State private var isEditing: Bool = false
 
     var body: some View {
-        VStack(spacing: 0){
-            HStack(spacing: 12) {
+        VStack(spacing: 16){
+            HStack(spacing: 0) {
                 Text(viewModel.selectedRoom.roomName)
                     .foregroundStyle(Color(.label))
                         
                 Spacer()
                 
-                Text("Items \(viewModel.selectedRoom.itemIds.count)")
+                if !isEditing {
+                    Text("Items \(viewModel.selectedRoom.itemIds.count)")
+                }
                 
                 Button {
-                    showItems.toggle()
+                    if isEditing {
+                        isEditing = false
+                    } else {
+                        showItems.toggle()
+                    }
                 } label: {
-                    Image(systemName: showItems ? "minus" : "plus")
+                    if isEditing {
+                        Text("Cancel")
+                            .foregroundStyle(.red)
+                    } else {
+                        Image(systemName: showItems ? "minus" : "plus")
+                    }
                 }
             }
             
             if showItems {
                 RoomItemList()
+                
+                EditRoomMenu()
             }
+        }
+        .sheet(isPresented: $showSheet) {
+            RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showSheet)
         }
         .onAppear {
             Task {
@@ -107,17 +125,54 @@ struct RoomListItemView: View {
             Spacer()
             
             // Show repair status if applicable
-            if item.repair {
-                Image(systemName: "wrench.fill")
-                    .foregroundStyle(Color.yellow)
+            if isEditing {
+                Image(systemName: "xmark")
+                    .frame(maxWidth: 16, maxHeight: 16)
+                    .foregroundStyle(Color(.systemGray))
+                    .padding(6)
+                    .background(.red)
+                    .clipShape(Circle())
+            } else {
+                if item.repair {
+                    Image(systemName: "wrench.fill")
+                        .foregroundStyle(Color.yellow)
+                }
             }
         }
     }
     
-    // MARK: RoomItemView
+    // MARK: EditRoomMenu()
+    @ViewBuilder private func EditRoomMenu() -> some View {
+        
+        HStack(spacing: 0) {
+            if isEditing {
+                TransparentButton(backgroundColor: .red, foregroundColor: .red, text: "Delete Room") {
+                    // viewModel.deleteRoom
+                }
+                
+                Spacer()
+                
+                
+                TransparentButton(backgroundColor: .green, foregroundColor: .green, text: "Add Items") {
+                    showSheet = true
+                }
+                
+                Spacer()
+                
+                TransparentButton(backgroundColor: .gray, foregroundColor: .gray, text: "Save") {
+                    isEditing = true
+                }
+            } else {
+                TransparentButton(backgroundColor: .gray, foregroundColor: .gray, text: "Edit") {
+                    isEditing = true
+                }
+            }
+        }
+    }
     
 }
 
 #Preview {
+    @Previewable @State var showAddItemsSheet = false
     RoomListItemView(room: Room.MOCK_DATA[0])
 }
