@@ -129,14 +129,11 @@ struct RoomView: View {
             
             Spacer()
             
-            // Show repair status if applicable
             if isEditing {
-                Image(systemName: "xmark")
-                    .frame(maxWidth: 16, maxHeight: 16)
-                    .foregroundStyle(Color(.systemGray))
-                    .padding(6)
-                    .background(.red)
-                    .clipShape(Circle())
+                Image(systemName: "xmark.circle.fill")
+                    .frame(maxWidth: 12, maxHeight: 12)
+                    .foregroundStyle(.red)
+                    .opacity(0.75)
             } else {
                 if item.repair {
                     Image(systemName: "wrench.fill")

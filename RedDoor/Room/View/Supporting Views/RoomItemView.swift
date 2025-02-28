@@ -9,19 +9,14 @@ import SwiftUI
 
 struct RoomItemView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var itemViewModel: ItemViewModel
+    var item: Item
     @Binding var roomViewModel: RoomViewModel
     
-    init(item: Item, roomViewModel: Binding<RoomViewModel>) {
-        self.itemViewModel = ItemViewModel(selectedItem: item)
-        _roomViewModel = roomViewModel
-    }
-    
     var body: some View {
-        Text("Item ID: \(itemViewModel.selectedItem.id)")
+        Text("Item ID: \(item.id)")
         
         Button {
-            roomViewModel.addItemToRoomDraft(item: itemViewModel.selectedItem)
+            roomViewModel.addItemToRoomDraft(item: item)
             dismiss()
         } label: {
             Text("Add Item to room")
