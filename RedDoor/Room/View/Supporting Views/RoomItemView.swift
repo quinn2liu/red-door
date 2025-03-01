@@ -16,7 +16,10 @@ struct RoomItemView: View {
         Text("Item ID: \(item.id)")
         
         Button {
-            roomViewModel.addItemToRoomDraft(item: item)
+            let added = roomViewModel.addItemToRoomDraft(item: item)
+            if !added {
+                // toggle a warning sheet
+            }
             dismiss()
         } label: {
             Text("Add Item to room")
