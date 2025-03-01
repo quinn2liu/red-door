@@ -1,105 +1,180 @@
 //
-//  RoomView.swift
+//  RoomListView.swift
 //  RedDoor
 //
-//  Created by Quinn Liu on 2/17/25.
+//  Created by Quinn Liu on 1/1/25.
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct RoomView: View {
-    @Environment(\.dismiss) private var dismiss
     
-    // MARK: View Parameters
-    @State var viewModel: RoomViewModel
+    // MARK: init Variables
+    @State private var viewModel: RoomViewModel
     
-    // MARK: init()
     init(room: Room) {
-        self._viewModel = State(initialValue: RoomViewModel(room: room))
+        _viewModel = State(initialValue: RoomViewModel(room: room))
     }
     
     // MARK: State Variables
+    @State private var showItems: Bool = false
+    @State private var showSheet: Bool = false
     @State private var isEditing: Bool = false
-    @State private var showAddItemsSheet: Bool = false
     
-    // MARK: Body()
     var body: some View {
-        VStack(spacing: 16) {
-            
-            TopBar()
-            
-            Button {
-                showAddItemsSheet = true
-            } label: {
-                Text("Add Items")
-            }
-            
-            RoomContents()
-            
-        }
-        .sheet(isPresented: $showAddItemsSheet) {
-            // TODO: rename this to room add items, and pass in the room
-            RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showAddItemsSheet)
-        }
-        .frameTop()
-        .frameHorizontalPadding()
-        .toolbar(.hidden)
-    }
-    
-    // MARK: TopBar()
-    @ViewBuilder
-    private func TopBar() -> some View {
-        
-        TopAppBar(leadingIcon: {
-            if isEditing {
-                Button {
-                    isEditing = false
-                } label: {
-                    Text("Cancel")
-                        .foregroundStyle(.blue)
-                }
-            } else {
-                BackButton()
-            }
-        }, header: {
-            if isEditing {
-                TextField("", text: $viewModel.selectedRoom.roomName)
-                    .padding(6)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-                    .multilineTextAlignment(.center)
-            } else {
+        VStack(spacing: 16){
+            HStack(spacing: 0) {
                 Text(viewModel.selectedRoom.roomName)
-            }
-        }, trailingIcon: {
-            Button {
-                if isEditing {
-                    viewModel.updateRoom()
+                    .foregroundStyle(Color(.label))
+                
+                Spacer()
+                
+                if !isEditing {
+                    Text("Items \(viewModel.selectedRoom.itemIds.count)")
                 }
-                isEditing.toggle()
-            } label: {
-                Text(isEditing ? "Save" : "Edit")
-                    .foregroundStyle(isEditing ? .blue : .red)
-                    .fontWeight(isEditing ? .semibold : .regular)
+                
+                Button {
+                    if isEditing {
+                        isEditing = false
+                    } else {
+                        showItems.toggle()
+                    }
+                } label: {
+                    if isEditing {
+                        Text("Cancel")
+                            .foregroundStyle(.red)
+                    } else {
+                        Image(systemName: showItems ? "minus" : "plus")
+                    }
+                }
             }
-        })
+            
+            if showItems {
+                RoomItemList()
+                
+                EditRoomMenu()
+            }
+        }
+        .sheet(isPresented: $showSheet) {
+            RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showSheet)
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadItemsAndModels()
+            }
+        }
+        .onChange(of: viewModel.selectedRoom.itemIds) {
+            Task {
+                await viewModel.loadItemsAndModels()
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .background(Color(.systemGray5))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
     }
     
-    // MARK: RoomContents()
-    @ViewBuilder private func RoomContents() -> some View {
-        
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(viewModel.selectedRoom.itemIds, id: \.self) { itemId in
-                    Text("itemId: \(itemId)")
+    // MARK: RoomItemList()
+    
+    @ViewBuilder private func RoomItemList() -> some View {
+        LazyVStack(spacing: 12) {
+            ForEach(viewModel.items, id: \.self) { item in
+                NavigationLink(destination: RoomItemView(item: item, roomViewModel: $viewModel)) { // MARK: RoomItemView should take in a viewmodel
+                    RoomItemListItem(item)
                 }
             }
         }
+    }
+    
+    // MARK: RoomItemListItem()
+    @ViewBuilder private func RoomItemListItem(_ item: Item) -> some View {
+        HStack(spacing: 12) {
+            if let model = viewModel.getModelForItem(item) {
+                if !model.imageIDs.isEmpty, let imageURL = model.imageURLDict[model.imageIDs[0]] {
+                    CachedAsyncImage(url: URL(string: imageURL)) { image in
+                        image.resizable()
+                    } placeholder: {
+                        Color.gray
+                    }
+                    .frame(width: 40, height: 40)
+                    .cornerRadius(4)
+                } else {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 40, height: 40)
+                        .cornerRadius(4)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(model.name)
+                        .font(.headline)
+                        .foregroundStyle(Color(.label))
+                    
+                    HStack {
+                        Text(model.type)
+                        Text("•")
+                        Text(model.primaryColor)
+                        Text("•")
+                        Text(model.primaryMaterial)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Color(.systemGray))
+                }
+            } else {
+                // Fallback if model isn't loaded yet
+                Text(item.id)
+                    .foregroundStyle(Color(.label))
+            }
+            
+            Spacer()
+            
+            if isEditing {
+                Image(systemName: "xmark.circle.fill")
+                    .frame(maxWidth: 12, maxHeight: 12)
+                    .foregroundStyle(.red)
+                    .opacity(0.75)
+            } else {
+                if item.repair {
+                    Image(systemName: "wrench.fill")
+                        .foregroundStyle(Color.yellow)
+                }
+            }
+        }
+    }
+    
+    // MARK: EditRoomMenu()
+    @ViewBuilder private func EditRoomMenu() -> some View {
         
+        HStack(spacing: 0) {
+            if isEditing {
+                TransparentButton(backgroundColor: .red, foregroundColor: .red, text: "Delete Room") {
+                    // viewModel.deleteRoom
+                }
+                
+                Spacer()
+                
+                
+                TransparentButton(backgroundColor: .green, foregroundColor: .green, text: "Add Items") {
+                    showSheet = true
+                }
+                
+                Spacer()
+                
+                TransparentButton(backgroundColor: .gray, foregroundColor: .gray, text: "Save") {
+                    isEditing = true
+                }
+            } else {
+                TransparentButton(backgroundColor: .gray, foregroundColor: .gray, text: "Edit") {
+                    isEditing = true
+                }
+            }
+        }
     }
     
 }
 
-#Preview {
-    RoomView(room: Room.MOCK_DATA[0])
-}
+//#Preview {
+//    @Previewable @State var showAddItemsSheet = false
+//    RoomView(room: Room.MOCK_DATA[0])
+//}
