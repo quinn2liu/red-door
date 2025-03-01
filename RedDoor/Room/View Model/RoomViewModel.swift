@@ -49,22 +49,29 @@ class RoomViewModel {
 extension RoomViewModel {
     
     // MARK: addItemToRoomDraft()
-    func addItemToRoomDraft(item: Item) {
-        let pullListRef = db.collection("pull_lists").document(selectedRoom.listId)
-        let roomRef = pullListRef.collection("rooms").document(selectedRoom.id)
-
-        // update the room with the new item
-        roomRef.updateData([
-            "itemIds": FieldValue.arrayUnion([item.id])
-        ]) { error in
-            if let error = error {
-                print("Error adding item to room: \(error)")
-            }
-        }
+    func addItemToRoomDraft(item: Item) -> Bool {
         
         var itemIdsSet = Set(selectedRoom.itemIds)
-        itemIdsSet.insert(item.id)
-        selectedRoom.itemIds = Array(itemIdsSet)
+        let (inserted, _) = itemIdsSet.insert(item.id)
+        if inserted { // the itemId doesn't already exist in the room's items
+            selectedRoom.itemIds = Array(itemIdsSet)
+            
+            let pullListRef = db.collection("pull_lists").document(selectedRoom.listId)
+            let roomRef = pullListRef.collection("rooms").document(selectedRoom.id)
+
+            // update the room with the new item
+            roomRef.updateData([
+                "itemIds": FieldValue.arrayUnion([item.id])
+            ]) { error in
+                if let error = error {
+                    print("Error adding item to room: \(error)")
+                }
+            }
+            return true
+        } else { // itemId already exists for the room
+            return false
+        }
+        
     }
     
     // MARK: Load Items and Models
