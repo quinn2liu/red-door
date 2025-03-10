@@ -12,30 +12,14 @@ struct ModelListItemView: View {
     
     var model: Model
     
+    // TODO: add primary image
     var urlString: String {
         return model.imageURLDict.values.first ?? ""
     }
     
     var body: some View {
-        HStack {
-            if urlString != "" {
-                CachedAsyncImage(url: URL(string: urlString)) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView() // Placeholder while loading
-                    case .success(let image):
-                        image.resizable().frame(50)
-                    case .failure:
-                        Image(systemName: "photo.badge.exclamationmark")
-                            .frame(50) // Fallback image
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-            } else {
-                Image(systemName: "photo")
-                    .frame(50) // Fallback image
-            }
+        HStack(spacing: 0) {
+            ModelImage()
             
             Spacer()
             
@@ -56,6 +40,27 @@ struct ModelListItemView: View {
             Spacer()
 
             Text(String(model.count))
+        }
+    }
+    
+    @ViewBuilder private func ModelImage() -> some View {
+        if urlString != "" {
+            CachedAsyncImage(url: URL(string: urlString)) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView() // Placeholder while loading
+                case .success(let image):
+                    image.resizable().frame(50)
+                case .failure:
+                    Image(systemName: "")
+                        .frame(50) // Fallback image
+                @unknown default:
+                    EmptyView()
+                }
+            }
+        } else {
+            Image(systemName: "photo")
+                .frame(50) // Fallback image
         }
     }
 }

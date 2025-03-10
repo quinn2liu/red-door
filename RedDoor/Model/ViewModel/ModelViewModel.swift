@@ -40,18 +40,18 @@ class ModelViewModel {
         }
     }
     
+    // MARK: Update Model
     func updateModelDataFirebase()  {
         do {
             selectedModel.name_lowercased = selectedModel.name.lowercased()
             try db.collection("models").document(selectedModel.id).setData(from: selectedModel)
-//            print("MODEL ADDED/EDITED")
+            //            print("MODEL ADDED/EDITED")
         } catch {
             print("Error adding document: \(error)")
         }
     }
     
-    // MARK: ITEMS
-    
+    // MARK: Create Model Items
     func createModelItemsFirebase() {
         let batch = db.batch()
         
@@ -73,6 +73,7 @@ class ModelViewModel {
         }
     }
     
+    // MARK: Create Single Model Item
     func createSingleModelItem() {
         let itemId = "item-\(UUID().uuidString)"
         let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
@@ -83,12 +84,13 @@ class ModelViewModel {
         do {
             try itemRef.setData(from: item)
             modelRef.updateData(["count": selectedModel.count])
-//            print("single item added")
+            //            print("single item added")
         } catch {
             print("Error adding item: \(itemId): \(error)")
         }
     }
     
+    // MARK: Get Model Items
     func getModelItems(completion: @escaping (Result<[Item], Error>) -> Void) {
         let query: Query = db.collection("items").whereField("modelId", isEqualTo: selectedModel.id)
         
@@ -114,36 +116,36 @@ class ModelViewModel {
         }
     }
     
-//    func updateModelItemsFirebase()  {
-//        let batch = db.batch()
-//        
-//        for itemId in (selectedModel.item_ids) {
-//            selectedModel.item_ids.append(itemId)
-//            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
-//            let documentRef = db.collection("items").document(itemId)
-//            do {
-//                try batch.setData(from: item, forDocument: documentRef)
-//            } catch {
-//                print("Error adding item: \(itemId): \(error)")
-//            }
-//        }
-//        batch.commit { err in
-//            if let err {
-//                print("Error writing batch: \(err)")
-//            } else {
-//                print("Batch write successful")
-//            }
-//        }
-//    }
+    //    func updateModelItemsFirebase()  {
+    //        let batch = db.batch()
+    //
+    //        for itemId in (selectedModel.item_ids) {
+    //            selectedModel.item_ids.append(itemId)
+    //            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
+    //            let documentRef = db.collection("items").document(itemId)
+    //            do {
+    //                try batch.setData(from: item, forDocument: documentRef)
+    //            } catch {
+    //                print("Error adding item: \(itemId): \(error)")
+    //            }
+    //        }
+    //        batch.commit { err in
+    //            if let err {
+    //                print("Error writing batch: \(err)")
+    //            } else {
+    //                print("Batch write successful")
+    //            }
+    //        }
+    //    }
     
-    // MARK: IMAGES
+    // MARK: Load Images
     func loadImages() {
         let dispatchGroup = DispatchGroup()
         var loadedImages: [UIImage] = []
         
         for (_, urlString) in selectedModel.imageURLDict {
             guard let url = URL(string: urlString) else { continue }
-//            print("Attempting to load imageURL: \(urlString)")
+            //            print("Attempting to load imageURL: \(urlString)")
             dispatchGroup.enter()
             
             URLSession.shared.dataTask(with: url) { data, _, error in
@@ -162,8 +164,7 @@ class ModelViewModel {
         }
     }
     
-    // MARK: UPDATES
-    
+    // MARK: Update Model Images
     func updateModelUIImagesFirebase(images: [UIImage]) async {
         
         if images.count > 0 {
@@ -197,15 +198,15 @@ class ModelViewModel {
                             
                             do {
                                 let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
-//                                print("Upload finished. Metadata: \(resultMetaData)")
+                                //                                print("Upload finished. Metadata: \(resultMetaData)")
                                 let imageURL = try await imageRef.downloadURL().absoluteString
-//                                print("imageURL = \(imageURL)")
+                                //                                print("imageURL = \(imageURL)")
                                 self.selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
                             } catch {
                                 print("Error occurred when uploading image \(error.localizedDescription)")
                             }
                         }
-//                        print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
+                        //                        print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
                         
                     }
                     try await group.waitForAll()
@@ -217,17 +218,18 @@ class ModelViewModel {
         }
     }
     
+    // MARK: Delete Model Images
     func deleteModelImagesFirebase() async {
         do {
-//            print("deleteModelImagesFirebase triggered")
+            //            print("deleteModelImagesFirebase triggered")
             try await withThrowingTaskGroup(of: Void.self) { group in
-//                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
+                //                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
                 for imageID in selectedModel.imageIDs {
                     group.addTask {
                         let deleteRef = self.storageRef.child(imageID)
                         do {
                             try await deleteRef.delete()
-//                            print("Successfully deleted imageID: \(imageID)")
+                            //                            print("Successfully deleted imageID: \(imageID)")
                         } catch {
                             print("Error deleting imageID \(imageID): \(error)")
                         }
@@ -241,6 +243,7 @@ class ModelViewModel {
         }
     }
     
+    // MARK: Delete Model
     func deleteModelFirebase() async {
         await withThrowingTaskGroup(of: Void.self) { group in
             
@@ -255,7 +258,7 @@ class ModelViewModel {
                     for itemId in self.selectedModel.item_ids {
                         try await self.db.collection("items").document(itemId).delete()
                     }
-//                    print("Document \(self.selectedModel.id) successfully removed!")
+                    //                    print("Document \(self.selectedModel.id) successfully removed!")
                 } catch {
                     print("Error removing document: \(error)")
                 }
@@ -263,27 +266,13 @@ class ModelViewModel {
             
         }
     }
+}
+
+// MARK: - Model Options
+extension ModelViewModel {
     
-    
-    var colorOptions: [String] = [
-        "Black",
-        "White",
-        "Brown",
-        "Gray",
-        "Pink",
-        "Red",
-        "Orange",
-        "Yellow",
-        "Green",
-        "Mint",
-        "Teal",
-        "Cyan",
-        "Blue",
-        "Purple",
-        "Indigo"
-    ]
-    
-    var colorMap: [String: Color] = [
+    static var colorMap: [String: Color] = [
+        "No Selection": .primary.opacity(0.5),
         "Black": .black,
         "White": .white,
         "Brown": .brown,
@@ -298,10 +287,10 @@ class ModelViewModel {
         "Cyan": .cyan,
         "Blue": .blue,
         "Purple": .purple,
-        "Indigo": .indigo
+        "Indigo": .indigo,
     ]
     
-    var typeOptions: [String] = [
+    static var typeOptions: [String] = [
         "Chair",
         "Desk",
         "Table",
@@ -309,19 +298,23 @@ class ModelViewModel {
         "Lamp",
         "Art",
         "Decor",
-        "Miscellaneous"
+        "Miscellaneous",
+        "No Selection"
     ]
     
-    var typeMap: [String: String] = [
+    static var typeMap: [String: String] = [
         "Chair": "chair.fill",
         "Desk": "table.furniture.fill",
         "Table": "table.furniture.fill",
         "Couch": "sofa.fill",
         "Lamp": "lamp.floor.fill",
-        "Art": "photo.artframe"
+        "Art": "photo.artframe",
+        "Miscellaneous": "ellipsis.circle",
+        "No Selection": "nosign"
     ]
     
-    var materialOptions: [String] = [
+    // TODO: convert model type to an enum, and then have these fields as computed property
+    static var materialOptions: [String] = [
         "Wood",
         "Metal",
         "Glass",
@@ -341,7 +334,9 @@ class ModelViewModel {
         "Vinyl",
         "Resin",
         "Cane",
-        "Stainless Steel"
+        "Stainless Steel",
+        "No Selection",
+        "None"
     ]
     
 }

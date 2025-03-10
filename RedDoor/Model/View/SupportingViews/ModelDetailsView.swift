@@ -15,11 +15,12 @@ struct ModelDetailsView: View {
     var body: some View {
         if (isEditing) {
             Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
-                ForEach(viewModel.colorOptions, id: \.self) { option in
-                    HStack {
+                ForEach(Array(ModelViewModel.colorMap), id: \.key) { option, color in
+                    HStack(spacing: 0) {
                         Text(option)
+                        
                         Image(systemName: "circle.fill")
-                            .foregroundStyle(viewModel.colorMap[option] ?? .black)
+                            .foregroundStyle(color)
                             .overlay(
                                 Image(systemName: "circle")
                                     .foregroundColor(.black.opacity(0.5))
@@ -31,16 +32,16 @@ struct ModelDetailsView: View {
 
 
             Picker("Item Type", selection: $viewModel.selectedModel.type) {
-                ForEach(viewModel.typeOptions, id: \.self) { option in
-                    HStack {
-                        Text("\(option)")
-                        Image(systemName: viewModel.typeMap[option] ?? "camera.metering.unknown")
+                ForEach(Array(ModelViewModel.typeMap), id: \.key) { option, iconName in
+                    HStack(spacing: 8) {
+                        Text(option)
+                        Image(systemName: iconName)
                     }
                 }
             }
 
             Picker("Material", selection: $viewModel.selectedModel.primaryMaterial) {
-                ForEach(viewModel.materialOptions, id: \.self) { material in
+                ForEach(ModelViewModel.materialOptions, id: \.self) { material in
                     Text(material)
                 }
             }
@@ -49,15 +50,16 @@ struct ModelDetailsView: View {
             HStack {
                 Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
                 Image(systemName: "circle.fill")
-                    .foregroundStyle(viewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
+                    .foregroundStyle(ModelViewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
                     .overlay(
                         Image(systemName: "circle")
                             .foregroundColor(.black.opacity(0.5))
                     )
             }
+            
             HStack {
                 Text("Item Type: \(viewModel.selectedModel.type)")
-                Image(systemName: viewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
+                Image(systemName: ModelViewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
             }
 
             Text("Material: \(viewModel.selectedModel.primaryMaterial)")

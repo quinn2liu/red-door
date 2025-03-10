@@ -72,26 +72,29 @@ struct InventoryView: View {
     
     // MARK: InventoryList
     @ViewBuilder private func InventoryList() -> some View {
-        List {
-            ForEach(viewModel.modelsArray, id: \.self) { model in
-                NavigationLink(value: model) {
-                    ModelListItemView(model: model)
-                }
-                .onAppear {
-                    if model == viewModel.modelsArray.last {
-                        Task {
-                            isLoading = true
-                            await viewModel.getMoreInventoryModels(searchText: !searchText.isEmpty ? searchText : nil, selectedType: selectedType)
-                            isLoading = false
+        LazyVStack(spacing: 12) {
+            ScrollView {
+                ForEach(viewModel.modelsArray, id: \.self) { model in
+                    NavigationLink(value: model) {
+                        ModelListItemView(model: model)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onAppear {
+                        if model == viewModel.modelsArray.last {
+                            Task {
+                                isLoading = true
+                                await viewModel.getMoreInventoryModels(searchText: !searchText.isEmpty ? searchText : nil, selectedType: selectedType)
+                                isLoading = false
+                            }
                         }
                     }
                 }
-            }
-            
-            if isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding()
+                
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                }
             }
         }
     }
