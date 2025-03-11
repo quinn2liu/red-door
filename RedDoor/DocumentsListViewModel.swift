@@ -1,16 +1,17 @@
 //
-//  InventoryViewModel.swift
+//  DocumentsListViewModel.swift
 //  RedDoor
 //
-//  Created by Quinn Liu on 8/6/24.
+//  Created by Quinn Liu on 3/10/25.
 //
 
 import Foundation
+import FirebaseCore
 import FirebaseFirestore
 
 //  MARK: Could be abstracted for all lists
 @Observable
-class InventoryViewModel {
+class DocumentsListViewModel {
     
     let db = Firestore.firestore()
     private var lastDocument: DocumentSnapshot?

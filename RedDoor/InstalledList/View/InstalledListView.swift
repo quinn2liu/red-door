@@ -1,13 +1,14 @@
 //
-//  InventoryView.swift
+//  InstalledListView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/6/24.
 //
 
 import SwiftUI
+import Firebase
 
-struct PullListInventoryView: View {
+struct InstalledListInventoryView: View {
     
     @State private var viewModel = ListInventoryViewModel()
     @State private var pullListArray: [RDList] = []
@@ -78,6 +79,7 @@ struct PullListInventoryView: View {
         
 }
 
-//#Preview {
-//    PullListView()
-//}
+
+#Preview {
+    InstalledListInventoryView()
+}

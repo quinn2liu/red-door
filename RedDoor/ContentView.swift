@@ -20,7 +20,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Pull Lists", systemImage: "list.bullet")
                 }.tint(.blue)
-            InstalledListView()
+            InstalledListInventoryView()
                 .tabItem {
                     Label("Installed Lists", systemImage: "list.bullet.clipboard")
                 }.tint(.blue)

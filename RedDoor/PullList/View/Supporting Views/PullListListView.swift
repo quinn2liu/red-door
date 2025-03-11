@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct PullListListView: View {
-    let pullList: PullList
+    let pullList: RDList
     
-    init(_ pullList: PullList) { // Underscore removes the argument label
+    init(_ pullList: RDList) { // Underscore removes the argument label
         self.pullList = pullList
     }
     
