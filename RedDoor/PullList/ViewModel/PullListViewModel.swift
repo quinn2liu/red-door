@@ -15,16 +15,8 @@ import FirebaseStorage
 @MainActor
 @Observable
 class PullListViewModel {
-    var selectedPullList: RDList {
-        didSet {
-            print("selectedPullList updated: \(selectedPullList)")
-        }
-    }
-    var rooms: [Room] = [] {
-        didSet {
-            print("updatedRooms \(rooms)")
-        }
-    }
+    var selectedPullList: RDList
+    var rooms: [Room] = []
     private var listener: ListenerRegistration?
     
     let db = Firestore.firestore()

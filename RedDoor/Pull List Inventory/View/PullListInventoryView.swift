@@ -16,15 +16,14 @@ struct PullListInventoryView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 0) {
-                List {
-                    ForEach(pullListArray) { pullList in
-                        NavigationLink(value: pullList) {
-                            PullListListView(pullList)
-                        }
+            LazyVStack(spacing: 0) {
+//                List {
+                ForEach(pullListArray) { pullList in
+                    NavigationLink(value: pullList) {
+                        PullListListView(pullList)
                     }
                 }
-                
+//                }
             }
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
             .toolbar {
