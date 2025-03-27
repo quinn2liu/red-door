@@ -60,66 +60,6 @@ class DocumentsListViewModel {
         self.documentType = documentType
     }
     
-    // MARK: - Generic Fetch Function (Async Version)
-    func fetchDocuments<T: Codable>(filters: [String: Any]? = nil, orderBy field: String = "id", descending: Bool = false) async -> [T] {
-        
-        // if no more data left, return no models
-        //        print("hasMoreData: \(hasMoreData)")
-        print("documentsArray count: \(documentsArray.count)")
-        
-        var query: Query = db.collection(documentType.collectionString)
-            .limit(to: fetchLimit)
-            .order(by: field)
-        
-        if let lastDocument = lastDocument {
-            query = query.start(afterDocument: lastDocument)
-        }
-        
-        print("filters in viewModel: \(String(describing: filters))")
-        
-        // Apply optional filters
-        if let filters {
-            for (key, value) in filters {
-                if key == "name_lowercased", let searchText = value as? String {
-                    print("searching for: \(searchText)")
-                    query = query
-                        .whereField("name_lowercased", isGreaterThanOrEqualTo: searchText)
-                        .whereField("name_lowercased", isLessThan: searchText + "\u{f8ff}")
-                } else {
-                    query = query.whereField(key, isEqualTo: value)
-                }
-            }
-        }
-        
-        do {
-            let querySnapshot = try await query.getDocuments()
-            lastDocument = querySnapshot.documents.last
-            
-            //            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
-            
-            if !querySnapshot.isEmpty {
-                let documents = querySnapshot.documents.compactMap { document -> T? in
-                    do {
-                        let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
-                        return try JSONDecoder().decode(T.self, from: jsonData)
-                    } catch {
-                        print("Error decoding document: \(error)")
-                        return nil
-                    }
-                }
-                
-                return documents
-                
-            } else {
-                return []
-            }
-            
-        } catch {
-            print("Error fetching documents: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
     // MARK: Fetch Initial Documents
     func fetchInitialDocuments(
         filters: [String: Any]? = nil

@@ -20,9 +20,9 @@ struct InstalledListInventoryView: View {
             VStack(spacing: 0) {
                 List {
                     ForEach(pullListArray) { pullList in
-                        NavigationLink(value: pullList) {
-                            PullListListView(pullList)
-                        }
+//                        NavigationLink(value: pullList) {
+//                            PullListListView(pullList)
+//                        }
                     }
                 }
                 

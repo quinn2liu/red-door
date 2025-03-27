@@ -32,14 +32,11 @@ struct InventoryView: View {
                 Spacer()
             }
             .frameTop()
-            .frameTopPadding()
             .frameHorizontalPadding()
             .onAppear {
                 Task {
                     if !isLoadingModels {
-                        isLoadingModels = true
                         await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                        isLoadingModels = false
                     }
                 }
             }
@@ -49,9 +46,7 @@ struct InventoryView: View {
             .onChange(of: selectedType) {
                 searchText = ""
                 Task {
-                    isLoadingModels = true
                     await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                    isLoadingModels = false
                 }
             }
             .onChange(of: searchText) {
@@ -87,7 +82,6 @@ struct InventoryView: View {
                             searchFocused = true
                         } label: {
                             Image(systemName: "magnifyingglass")
-                            
                         }
                     }
                     
@@ -109,10 +103,7 @@ struct InventoryView: View {
                     .onSubmit {
                         if !searchText.isEmpty {
                             Task {
-//                                viewModel.documentsArray = []
-                                isLoadingModels = true
                                 await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
-                                isLoadingModels = false
                             }
                         }
                         searchTextFocused = false
@@ -146,9 +137,7 @@ struct InventoryView: View {
                     .onAppear {
                         if model == viewModel.documentsArray.last as? Model {
                             Task {
-                                isLoadingModels = true
                                 await fetchModels(initial: false, searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
-                                isLoadingModels = false
                             }
                         }
                     }
@@ -191,10 +180,18 @@ struct InventoryView: View {
             filters.updateValue(searchText.lowercased(), forKey: "name_lowercased")
         }
         
+        DispatchQueue.main.async {
+            isLoadingModels = true
+        }
+
         if isInitial {
             await viewModel.fetchInitialDocuments(filters: filters)
         } else {
             await viewModel.fetchMoreDocuments(filters: filters)
+        }
+
+        DispatchQueue.main.async {
+            isLoadingModels = false
         }
     }
     
