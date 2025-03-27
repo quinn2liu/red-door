@@ -44,8 +44,6 @@ struct Model: Identifiable, Codable, Hashable {
         }
 }
 
-
-
 // MARK: - Mock Data
 extension Model {
     static var MOCK_DATA: [Model] = [

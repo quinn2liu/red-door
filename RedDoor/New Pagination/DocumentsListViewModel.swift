@@ -11,6 +11,37 @@ import FirebaseFirestore
 
 enum DocumentType {
     case models, pull_lists, installed_lists, storage
+    
+    var collectionString: String {
+        switch self {
+        case .models:
+            return "models"
+        case .pull_lists:
+            return "pull_lists"
+        case .installed_lists:
+            return "installed_lists"
+        case .storage:
+            return "storage"
+        }
+    }
+    
+    var documentDataType: Codable.Type {
+        switch self {
+            case .models:
+                return Model.self
+            case .pull_lists, .installed_lists, .storage:
+                return RDList.self
+        }
+    }
+    
+    var orderByField: String {
+        switch self {
+        case .models:
+            return "name_lowercased"
+        case .pull_lists, .installed_lists, .storage:
+            return "id"
+        }
+    }
 }
 
 //  MARK: Could be abstracted for all lists
@@ -21,44 +52,36 @@ class DocumentsListViewModel {
     private var lastDocument: DocumentSnapshot?
     private var hasMoreData: Bool = true
     
+    var documentType: DocumentType
     var documentsArray: [Codable] = [] // Generic array to store different types of data
-    let fetchLimit: Int = 20
+    let fetchLimit: Int = 10
     
-    // MARK: - Get Firestore Collection Reference Dynamically
-    func getCollectionRef(for collection: String) -> CollectionReference {
-        return db.collection(collection)
+    init(_ documentType: DocumentType) {
+        self.documentType = documentType
     }
     
-//    func searchDocuments<T: Codable>(
-//        from collection: String,
-//        matching filters: [String: Any]? = nil,
-//        orderBy field: String = "id",
-//        descending: Bool = false,
-//        limit: Int = 10
-//    ) async -> [T] {
-//        
-//    }
-    
     // MARK: - Generic Fetch Function (Async Version)
-    func fetchDocuments<T: Codable>(
-        from collection: String,
-        matching filters: [String: Any]? = nil,
-        orderBy field: String = "id",
-        descending: Bool = false,
-        limit: Int = 10
-    ) async -> [T] {
-        var query: Query = getCollectionRef(for: collection)
-            .limit(to: limit + 1) // Fetch one extra document to check for more
-            .order(by: field, descending: descending)
+    func fetchDocuments<T: Codable>(filters: [String: Any]? = nil, orderBy field: String = "id", descending: Bool = false) async -> [T] {
+        
+        // if no more data left, return no models
+        //        print("hasMoreData: \(hasMoreData)")
+        print("documentsArray count: \(documentsArray.count)")
+        
+        var query: Query = db.collection(documentType.collectionString)
+            .limit(to: fetchLimit)
+            .order(by: field)
         
         if let lastDocument = lastDocument {
             query = query.start(afterDocument: lastDocument)
         }
         
+        print("filters in viewModel: \(String(describing: filters))")
+        
         // Apply optional filters
         if let filters {
             for (key, value) in filters {
                 if key == "name_lowercased", let searchText = value as? String {
+                    print("searching for: \(searchText)")
                     query = query
                         .whereField("name_lowercased", isGreaterThanOrEqualTo: searchText)
                         .whereField("name_lowercased", isLessThan: searchText + "\u{f8ff}")
@@ -70,22 +93,12 @@ class DocumentsListViewModel {
         
         do {
             let querySnapshot = try await query.getDocuments()
+            lastDocument = querySnapshot.documents.last
             
-            // Determine if there are more documents
-            hasMoreData = querySnapshot.documents.count > limit
-            
-            // If there are more documents than the limit, remove the last one
-            let documents = hasMoreData
-                ? Array(querySnapshot.documents.prefix(limit))
-                : querySnapshot.documents
-            
-            // Update last document for next pagination
-            lastDocument = hasMoreData
-                ? querySnapshot.documents[limit - 1]
-                : querySnapshot.documents.last
+            //            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
             
             if !querySnapshot.isEmpty {
-                let parsedDocuments = documents.compactMap { document -> T? in
+                let documents = querySnapshot.documents.compactMap { document -> T? in
                     do {
                         let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
                         return try JSONDecoder().decode(T.self, from: jsonData)
@@ -95,7 +108,8 @@ class DocumentsListViewModel {
                     }
                 }
                 
-                return parsedDocuments
+                return documents
+                
             } else {
                 return []
             }
@@ -106,40 +120,103 @@ class DocumentsListViewModel {
         }
     }
     
-    // MARK: - Fetch Lists (Callback Version)
-//    func loadLists(installedLists: Bool, limit: Int = 20, completion: @escaping ([RDList]) -> Void) async {
-//        lastDocument = nil
-//        hasMoreData = true
-//        
-//        let collectionName = installedLists ? "installed_lists" : "pull_lists"
-//        let collectionRef = getCollectionRef(for: collectionName)
-//        
-//        let query: Query = collectionRef.limit(to: limit).order(by: "id", descending: false)
-//        
-//        do {
-//            let querySnapshot = try await query.getDocuments()
-//            lastDocument = querySnapshot.documents.last
-//            
-//            let lists = querySnapshot.documents.compactMap { document -> RDList? in
-//                do {
-//                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
-//                    return try JSONDecoder().decode(RDList.self, from: jsonData)
-//                } catch {
-//                    print("Error decoding document: \(error)")
-//                    return nil
-//                }
-//            }
-//            
-//            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
-//            
-//            await MainActor.run {
-//                completion(lists)
-//            }
-//        } catch {
-//            print("Error fetching documents: \(error.localizedDescription)")
-//            await MainActor.run {
-//                completion([])
-//            }
-//        }
-//    }
+    // MARK: Fetch Initial Documents
+    func fetchInitialDocuments(
+        filters: [String: Any]? = nil
+    ) async {
+        documentsArray = []
+        lastDocument = nil
+        hasMoreData = true
+        
+        var query: Query = db.collection(documentType.collectionString)
+            .limit(to: fetchLimit)
+            .order(by: documentType.orderByField)
+        
+        // applying search and additional features
+        if let filters {
+            query = applyQueryFilters(query, filters: filters)
+        }
+        
+        do {
+            let querySnapshot = try await query.getDocuments()
+            lastDocument = querySnapshot.documents.last
+            
+            let dataType = documentType.documentDataType
+            
+            let documents: [Codable] = querySnapshot.documents.compactMap { document in
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
+                    return try JSONDecoder().decode(dataType, from: jsonData)
+                } catch {
+                    print("Error decoding document: \(error)")
+                    return nil
+                }
+            }
+            
+            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == fetchLimit
+            
+            documentsArray = documents
+        } catch {
+            print("Error fetching documents: \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchMoreDocuments(
+        filters: [String: Any]? = nil
+    ) async {
+        guard hasMoreData, let lastDocument else {
+            print("hasMoreData: \(hasMoreData)")
+            return
+        }
+        
+        var query: Query = db.collection(documentType.collectionString)
+            .order(by: documentType.orderByField)
+            .limit(to: fetchLimit)
+            .start(afterDocument: lastDocument)
+        
+        // applying search and additional features
+        if let filters {
+            query = applyQueryFilters(query, filters: filters)
+        }
+        
+        do {
+            let querySnapshot = try await query.getDocuments()
+            self.lastDocument = querySnapshot.documents.last
+            
+            let dataType = documentType.documentDataType
+            
+            let documents = querySnapshot.documents.compactMap { document in
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
+                    return try JSONDecoder().decode(dataType, from: jsonData)
+                } catch {
+                    print("Error decoding document: \(error)")
+                    return nil
+                }
+            }
+                        
+            hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == fetchLimit
+            
+            documentsArray.append(contentsOf: documents)
+        } catch {
+            print("Error fetching documents: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: Apply query filters and search filter
+    func applyQueryFilters(_ query: Query, filters: [String: Any]) -> Query {
+        var updatedQuery = query
+        
+        for (key, value) in filters {
+            if key == "name_lowercased", let searchText = value as? String {
+                updatedQuery = updatedQuery
+                    .whereField("name_lowercased", isGreaterThanOrEqualTo: searchText)
+                    .whereField("name_lowercased", isLessThan: searchText + "\u{f8ff}")
+            } else {
+                updatedQuery = updatedQuery.whereField(key, isEqualTo: value)
+            }
+        }
+        
+        return updatedQuery
+    }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 struct PullListInventoryView: View {
     
     @State private var path: NavigationPath = NavigationPath()
-    @State private var viewModel = DocumentsListViewModel()
+    @State private var viewModel = DocumentsListViewModel(.pull_lists)
 //    @State private var pullListArray: [RDList] = []
     
     @State private var searchText: String = ""
@@ -30,7 +30,7 @@ struct PullListInventoryView: View {
                                 Task {
                                     if !isLoading {
                                         isLoading = true
-                                        await fetchPullLists(searchText: !searchText.isEmpty ? searchText : nil)
+                                        await fetchPullLists(initial: false, searchText: !searchText.isEmpty ? searchText : nil)
                                         isLoading = false
                                     }
                                 }
@@ -61,12 +61,9 @@ struct PullListInventoryView: View {
             .onAppear {
                 Task {
                     isLoading = true
-                    await fetchPullLists(searchText: nil)
+                    await fetchPullLists(initial: true, searchText: nil)
                     isLoading = false
                 }
-            }
-            .onDisappear {
-    //            viewModel.stopListening()
             }
             .rootNavigationDestinations()
         }
@@ -91,18 +88,25 @@ struct PullListInventoryView: View {
         .padding(.horizontal)
     }
     
-    private func fetchPullLists(searchText: String?) async {
+    private func fetchPullLists(initial isInitial: Bool, searchText: String?) async {
         var filters: [String: Any] = [:]
 
         if let searchText {
             filters.updateValue(searchText, forKey: "id")
         }
         
-        let pullLists: [RDList] = await viewModel.fetchDocuments(from: "pull_lists", matching: filters.isEmpty ? nil : filters, descending: false)
-        
-        if !pullLists.isEmpty {
-            viewModel.documentsArray.append(contentsOf: pullLists)
+        if isInitial {
+            await viewModel.fetchInitialDocuments(filters: filters)
+        } else {
+            await viewModel.fetchMoreDocuments(filters: filters)
         }
+        
+//
+//        let pullLists: [RDList] = await viewModel.fetchDocuments(from: "pull_lists", matching: filters.isEmpty ? nil : filters, descending: false)
+//        
+//        if !pullLists.isEmpty {
+//            viewModel.documentsArray.append(contentsOf: pullLists)
+//        }
     }
     
 //    private func loadInitialPullLists() async {

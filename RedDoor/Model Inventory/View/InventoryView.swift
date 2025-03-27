@@ -2,7 +2,7 @@ import SwiftUI
 
 struct InventoryView: View {
     
-    @State private var viewModel = DocumentsListViewModel()
+    @State private var viewModel = DocumentsListViewModel(.models)
     @State private var path: NavigationPath = NavigationPath()
     
     @State private var searchText: String = ""
@@ -32,13 +32,13 @@ struct InventoryView: View {
                 Spacer()
             }
             .frameTop()
-            .frameHorizontalPadding()
             .frameTopPadding()
+            .frameHorizontalPadding()
             .onAppear {
                 Task {
                     if !isLoadingModels {
                         isLoadingModels = true
-                        await fetchModels(searchText: nil, modelType: selectedType)
+                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
                         isLoadingModels = false
                     }
                 }
@@ -50,7 +50,7 @@ struct InventoryView: View {
                 searchText = ""
                 Task {
                     isLoadingModels = true
-                    await fetchModels(searchText: nil, modelType: selectedType)
+                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
                     isLoadingModels = false
                 }
             }
@@ -58,7 +58,7 @@ struct InventoryView: View {
                 if searchText.isEmpty {
                     Task {
                         isLoadingModels = true
-                        await fetchModels(searchText: nil, modelType: selectedType)
+                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
                         isLoadingModels = false
                     }
                 }
@@ -66,8 +66,6 @@ struct InventoryView: View {
             .rootNavigationDestinations()
         }
     }
-    
-    
     
     // MARK: Top Bar
     @ViewBuilder private func TopBar() -> some View {
@@ -113,7 +111,7 @@ struct InventoryView: View {
                             Task {
 //                                viewModel.documentsArray = []
                                 isLoadingModels = true
-                                await fetchModels(searchText: searchText, modelType: selectedType)
+                                await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
                                 isLoadingModels = false
                             }
                         }
@@ -149,7 +147,7 @@ struct InventoryView: View {
                         if model == viewModel.documentsArray.last as? Model {
                             Task {
                                 isLoadingModels = true
-                                await fetchModels(searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
+                                await fetchModels(initial: false, searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
                                 isLoadingModels = false
                             }
                         }
@@ -182,7 +180,7 @@ struct InventoryView: View {
     }
     
     // MARK: Fetch Models (Using the Abstracted ViewModel)
-    private func fetchModels(searchText: String?, modelType: ModelType?) async {
+    private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {
         var filters: [String: Any] = [:]
         
         if let modelType {
@@ -193,12 +191,10 @@ struct InventoryView: View {
             filters.updateValue(searchText.lowercased(), forKey: "name_lowercased")
         }
         
-        print("filters.count: \(filters.count)")
-        
-        let models: [Model] = await viewModel.fetchDocuments(from: "models", matching: filters.isEmpty ? nil : filters, orderBy: "name_lowercased", descending: false)
-        
-        if !models.isEmpty {
-            viewModel.documentsArray.append(contentsOf: models)
+        if isInitial {
+            await viewModel.fetchInitialDocuments(filters: filters)
+        } else {
+            await viewModel.fetchMoreDocuments(filters: filters)
         }
     }
     
