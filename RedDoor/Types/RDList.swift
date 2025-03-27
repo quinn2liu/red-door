@@ -1,5 +1,5 @@
 //
-//  PullList.swift
+//  List.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/26/24.
@@ -8,25 +8,28 @@
 import Foundation
 import MapKit
 
-struct PullList: Codable, Identifiable, Hashable {
+struct RDList: Codable, Identifiable, Hashable {
     
     var id: String = UUID().uuidString
     
     var roomNames: [String] = []
     var installDate: String
     var client: String
+    var installed: Bool?
+    
     var isStorage: Bool
 
-    init(address: Address = Address(warehouseNumber: "1"), installDate: String = "", client: String = "", isStorage: Bool = false) {
+    init(address: Address = Address(warehouseNumber: "1"), installDate: String = "", client: String = "", installed: Bool? = nil, isStorage: Bool = true) {
+        self.id = address.toUniqueID()
         self.installDate = installDate
         self.client = client
-        self.id = address.toUniqueID()
+        self.installed = installed
         self.isStorage = isStorage
     }
 }
 
-extension PullList {
-    static var MOCK_DATA: [PullList] = [
+extension RDList {
+    static var MOCK_DATA: [RDList] = [
         .init(address: Address(warehouseNumber: "1"), installDate: "2025-04-01", client: "Client A", isStorage: false),
         .init(address: Address(warehouseNumber: "2"), installDate: "2025-04-05", client: "Client B", isStorage: true),
         .init(address: Address(warehouseNumber: "3"), installDate: "2025-04-10", client: "Client C", isStorage: false),

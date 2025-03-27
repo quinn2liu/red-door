@@ -42,45 +42,7 @@ struct Model: Identifiable, Codable, Hashable {
             self.count = count
             self.id = id
         }
-    
-    
-    // TODO: get rid of this, don't think it's needed
-//    enum CodingKeys: String, CodingKey {
-//        case name, name_lowercased, item_ids, type, primaryColor, primaryMaterial, imageIDs, imageURLDict, count, id
-//    }
-//    
-//    // Custom encoding
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(name, forKey: .name)
-//        try container.encode(name_lowercased, forKey: .name_lowercased)
-//        try container.encode(item_ids, forKey: .item_ids)
-//        try container.encode(type, forKey: .type)
-//        try container.encode(primaryColor, forKey: .primaryColor)
-//        try container.encode(primaryMaterial, forKey: .primaryMaterial)
-//        try container.encode(imageIDs, forKey: .imageIDs)
-//        try container.encode(imageURLDict, forKey: .imageURLDict)
-//        try container.encode(count, forKey: .count)
-//        try container.encode(id, forKey: .id)
-//    }
-//    
-//    // Custom decoding
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        name = try container.decode(String.self, forKey: .name)
-//        name_lowercased = try container.decode(String.self, forKey: .name_lowercased)
-//        item_ids = try container.decode([String].self, forKey: .item_ids)
-//        type = try container.decode(String.self, forKey: .type)
-//        primaryColor = try container.decode(String.self, forKey: .primaryColor)
-//        primaryMaterial = try container.decode(String.self, forKey: .primaryMaterial)
-//        imageIDs = try container.decode([String].self, forKey: .imageIDs)
-//        imageURLDict = try container.decode([String: String].self, forKey: .imageURLDict)
-//        count = try container.decode(Int.self, forKey: .count)
-//        id = try container.decode(String.self, forKey: .id)
-//    }
 }
-
-
 
 // MARK: - Mock Data
 extension Model {

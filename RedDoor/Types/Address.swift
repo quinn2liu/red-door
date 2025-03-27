@@ -17,7 +17,7 @@ struct Address {
     let warehouseNumber: String?
     let fullAddress: String?
     
-    init(warehouseNumber: String? = "", fullAddress: String? = "") {
+    init(warehouseNumber: String? = nil, fullAddress: String? = nil) {
         self.warehouseNumber = warehouseNumber
         self.fullAddress = fullAddress
     }
@@ -41,19 +41,16 @@ struct Address {
     }
     
     func toUniqueID() -> String {
-        
-        if let warehouseNumber, warehouseNumber != "" {
+        if let warehouseNumber {
             return "warehouse-\(warehouseNumber)"
-        } else {
-            // MARK: FIX WITH ACTUAL ADDRESS PARSING
-            if let address = fullAddress {
-                return address
-            } else {
-                return "ERROR: see Address"
-            }
-//            let normalizedStreetType = Address.normalizeStreetType(streetType)
-//            
-//            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
         }
+        
+        if let fullAddress {
+//            let normalizedStreetType = Address.normalizeStreetType(streetType)
+//            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
+            return fullAddress
+        }
+        
+        return "Error: Address"
     }
 }

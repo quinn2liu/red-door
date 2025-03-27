@@ -18,7 +18,7 @@ struct NavigationDestinationsModifier: ViewModifier {
             .navigationDestination(for: Item.self) { item in
                 ItemDetailView(item: item)
             }
-            .navigationDestination(for: PullList.self) { pullList in
+            .navigationDestination(for: RDList.self) { pullList in
                 PullListDetailsView(pullList: pullList)
             }
 //            .navigationDestination(for: InstalledList.self) { installedList in

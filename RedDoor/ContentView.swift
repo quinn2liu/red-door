@@ -12,24 +12,26 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            InventoryView()
-                .tabItem {
-                    Label("Inventory", systemImage: "square.stack.fill")
-                }.tint(.blue)
-            PullListInventoryView()
-                .tabItem {
-                    Label("Pull Lists", systemImage: "list.bullet")
-                }.tint(.blue)
-            InstalledListView()
-                .tabItem {
-                    Label("Installed Lists", systemImage: "list.bullet.clipboard")
-                }.tint(.blue)
-            AccountView()
-                .tabItem {
-                    Label("Account", systemImage: "person")
-                }.tint(.blue)
-        }
-        .tint(.red)
+            Group {
+                InventoryView()
+                    .tabItem {
+                        Label("Inventory", systemImage: "square.stack.fill")
+                    }
+
+                PullListInventoryView()
+                    .tabItem {
+                        Label("Pull Lists", systemImage: "list.bullet")
+                    }
+                InstalledListInventoryView()
+                    .tabItem {
+                        Label("Installed Lists", systemImage: "list.bullet.clipboard")
+                    }
+                AccountView()
+                    .tabItem {
+                        Label("Account", systemImage: "person")
+                    }
+            }.tint(.blue)
+        }.tint(.red)
     }
 }
 

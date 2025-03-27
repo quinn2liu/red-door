@@ -15,23 +15,15 @@ import FirebaseStorage
 @MainActor
 @Observable
 class PullListViewModel {
-    var selectedPullList: PullList {
-        didSet {
-            print("selectedPullList updated: \(selectedPullList)")
-        }
-    }
-    var rooms: [Room] = [] {
-        didSet {
-            print("updatedRooms \(rooms)")
-        }
-    }
+    var selectedPullList: RDList
+    var rooms: [Room] = []
     private var listener: ListenerRegistration?
     
     let db = Firestore.firestore()
     private var lastDocument: DocumentSnapshot?
     private var hasMoreData = true
     
-    init(selectedPullList: PullList = PullList()) {
+    init(selectedPullList: RDList = RDList()) {
         self.selectedPullList = selectedPullList
     }
 
@@ -43,7 +35,7 @@ class PullListViewModel {
             
             if let data = document.data() {
                 let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
-                let updatedPullList = try JSONDecoder().decode(PullList.self, from: jsonData)
+                let updatedPullList = try JSONDecoder().decode(RDList.self, from: jsonData)
                 
                 // Update selectedPullList on the main thread
                 if self.selectedPullList != updatedPullList {

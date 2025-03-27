@@ -8,24 +8,23 @@
 import Foundation
 import FirebaseCore
 import FirebaseFirestore
-import PhotosUI
 import SwiftUI
 import FirebaseStorage
 
 @Observable
-class PullListInventoryViewModel {
+class ListInventoryViewModel {
+    
+    var installedLists: Bool = false
     
     let db = Firestore.firestore()
     private var lastDocument: DocumentSnapshot?
     private var hasMoreData = true
     
-    // MARK: Pull List
-    
-    func loadPullLists(limit: Int = 20, completion: @escaping ([PullList]) -> Void) async {
+    func loadLists(limit: Int = 20, completion: @escaping ([RDList]) -> Void) async {
         lastDocument = nil
         hasMoreData = true
         
-        let collectionRef = db.collection("pull_lists")
+        let collectionRef = db.collection(installedLists ? "installed_lists" : "pull_lists")
 
         let query: Query = collectionRef.limit(to: limit).order(by: "id", descending: false)
         
@@ -33,10 +32,10 @@ class PullListInventoryViewModel {
             let querySnapshot = try await query.getDocuments()
             lastDocument = querySnapshot.documents.last
             
-            let pullLists = querySnapshot.documents.compactMap { document -> PullList? in
+            let lists = querySnapshot.documents.compactMap { document -> RDList? in
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
-                    return try JSONDecoder().decode(PullList.self, from: jsonData)
+                    return try JSONDecoder().decode(RDList.self, from: jsonData)
                 } catch {
                     print("Error decoding document: \(error)")
                     return nil
@@ -46,7 +45,7 @@ class PullListInventoryViewModel {
             hasMoreData = !querySnapshot.documents.isEmpty && querySnapshot.documents.count == limit
             
             await MainActor.run {
-                completion(pullLists)
+                completion(lists)
             }
         } catch {
             print("Error fetching documents: \(error.localizedDescription)")

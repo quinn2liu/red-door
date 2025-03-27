@@ -14,7 +14,7 @@ struct PullListDetailsView: View {
     @State private var isEditing: Bool = false
     @State private var showSheet: Bool = false
 
-    init(pullList: PullList) {
+    init(pullList: RDList) {
         self.viewModel = PullListViewModel(selectedPullList: pullList)
     }
     
