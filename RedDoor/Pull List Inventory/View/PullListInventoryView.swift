@@ -9,21 +9,41 @@ import SwiftUI
 
 struct PullListInventoryView: View {
     
-    @State private var viewModel = ListInventoryViewModel()
-    @State private var pullListArray: [RDList] = []
     @State private var path: NavigationPath = NavigationPath()
+    @State private var viewModel = DocumentsListViewModel()
+//    @State private var pullListArray: [RDList] = []
+    
     @State private var searchText: String = ""
+    @State private var isLoading: Bool = false
 
     var body: some View {
         NavigationStack(path: $path) {
-            LazyVStack(spacing: 0) {
-//                List {
-                ForEach(pullListArray) { pullList in
-                    NavigationLink(value: pullList) {
-                        PullListListView(pullList)
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { pullList in
+                        NavigationLink(value: pullList) {
+                            Text(pullList.id)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .onAppear {
+                            if pullList == viewModel.documentsArray.last as? RDList {
+                                Task {
+                                    if !isLoading {
+                                        isLoading = true
+                                        await fetchPullLists(searchText: !searchText.isEmpty ? searchText : nil)
+                                        isLoading = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
                     }
                 }
-//                }
             }
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
             .toolbar {
@@ -40,7 +60,9 @@ struct PullListInventoryView: View {
             }
             .onAppear {
                 Task {
-                    await loadInitialPullLists()
+                    isLoading = true
+                    await fetchPullLists(searchText: nil)
+                    isLoading = false
                 }
             }
             .onDisappear {
@@ -69,14 +91,28 @@ struct PullListInventoryView: View {
         .padding(.horizontal)
     }
     
-    private func loadInitialPullLists() async {
-        await viewModel.loadLists() { fetchedLists in
-            pullListArray = fetchedLists
+    private func fetchPullLists(searchText: String?) async {
+        var filters: [String: Any] = [:]
+
+        if let searchText {
+            filters.updateValue(searchText, forKey: "id")
+        }
+        
+        let pullLists: [RDList] = await viewModel.fetchDocuments(from: "pull_lists", matching: filters.isEmpty ? nil : filters, descending: false)
+        
+        if !pullLists.isEmpty {
+            viewModel.documentsArray.append(contentsOf: pullLists)
         }
     }
+    
+//    private func loadInitialPullLists() async {
+//        await viewModel.loadLists() { fetchedLists in
+//            pullListArray = fetchedLists
+//        }
+//    }
         
 }
 
-//#Preview {
-//    PullListView()
-//}
+#Preview {
+    PullListInventoryView()
+}

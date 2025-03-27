@@ -45,9 +45,10 @@ struct Address {
             return "warehouse-\(warehouseNumber)"
         }
         
-        if let address = fullAddress {
-            let normalizedStreetType = Address.normalizeStreetType(streetType)
-            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
+        if let fullAddress {
+//            let normalizedStreetType = Address.normalizeStreetType(streetType)
+//            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
+            return fullAddress
         }
         
         return "Error: Address"

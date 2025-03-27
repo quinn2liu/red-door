@@ -9,7 +9,7 @@ struct InventoryView: View {
     
     // MARK: View Modifier Variables
     @State private var selectedType: ModelType?
-    @State private var isLoading: Bool = false
+    @State private var isLoadingModels: Bool = false
     @State private var searchFocused: Bool = false
     @FocusState var searchTextFocused: Bool
     
@@ -36,9 +36,11 @@ struct InventoryView: View {
             .frameTopPadding()
             .onAppear {
                 Task {
-                    isLoading = true
-                    await fetchModels(searchText: nil, modelType: selectedType)
-                    isLoading = false
+                    if !isLoadingModels {
+                        isLoadingModels = true
+                        await fetchModels(searchText: nil, modelType: selectedType)
+                        isLoadingModels = false
+                    }
                 }
             }
             .onChange(of: path) {
@@ -47,17 +49,17 @@ struct InventoryView: View {
             .onChange(of: selectedType) {
                 searchText = ""
                 Task {
-                    isLoading = true
+                    isLoadingModels = true
                     await fetchModels(searchText: nil, modelType: selectedType)
-                    isLoading = false
+                    isLoadingModels = false
                 }
             }
             .onChange(of: searchText) {
                 if searchText.isEmpty {
                     Task {
-                        isLoading = true
+                        isLoadingModels = true
                         await fetchModels(searchText: nil, modelType: selectedType)
-                        isLoading = false
+                        isLoadingModels = false
                     }
                 }
             }
@@ -65,22 +67,7 @@ struct InventoryView: View {
         }
     }
     
-    // MARK: Fetch Models (Using the Abstracted ViewModel)
-    private func fetchModels(searchText: String?, modelType: ModelType?) async {
-        var filters: [String: Any] = [:]
-        
-        if let modelType {
-            filters.updateValue(modelType, forKey: "type")
-        }
-        
-        if let searchText {
-            filters.updateValue(searchText, forKey: "name")
-        }
-        
-        let models: [Model] = await viewModel.fetchDocuments(from: "models", matching: filters.isEmpty ? nil : filters, orderBy: "name", descending: false)
-        
-        viewModel.documentsArray = models
-    }
+    
     
     // MARK: Top Bar
     @ViewBuilder private func TopBar() -> some View {
@@ -109,8 +96,7 @@ struct InventoryView: View {
                     ToolBarMenu()
                 }
             }
-        )
-        .tint(.red)
+        ).tint(.red)
     }
     
     // MARK: Search Bar
@@ -123,11 +109,12 @@ struct InventoryView: View {
                     .submitLabel(.search)
                     .focused($searchTextFocused)
                     .onSubmit {
-                        if searchText != "" {
+                        if !searchText.isEmpty {
                             Task {
-                                isLoading = true
+//                                viewModel.documentsArray = []
+                                isLoadingModels = true
                                 await fetchModels(searchText: searchText, modelType: selectedType)
-                                isLoading = false
+                                isLoadingModels = false
                             }
                         }
                         searchTextFocused = false
@@ -153,27 +140,27 @@ struct InventoryView: View {
     @ViewBuilder private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                    ForEach(viewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
-                        NavigationLink(value: model) {
-                            ModelListItemView(model: model)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .onAppear {
-                            if model == viewModel.documentsArray.last as? Model {
-                                Task {
-                                    isLoading = true
-                                    await fetchModels(searchText: !searchText.isEmpty ? searchText : nil, modelType: selectedType)
-                                    isLoading = false
-                                }
+                ForEach(viewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
+                    NavigationLink(value: model) {
+                        ModelListItemView(model: model)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onAppear {
+                        if model == viewModel.documentsArray.last as? Model {
+                            Task {
+                                isLoadingModels = true
+                                await fetchModels(searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
+                                isLoadingModels = false
                             }
                         }
                     }
-                    
-                    if isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
-                    }
+                }
+                
+                if isLoadingModels {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                }
                 
             }
         }
@@ -191,6 +178,27 @@ struct InventoryView: View {
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.red)
+        }
+    }
+    
+    // MARK: Fetch Models (Using the Abstracted ViewModel)
+    private func fetchModels(searchText: String?, modelType: ModelType?) async {
+        var filters: [String: Any] = [:]
+        
+        if let modelType {
+            filters.updateValue(modelType, forKey: "type")
+        }
+        
+        if let searchText {
+            filters.updateValue(searchText.lowercased(), forKey: "name_lowercased")
+        }
+        
+        print("filters.count: \(filters.count)")
+        
+        let models: [Model] = await viewModel.fetchDocuments(from: "models", matching: filters.isEmpty ? nil : filters, orderBy: "name_lowercased", descending: false)
+        
+        if !models.isEmpty {
+            viewModel.documentsArray.append(contentsOf: models)
         }
     }
     
