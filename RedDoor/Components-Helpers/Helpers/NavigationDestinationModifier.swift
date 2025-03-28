@@ -18,12 +18,13 @@ struct NavigationDestinationsModifier: ViewModifier {
             .navigationDestination(for: Item.self) { item in
                 ItemDetailView(item: item)
             }
-            .navigationDestination(for: RDList.self) { pullList in
-                PullListDetailsView(pullList: pullList)
+            .navigationDestination(for: RDList.self) { list in
+                if list.listType == .pull {
+                    PullListDetailsView(pullList: list)
+                } else if list.listType == .installed {
+                    InstalledListDetailView(installedList: list)
+                }
             }
-//            .navigationDestination(for: InstalledList.self) { installedList in
-//                InstalledListView()
-//            } not used yet
             .navigationDestination(for: String.self) { string in
                 Group {
                     if string == "might be useful" {

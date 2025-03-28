@@ -13,16 +13,16 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Group {
-                InventoryView()
+                ModelInventoryView()
                     .tabItem {
                         Label("Inventory", systemImage: "square.stack.fill")
                     }
 
-                PullListInventoryView()
+                PullListDocumentView()
                     .tabItem {
                         Label("Pull Lists", systemImage: "list.bullet")
                     }
-                InstalledListInventoryView()
+                InstalledListDocumentView()
                     .tabItem {
                         Label("Installed Lists", systemImage: "list.bullet.clipboard")
                     }

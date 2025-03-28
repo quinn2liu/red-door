@@ -17,21 +17,51 @@ import FirebaseStorage
 class PullListViewModel {
     var selectedPullList: RDList
     var rooms: [Room] = []
-    private var listener: ListenerRegistration?
     
     let db = Firestore.firestore()
     private var lastDocument: DocumentSnapshot?
     private var hasMoreData = true
     
-    init(selectedPullList: RDList = RDList()) {
+    var selectedPullListReference: DocumentReference {
+        return db.collection("pull_lists").document(selectedPullList.id)
+    }
+    
+    init(selectedPullList: RDList = RDList(listType: .pull)) {
         self.selectedPullList = selectedPullList
     }
-
-    func refreshPullList() async {
-        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
-        print("refreshPullList() called")
+    
+    // MARK: - Create Pull List
+    func createPullList() {
         do {
-            let document = try await pullListRef.getDocument()
+            try selectedPullListReference.setData(from: selectedPullList)
+        } catch {
+            print("Error adding pull list: \(selectedPullList.id): \(error)")
+        }
+        
+        // creating the rooms
+        let batch = db.batch()
+        selectedPullList.roomNames.forEach { roomName in
+            let room = Room(roomName: roomName, listId: selectedPullList.id)
+            let roomRef = selectedPullListReference.collection("rooms").document(room.id)
+            
+            do {
+                try batch.setData(from: room, forDocument: roomRef)
+            } catch {
+                print("Error adding item: \(room.id): \(error)")
+            }
+        }
+        
+        batch.commit { err in
+            if let err {
+                print("Error writing batch: \(err)")
+            }
+        }
+    }
+
+    // MARK: Refresh Pull List
+    func refreshPullList() async {
+        do {
+            let document = try await selectedPullListReference.getDocument()
             
             if let data = document.data() {
                 let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
@@ -52,57 +82,26 @@ class PullListViewModel {
         }
     }
     
-    // MARK: Pull List
-    func createPullList() {
-        // This will only create pull list, not setup a listener
-        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
-        
-        do {
-            try pullListRef.setData(from: selectedPullList)
-        } catch {
-            print("Error adding pull list: \(selectedPullList.id): \(error)")
-        }
-        
-        // creating the rooms
-        let batch = db.batch()
-        selectedPullList.roomNames.forEach { roomName in
-            let room = Room(roomName: roomName, listId: selectedPullList.id)
-            let roomRef = pullListRef.collection("rooms").document(room.id)
-            
-            do {
-                try batch.setData(from: room, forDocument: roomRef)
-            } catch {
-                print("Error adding item: \(room.id): \(error)")
-            }
-        }
-        
-        batch.commit { err in
-            if let err {
-                print("Error writing batch: \(err)")
-            }
-        }
-    }
-    
+    // MARK: Update Pull List
     func updatePullList() {
-        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
         do {
-            try pullListRef.setData(from: selectedPullList, merge: true)
+            try selectedPullListReference.setData(from: selectedPullList, merge: true)
         } catch {
             print("Error adding pull list: \(selectedPullList.id): \(error)")
         }
     }
     
     
+    // MARK: Delete Pull List
     func deletePullList() {
-        let pullListRef = db.collection("pull_lists").document(selectedPullList.id)
-        pullListRef.delete()
+        selectedPullListReference.delete()
         for roomId in selectedPullList.roomNames {
-            let roomsRef = pullListRef.collection("rooms").document(roomId)
+            let roomsRef = selectedPullListReference.collection("rooms").document(roomId)
             roomsRef.delete()
         }
     }
     
-    // MARK: Room
+    // MARK: - Create Room
     func createEmptyRoom(_ roomName: String) -> Bool {
         if roomExists(newRoomName: roomName, roomNames: self.selectedPullList.roomNames) {
             return false // room not added
@@ -112,6 +111,7 @@ class PullListViewModel {
         }
     }
     
+    // MARK: Room Exists
     func roomExists(newRoomName: String, roomNames: [String]) -> Bool {
         let trimmedNewRoom = newRoomName.lowercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -126,9 +126,9 @@ class PullListViewModel {
         }
     }
     
+    // MARK: Load Rooms
     func loadRooms() async {
-        
-        let roomRef = db.collection("pull_lists").document(selectedPullList.id).collection("rooms")
+        let roomRef = selectedPullListReference.collection("rooms")
         
         do {
             let roomDocuments = try await roomRef.getDocuments()
@@ -146,5 +146,10 @@ class PullListViewModel {
         } catch {
             print("Error fetching documents: \(error.localizedDescription)")
         }
+    }
+    
+    // MARK: - Create Installed List
+    func createInstalledFromPull() -> RDList {
+        return RDList(listType: .installed)
     }
 }

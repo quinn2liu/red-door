@@ -13,13 +13,13 @@ struct PullListDetailsView: View {
     @State private var viewModel: PullListViewModel
     @State private var isEditing: Bool = false
     @State private var showSheet: Bool = false
-
+    
     init(pullList: RDList) {
         self.viewModel = PullListViewModel(selectedPullList: pullList)
     }
     
     @FocusState private var keyboardFocused: Bool
-        
+    
     @State private var addressQuery: String = ""
     @State private var date: Date = Date()
     
@@ -35,19 +35,7 @@ struct PullListDetailsView: View {
             
             Spacer()
             
-            if isEditing {
-                HStack {
-                    Button("Delete Pull List") {
-                        viewModel.deletePullList()
-                        dismiss()
-                    }
-                    
-                    Button("Save Pull List") {
-                        viewModel.updatePullList()
-                        dismiss()
-                    }
-                }
-            }
+            Footer()
         }
         .onAppear {
             Task {
@@ -146,6 +134,30 @@ struct PullListDetailsView: View {
             if isEditing {
                 TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
                     showCreateRoom = true
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder private func Footer() -> some View {
+        if isEditing {
+            HStack {
+                Button("Delete Pull List") {
+                    viewModel.deletePullList()
+                    dismiss()
+                }
+                
+                Button("Save Pull List") {
+                    viewModel.updatePullList()
+                    dismiss()
+                }
+            }
+        } else {
+            Button {
+                // turn into installed list
+            } label: {
+                RedDoorButton(type: .green, text: "Create Installed List") {
+//                    viewModel.createInstalledList()
                 }
             }
         }

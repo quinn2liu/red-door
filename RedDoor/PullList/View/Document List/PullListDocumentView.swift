@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PullListInventoryView: View {
+struct PullListDocumentView: View {
     
     @State private var path: NavigationPath = NavigationPath()
     @State private var viewModel = DocumentsListViewModel(.pull_lists)
@@ -178,5 +178,5 @@ struct PullListInventoryView: View {
 }
 
 #Preview {
-    PullListInventoryView()
+    PullListDocumentView()
 }

@@ -1,37 +1,18 @@
-//
-//  RoomAddItemsSheet.swift
-//  RedDoor
-//
-//  Created by Quinn Liu on 2/13/25.
-//
-
 import SwiftUI
 
-
-struct RoomAddItemsSheet: View {
-    // MARK: Environment Variables
-    @Environment(\.dismiss) private var dismiss
+struct ModelInventoryView: View {
     
-    // MARK: View Parameters
-    @State private var inventoryViewModel: DocumentsListViewModel = DocumentsListViewModel(.models)
-    @Binding var roomViewModel: RoomViewModel
-    @Binding var showSheet: Bool
-    
-    // MARK: init()
-    init(roomViewModel: Binding<RoomViewModel>, showSheet: Binding<Bool>) {
-        self._roomViewModel = roomViewModel
-        self._showSheet = showSheet
-    }
+    @State private var viewModel = DocumentsListViewModel(.models)
+    @State private var path: NavigationPath = NavigationPath()
     
     // MARK: Filter Variables
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
     
-    // MARK: State Variables
-    @State var path: NavigationPath = NavigationPath()
+    // MARK: View Modifier Variables
+    @State private var isLoadingModels: Bool = false
     @State private var searchFocused: Bool = false
     @FocusState var searchTextFocused: Bool
-    @State private var isLoadingModels: Bool = false
     
     // MARK: Body
     var body: some View {
@@ -52,7 +33,6 @@ struct RoomAddItemsSheet: View {
                 Spacer()
             }
             .frameTop()
-            .frameTopPadding()
             .frameHorizontalPadding()
             .onAppear {
                 Task {
@@ -79,12 +59,7 @@ struct RoomAddItemsSheet: View {
                     }
                 }
             }
-            .navigationDestination(for: Model.self) { model in
-                RoomModelView(model: model, roomViewModel: $roomViewModel)
-            }
-            .navigationDestination(for: Item.self) { item in
-                RoomItemView(item: item, roomViewModel: $roomViewModel)
-            }
+            .rootNavigationDestinations()
         }
     }
     
@@ -151,32 +126,17 @@ struct RoomAddItemsSheet: View {
         .animation(.bouncy(duration: 0.5), value: searchTextFocused)
     }
     
-    // MARK: ToolBarMenu
-    @ViewBuilder private func ToolBarMenu() -> some View {
-        Menu {
-            NavigationLink(destination: CreateModelView()) {
-                Label("Add Item", systemImage: "plus")
-            }
-            NavigationLink(destination: ScanItemView()) {
-                Label("Scan Item", systemImage: "qrcode.viewfinder")
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(.red)
-        }
-    }
-    
     // MARK: InventoryList
     @ViewBuilder private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(inventoryViewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
+                ForEach(viewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
                     NavigationLink(value: model) {
                         ModelListItemView(model: model)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .onAppear {
-                        if model == inventoryViewModel.documentsArray.last as? Model {
+                        if model == viewModel.documentsArray.last as? Model {
                             Task {
                                 await fetchModels(initial: false, searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
                             }
@@ -191,6 +151,21 @@ struct RoomAddItemsSheet: View {
                 }
                 
             }
+        }
+    }
+    
+    // MARK: ToolBarMenu
+    @ViewBuilder private func ToolBarMenu() -> some View {
+        Menu {
+            NavigationLink(destination: CreateModelView()) {
+                Label("Add Item", systemImage: "plus")
+            }
+            NavigationLink(destination: ScanItemView()) {
+                Label("Scan Item", systemImage: "qrcode.viewfinder")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(.red)
         }
     }
     
@@ -211,18 +186,17 @@ struct RoomAddItemsSheet: View {
         }
 
         if isInitial {
-            await inventoryViewModel.fetchInitialDocuments(filters: filters)
+            await viewModel.fetchInitialDocuments(filters: filters)
         } else {
-            await inventoryViewModel.fetchMoreDocuments(filters: filters)
+            await viewModel.fetchMoreDocuments(filters: filters)
         }
 
         DispatchQueue.main.async {
             isLoadingModels = false
         }
     }
-    
 }
 
-//#Preview {
-//    RoomAddItemsSheet(room: Room.MOCK_DATA[0], showSheet: .constant(true))
-//}
+#Preview {
+    ModelInventoryView()
+}
