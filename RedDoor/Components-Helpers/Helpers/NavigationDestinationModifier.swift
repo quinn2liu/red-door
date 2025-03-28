@@ -10,6 +10,9 @@ import Foundation
 import SwiftUI
 
 struct NavigationDestinationsModifier: ViewModifier {
+    
+    @Binding var path: NavigationPath
+    
     func body(content: Content) -> some View {
         content
             .navigationDestination(for: Model.self) { model in
@@ -20,7 +23,7 @@ struct NavigationDestinationsModifier: ViewModifier {
             }
             .navigationDestination(for: RDList.self) { list in
                 if list.listType == .pull {
-                    PullListDetailsView(pullList: list)
+                    PullListDetailsView(pullList: list, path: $path)
                 } else if list.listType == .installed {
                     InstalledListDetailView(installedList: list)
                 }
@@ -36,7 +39,7 @@ struct NavigationDestinationsModifier: ViewModifier {
 }
 
 extension View {
-    func rootNavigationDestinations() -> some View {
-        modifier(NavigationDestinationsModifier())
+    func rootNavigationDestinations(path: Binding<NavigationPath>) -> some View {
+        modifier(NavigationDestinationsModifier(path: path))
     }
 }

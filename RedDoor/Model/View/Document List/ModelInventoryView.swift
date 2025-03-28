@@ -59,7 +59,7 @@ struct ModelInventoryView: View {
                     }
                 }
             }
-            .rootNavigationDestinations()
+            .rootNavigationDestinations(path: $path)
         }
     }
     

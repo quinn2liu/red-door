@@ -21,11 +21,21 @@ struct RDList: Codable, Identifiable, Hashable {
     var installed: Bool?
     var listType: RDListType
 
+    // init from address
     init(address: Address = Address(warehouseNumber: "1"), installDate: String = "", client: String = "", installed: Bool? = nil, listType: RDListType) {
         self.id = address.toUniqueID()
         self.installDate = installDate
         self.client = client
         self.installed = installed
+        self.listType = listType
+    }
+    
+    // init from list
+    init(pullList: RDList, listType: RDListType) {
+        self.id = pullList.id
+        self.roomNames = pullList.roomNames
+        self.client = pullList.client
+        self.installDate = pullList.installDate
         self.listType = listType
     }
 }

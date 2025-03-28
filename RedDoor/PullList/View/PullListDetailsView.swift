@@ -11,19 +11,20 @@ struct PullListDetailsView: View {
     
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: PullListViewModel
-    @State private var isEditing: Bool = false
-    @State private var showSheet: Bool = false
+    @Binding var path: NavigationPath
     
-    init(pullList: RDList) {
+    init(pullList: RDList, path: Binding<NavigationPath>) {
         self.viewModel = PullListViewModel(selectedPullList: pullList)
+        self._path = path
     }
     
     @FocusState private var keyboardFocused: Bool
+    @State private var isEditing: Bool = false
+    @State private var showSheet: Bool = false
+    @State private var showCreateRoom: Bool = false
     
     @State private var addressQuery: String = ""
     @State private var date: Date = Date()
-    
-    @State private var showCreateRoom: Bool = false
     
     var body: some View {
         VStack(spacing: 16) {
@@ -157,7 +158,10 @@ struct PullListDetailsView: View {
                 // turn into installed list
             } label: {
                 RedDoorButton(type: .green, text: "Create Installed List") {
-//                    viewModel.createInstalledList()
+                    Task {
+                        var installedList = await viewModel.createInstalledFromPull()
+                        path.append(installedList)
+                    }
                 }
             }
         }

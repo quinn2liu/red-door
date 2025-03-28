@@ -41,7 +41,7 @@ struct InstalledListDocumentView: View {
             }
             .frameTop()
             .frameHorizontalPadding()
-            .rootNavigationDestinations()
+            .rootNavigationDestinations(path: $path)
         }
         
     }

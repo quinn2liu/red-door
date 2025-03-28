@@ -19,8 +19,6 @@ class PullListViewModel {
     var rooms: [Room] = []
     
     let db = Firestore.firestore()
-    private var lastDocument: DocumentSnapshot?
-    private var hasMoreData = true
     
     var selectedPullListReference: DocumentReference {
         return db.collection("pull_lists").document(selectedPullList.id)
@@ -149,7 +147,51 @@ class PullListViewModel {
     }
     
     // MARK: - Create Installed List
-    func createInstalledFromPull() -> RDList {
-        return RDList(listType: .installed)
+    func createInstalledFromPull() async -> RDList {
+        
+        // creating installed list
+        var installedList: RDList = RDList(pullList: selectedPullList, listType: .installed)
+        let installedListReference: DocumentReference = db.collection("installed_lists").document(installedList.id)
+        
+        do {
+            try installedListReference.setData(from: installedList)
+        } catch {
+            print("Error adding installed list: \(installedList.id): \(error)")
+        }
+        
+        // creating the rooms
+        do {
+            let roomsBatch = db.batch()
+            let pullListRoomRef = selectedPullListReference.collection("rooms")
+            let roomDocuments = try await pullListRoomRef.getDocuments()
+            
+            let rooms: [Room] = roomDocuments.documents.compactMap { roomDocument -> Room? in
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: roomDocument.data(), options: [])
+                    return try JSONDecoder().decode(Room.self, from: jsonData)
+                } catch {
+                    print("Error decoding document: \(error)")
+                    return nil
+                }
+            }
+
+            rooms.forEach { room in
+                let roomRef = installedListReference.collection("rooms").document(room.id)
+                
+                do {
+                    try roomsBatch.setData(from: room, forDocument: roomRef)
+                } catch {
+                    print("Error adding item: \(room.id): \(error)")
+                }
+            }
+            
+            // committing batch
+            try await roomsBatch.commit()
+            
+        } catch {
+            print("Error creating installed list rooms: \(error.localizedDescription)")
+        }
+    
+        return installedList
     }
 }

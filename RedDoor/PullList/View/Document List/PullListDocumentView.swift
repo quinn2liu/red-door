@@ -21,7 +21,6 @@ struct PullListDocumentView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            
             VStack(spacing: 16) {
                 if !searchTextFocused {
                     TopBar()
@@ -41,7 +40,7 @@ struct PullListDocumentView: View {
             }
             .frameTop()
             .frameHorizontalPadding()
-            .rootNavigationDestinations()
+            .rootNavigationDestinations(path: $path)
         }
         
     }
