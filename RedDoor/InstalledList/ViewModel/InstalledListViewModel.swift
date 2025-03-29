@@ -15,5 +15,13 @@ import FirebaseStorage
 @Observable
 class InstalledListViewModel {
     
+    init(selectedInstalledList: RDList, rooms: [Room]) {
+        self.selectedInstalledList = selectedInstalledList
+        self.rooms = rooms
+    }
+    var selectedInstalledList: RDList
+    var rooms: [Room] = []
+    
+    let db = Firestore.firestore()
     
 }

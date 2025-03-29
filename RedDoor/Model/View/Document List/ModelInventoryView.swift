@@ -1,14 +1,15 @@
 import SwiftUI
 
-struct InventoryView: View {
+struct ModelInventoryView: View {
     
     @State private var viewModel = DocumentsListViewModel(.models)
     @State private var path: NavigationPath = NavigationPath()
     
+    // MARK: Filter Variables
     @State private var searchText: String = ""
+    @State private var selectedType: ModelType?
     
     // MARK: View Modifier Variables
-    @State private var selectedType: ModelType?
     @State private var isLoadingModels: Bool = false
     @State private var searchFocused: Bool = false
     @FocusState var searchTextFocused: Bool
@@ -25,7 +26,7 @@ struct InventoryView: View {
                     SearchBar()
                 }
                 
-                InventoryFilterView(selectedType: $selectedType)
+                ModelInventoryFilterView(selectedType: $selectedType)
                 
                 InventoryList()
                 
@@ -58,7 +59,7 @@ struct InventoryView: View {
                     }
                 }
             }
-            .rootNavigationDestinations()
+            .rootNavigationDestinations(path: $path)
         }
     }
     
@@ -194,9 +195,8 @@ struct InventoryView: View {
             isLoadingModels = false
         }
     }
-    
 }
 
 #Preview {
-    InventoryView()
+    ModelInventoryView()
 }

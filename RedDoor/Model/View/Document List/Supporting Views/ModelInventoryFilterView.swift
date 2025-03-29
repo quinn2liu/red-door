@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct InventoryFilterView: View {
+struct ModelInventoryFilterView: View {
     
     @Environment(\.colorScheme) private var scheme
     @Binding var selectedType: ModelType?

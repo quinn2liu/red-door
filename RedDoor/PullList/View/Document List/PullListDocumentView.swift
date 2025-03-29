@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PullListInventoryView: View {
+struct PullListDocumentView: View {
     
     @State private var path: NavigationPath = NavigationPath()
     @State private var viewModel = DocumentsListViewModel(.pull_lists)
@@ -21,7 +21,6 @@ struct PullListInventoryView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            
             VStack(spacing: 16) {
                 if !searchTextFocused {
                     TopBar()
@@ -41,7 +40,7 @@ struct PullListInventoryView: View {
             }
             .frameTop()
             .frameHorizontalPadding()
-            .rootNavigationDestinations()
+            .rootNavigationDestinations(path: $path)
         }
         
     }
@@ -178,5 +177,5 @@ struct PullListInventoryView: View {
 }
 
 #Preview {
-    PullListInventoryView()
+    PullListDocumentView()
 }

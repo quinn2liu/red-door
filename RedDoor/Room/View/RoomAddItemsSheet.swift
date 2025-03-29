@@ -1,5 +1,5 @@
 //
-//  InventoryPullListView.swift
+//  RoomAddItemsSheet.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 2/13/25.
@@ -13,7 +13,7 @@ struct RoomAddItemsSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     // MARK: View Parameters
-    @State private var inventoryViewModel: InventoryViewModel = InventoryViewModel()
+    @State private var inventoryViewModel: DocumentsListViewModel = DocumentsListViewModel(.models)
     @Binding var roomViewModel: RoomViewModel
     @Binding var showSheet: Bool
     
@@ -26,40 +26,58 @@ struct RoomAddItemsSheet: View {
     // MARK: Filter Variables
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
-    @State private var isLoading: Bool = false
     
     // MARK: State Variables
-    @FocusState var searchFocused: Bool
     @State var path: NavigationPath = NavigationPath()
+    @State private var searchFocused: Bool = false
+    @FocusState var searchTextFocused: Bool
+    @State private var isLoadingModels: Bool = false
     
     // MARK: Body
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(alignment: .leading, spacing: 16) {
-                if !searchFocused {
-                    HStack(spacing: 0) {
-                        Text("Add Items: \(roomViewModel.selectedRoom.roomName)")
-                            .font(.system(.title2, design: .default))
-                            .bold()
-                            .foregroundStyle(.red)
-                        
-                        Spacer()
-                        
-                        Button {
-                            dismiss()
-                        } label: {
-                            Text("Cancel")
-                        }
-                    }
+            VStack(spacing: 16) {
+                if !searchTextFocused {
+                    TopBar()
                 }
                 
-                SearchBar()
+                if searchFocused {
+                    SearchBar()
+                }
                 
-                InventoryFilterView(selectedType: $selectedType)
+                ModelInventoryFilterView(selectedType: $selectedType)
                 
                 InventoryList()
                 
                 Spacer()
+            }
+            .frameTop()
+            .frameTopPadding()
+            .frameHorizontalPadding()
+            .onAppear {
+                Task {
+                    if !isLoadingModels {
+                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+                    }
+                }
+            }
+            .onChange(of: path) {
+                searchFocused = false
+            }
+            .onChange(of: selectedType) {
+                searchText = ""
+                Task {
+                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+                }
+            }
+            .onChange(of: searchText) {
+                if searchText.isEmpty {
+                    Task {
+                        isLoadingModels = true
+                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+                        isLoadingModels = false
+                    }
+                }
             }
             .navigationDestination(for: Model.self) { model in
                 RoomModelView(model: model, roomViewModel: $roomViewModel)
@@ -68,65 +86,35 @@ struct RoomAddItemsSheet: View {
                 RoomItemView(item: item, roomViewModel: $roomViewModel)
             }
         }
-        .frameTop()
-        .frameHorizontalPadding()
-        .frameVerticalPadding()
-        .onAppear {
-            Task {
-                isLoading = true
-                await inventoryViewModel.getInitialInventoryModels(selectedType: selectedType)
-                isLoading = false
-            }
-        }
-        .onDisappear {
-            showSheet = false
-        }
-        .onChange(of: selectedType) {
-            inventoryViewModel.modelsArray = []
-            Task {
-                isLoading = true
-                await inventoryViewModel.getInitialInventoryModels(selectedType: selectedType)
-                isLoading = false
-            }
-        }
-        .onChange(of: searchText) {
-            if (searchText.isEmpty) {
-                Task {
-                    inventoryViewModel.modelsArray = []
-                    isLoading = true
-                    await inventoryViewModel.getInitialInventoryModels(selectedType: selectedType)
-                    isLoading = false
-                }
-            }
-        }
     }
     
-    // MARK: Inventory List
-    @ViewBuilder private func InventoryList() -> some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(inventoryViewModel.modelsArray, id: \.self) { model in
-                    NavigationLink(value: model) {
-                        ModelListItemView(model: model)
-                    }
-                    .onAppear {
-                        if model == inventoryViewModel.modelsArray.last {
-                            Task {
-                                isLoading = true
-                                await inventoryViewModel.getMoreInventoryModels(searchText: !searchText.isEmpty ? searchText : nil, selectedType: selectedType)
-                                isLoading = false
-                            }
+    // MARK: Top Bar
+    @ViewBuilder private func TopBar() -> some View {
+        TopAppBar(
+            leadingIcon: {
+                Text("Inventory")
+                    .font(.system(.title2, design: .default))
+                    .bold()
+                    .foregroundStyle(.red)
+            },
+            header: {
+                EmptyView()
+            },
+            trailingIcon: {
+                HStack(spacing: 12) {
+                    if !searchFocused {
+                        Button {
+                            searchTextFocused = true
+                            searchFocused = true
+                        } label: {
+                            Image(systemName: "magnifyingglass")
                         }
                     }
-                }
-                
-                if isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
+                    
+                    ToolBarMenu()
                 }
             }
-        }
+        ).tint(.red)
     }
     
     // MARK: Search Bar
@@ -136,29 +124,103 @@ struct RoomAddItemsSheet: View {
                 Image(systemName: "magnifyingglass")
                 
                 TextField("", text: $searchText, prompt: Text("Search..."))
-                    .font(.footnote)
-                    .focused($searchFocused)
+                    .submitLabel(.search)
+                    .focused($searchTextFocused)
                     .onSubmit {
-                        Task {
-                            isLoading = true
-                            await inventoryViewModel.searchInventoryModels(searchText: searchText, selectedType: selectedType)
-                            isLoading = false
+                        if !searchText.isEmpty {
+                            Task {
+                                await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
+                            }
                         }
+                        searchTextFocused = false
+                        searchFocused = false
                     }
             }
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
             
-            if searchFocused {
+            if searchTextFocused {
                 Button("Cancel") {
                     searchText = ""
+                    searchTextFocused = false
                     searchFocused = false
                 }
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.bouncy(duration: 0.5), value: searchFocused)
+        .animation(.bouncy(duration: 0.5), value: searchTextFocused)
     }
+    
+    // MARK: ToolBarMenu
+    @ViewBuilder private func ToolBarMenu() -> some View {
+        Menu {
+            NavigationLink(destination: CreateModelView()) {
+                Label("Add Item", systemImage: "plus")
+            }
+            NavigationLink(destination: ScanItemView()) {
+                Label("Scan Item", systemImage: "qrcode.viewfinder")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(.red)
+        }
+    }
+    
+    // MARK: InventoryList
+    @ViewBuilder private func InventoryList() -> some View {
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(inventoryViewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
+                    NavigationLink(value: model) {
+                        ModelListItemView(model: model)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onAppear {
+                        if model == inventoryViewModel.documentsArray.last as? Model {
+                            Task {
+                                await fetchModels(initial: false, searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
+                            }
+                        }
+                    }
+                }
+                
+                if isLoadingModels {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                }
+                
+            }
+        }
+    }
+    
+    // MARK: Fetch Models (Using the Abstracted ViewModel)
+    private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {
+        var filters: [String: Any] = [:]
+        
+        if let modelType {
+            filters.updateValue(modelType, forKey: "type")
+        }
+        
+        if let searchText {
+            filters.updateValue(searchText.lowercased(), forKey: "name_lowercased")
+        }
+        
+        DispatchQueue.main.async {
+            isLoadingModels = true
+        }
+
+        if isInitial {
+            await inventoryViewModel.fetchInitialDocuments(filters: filters)
+        } else {
+            await inventoryViewModel.fetchMoreDocuments(filters: filters)
+        }
+
+        DispatchQueue.main.async {
+            isLoadingModels = false
+        }
+    }
+    
 }
 
 //#Preview {
