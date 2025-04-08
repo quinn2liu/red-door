@@ -30,7 +30,7 @@ struct InstalledListDetailView: View {
         VStack(spacing: 16) {
             TopBar()
             
-            PullListDetails()
+            InstalledListDetails()
             
             RoomList()
             
@@ -59,7 +59,7 @@ struct InstalledListDetailView: View {
                         .foregroundStyle(.blue)
                 }
             } else {
-                BackButton()
+                BackButton(path: $path)
             }
         }, header: {
             if isEditing {
@@ -91,8 +91,8 @@ struct InstalledListDetailView: View {
         })
     }
     
-    // MARK: PullListDetails()
-    @ViewBuilder private func PullListDetails() -> some View {
+    // MARK: InstalledListDetails()
+    @ViewBuilder private func InstalledListDetails() -> some View {
         
         VStack(spacing: 12) {
             if isEditing {

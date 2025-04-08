@@ -70,7 +70,6 @@ class DocumentsListViewModel {
         filters: [String: Any]? = nil
     ) async {
         guard hasMoreData, let lastDocument else {
-            print("hasMoreData: \(hasMoreData)")
             return
         }
         

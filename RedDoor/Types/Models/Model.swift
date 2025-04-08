@@ -13,6 +13,7 @@ struct Model: Identifiable, Codable, Hashable {
     var name: String
     var name_lowercased: String
     var item_ids: [String]
+    var available_item_ids: [String]
     var type: String
     var primaryColor: String
     var primaryMaterial: String
@@ -24,6 +25,7 @@ struct Model: Identifiable, Codable, Hashable {
     init(
         name: String = "",
         item_ids: [String] = [],
+        available_item_ids: [String] = [],
         type: String = "No Selection",
         primaryColor: String = "No Selection",
         primaryMaterial: String = "No Selection",
@@ -34,6 +36,7 @@ struct Model: Identifiable, Codable, Hashable {
             self.name = name
             self.name_lowercased = name.lowercased()
             self.item_ids = item_ids
+            self.available_item_ids = available_item_ids
             self.type = type
             self.primaryColor = primaryColor
             self.primaryMaterial = primaryMaterial

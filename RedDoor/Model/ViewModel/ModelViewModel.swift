@@ -45,7 +45,6 @@ class ModelViewModel {
         do {
             selectedModel.name_lowercased = selectedModel.name.lowercased()
             try db.collection("models").document(selectedModel.id).setData(from: selectedModel)
-            //            print("MODEL ADDED/EDITED")
         } catch {
             print("Error adding document: \(error)")
         }
@@ -59,6 +58,7 @@ class ModelViewModel {
             let itemId = "item-\(UUID().uuidString)"
             let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
             selectedModel.item_ids.append(itemId)
+            selectedModel.available_item_ids.append(itemId)
             let documentRef = db.collection("items").document(itemId)
             do {
                 try batch.setData(from: item, forDocument: documentRef)
@@ -66,6 +66,7 @@ class ModelViewModel {
                 print("Error adding item: \(itemId): \(error)")
             }
         }
+        
         batch.commit { err in
             if let err {
                 print("Error writing batch: \(err)")
@@ -78,6 +79,7 @@ class ModelViewModel {
         let itemId = "item-\(UUID().uuidString)"
         let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
         selectedModel.item_ids.append(itemId)
+        selectedModel.available_item_ids.append(itemId)
         selectedModel.count += 1
         let itemRef = db.collection("items").document(itemId)
         let modelRef = db.collection("models").document(selectedModel.id)
@@ -198,16 +200,12 @@ class ModelViewModel {
                             
                             do {
                                 let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
-                                //                                print("Upload finished. Metadata: \(resultMetaData)")
                                 let imageURL = try await imageRef.downloadURL().absoluteString
-                                //                                print("imageURL = \(imageURL)")
                                 self.selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
                             } catch {
                                 print("Error occurred when uploading image \(error.localizedDescription)")
                             }
                         }
-                        //                        print("after re-uploading, imageID.count = \(self.selectedModel.imageIDs.count)")
-                        
                     }
                     try await group.waitForAll()
                     
@@ -221,15 +219,12 @@ class ModelViewModel {
     // MARK: Delete Model Images
     func deleteModelImagesFirebase() async {
         do {
-            //            print("deleteModelImagesFirebase triggered")
             try await withThrowingTaskGroup(of: Void.self) { group in
-                //                print("#imageIDs in selectedModel.imageIDs = \(selectedModel.imageIDs.count)")
                 for imageID in selectedModel.imageIDs {
                     group.addTask {
                         let deleteRef = self.storageRef.child(imageID)
                         do {
                             try await deleteRef.delete()
-                            //                            print("Successfully deleted imageID: \(imageID)")
                         } catch {
                             print("Error deleting imageID \(imageID): \(error)")
                         }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 struct Item: Identifiable, Codable, Hashable {
     var modelId: String // comes from the "parent" model
     var id: String // the item's id (a variation of the modelId
@@ -20,6 +21,7 @@ struct Item: Identifiable, Codable, Hashable {
     }
 }
 
+// MARK: - Mock Data
 extension Item {
     static var MOCK_DATA: [Item] = [
         // Items for mock_Chair

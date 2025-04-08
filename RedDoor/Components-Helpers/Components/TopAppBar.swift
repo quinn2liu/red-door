@@ -30,9 +30,15 @@ struct TopAppBar<LeadingIcon: View, Header: View, TrailingIcon: View>: View {
 struct BackButton: View {
     @Environment(\.dismiss) private var dismiss
     
+    var path: Binding<NavigationPath>? = nil
+
     var body: some View {
         Button {
-            dismiss()
+            if let path = path {
+                path.wrappedValue = NavigationPath()
+            } else {
+                dismiss()
+            }
         } label: {
             Image(systemName: "chevron.left")
                 .fontWeight(.bold)

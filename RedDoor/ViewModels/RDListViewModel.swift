@@ -21,7 +21,7 @@ class RDListViewModel {
     
     let db = Firestore.firestore()
     
-    init(selectedList: RDList, rooms: [Room] = []) {
+    init(selectedList: RDList = RDList(), rooms: [Room] = []) {
         self.selectedList = selectedList
         self.rooms = rooms
     }
@@ -33,7 +33,8 @@ class RDListViewModel {
 
 // MARK: - Pull List
 extension RDListViewModel {
-    // MARK: Create Pull List
+    
+    // MARK: Create PL
     func createPullList() {
         do {
             try selectedListReference.setData(from: selectedList)
@@ -57,7 +58,7 @@ extension RDListViewModel {
         }
     }
     
-    // MARK: Refresh Pull List
+    // MARK: Refresh PL
     func refreshPullList() async {
         do {
             let document = try await selectedListReference.getDocument()
@@ -81,7 +82,7 @@ extension RDListViewModel {
         }
     }
     
-    // MARK: Update Pull List
+    // MARK: Update PL
     func updatePullList() {
         do {
             try selectedListReference.setData(from: selectedList, merge: true)
@@ -91,7 +92,7 @@ extension RDListViewModel {
     }
     
     
-    // MARK: Delete Pull List
+    // MARK: Delete PL
     func deletePullList() {
         for roomId in selectedList.roomNames {
             let roomsRef = selectedListReference.collection("rooms").document(roomId) // TODO: confirm if this works
@@ -99,6 +100,61 @@ extension RDListViewModel {
         }
         selectedListReference.delete()
     }
+}
+
+// MARK: - Installed List
+extension RDListViewModel {
+    
+    // MARK: Create IL
+    func createInstalledFromPull() async -> RDList {
+        // creating installed list
+        let installedList: RDList = RDList(pullList: selectedList)
+        let installedListReference: DocumentReference = db.collection("installed_lists").document(installedList.id)
+        
+        do {
+            try installedListReference.setData(from: installedList)
+        } catch {
+            print("Error adding installed list: \(installedList.id): \(error)")
+        }
+        
+        // creating the rooms
+        do {
+            let installedListRoomReference = installedListReference.collection("rooms")
+            
+            if !rooms.isEmpty {
+                let roomsBatch = db.batch()
+                
+                rooms.forEach { room in
+                    let roomRef = installedListRoomReference.document(room.id)
+                    
+                    do {
+                        try roomsBatch.setData(from: room, forDocument: roomRef)
+                    } catch {
+                        print("Error adding item: \(room.id): \(error)")
+                    }
+                }
+                
+                // committing batch
+                try await roomsBatch.commit()
+            }
+        } catch {
+            print("Error creating installed list rooms: \(error.localizedDescription)")
+        }
+        
+        // delete pull list
+        deletePullList()
+        
+        return installedList
+    }
+//      TODO: what to update after creating the installed list:
+//    1. delete the pull list.
+//    2. update the listID of each of the items.
+//    3. update the available_item_ids of the models.
+    
+    func updateItemsLocations() async {
+        //
+    }
+    
 }
 
 // MARK: - Room
@@ -152,47 +208,3 @@ extension RDListViewModel {
         }
     }
 }
-
-// MARK: - Installed List
-extension RDListViewModel {
-    
-    // MARK: Create Installed List
-    func createInstalledFromPull() async -> RDList {
-        // creating installed list
-        var installedList: RDList = RDList(pullList: selectedList, listType: .installed_list)
-        let installedListReference: DocumentReference = db.collection("installed_lists").document(installedList.id)
-        
-        do {
-            try installedListReference.setData(from: installedList)
-        } catch {
-            print("Error adding installed list: \(installedList.id): \(error)")
-        }
-        
-        // creating the rooms
-        do {
-            let pullListRoomRef = selectedListReference.collection("rooms")
-            
-            if !rooms.isEmpty {
-                let roomsBatch = db.batch()
-                
-                rooms.forEach { room in
-                    let roomRef = installedListReference.collection("rooms").document(room.id)
-                    
-                    do {
-                        try roomsBatch.setData(from: room, forDocument: roomRef)
-                    } catch {
-                        print("Error adding item: \(room.id): \(error)")
-                    }
-                }
-                
-                // committing batch
-                try await roomsBatch.commit()
-            }
-        } catch {
-            print("Error creating installed list rooms: \(error.localizedDescription)")
-        }
-        
-        return installedList
-    }
-}
-
