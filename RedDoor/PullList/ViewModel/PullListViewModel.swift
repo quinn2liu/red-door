@@ -24,7 +24,7 @@ class PullListViewModel {
         return db.collection("pull_lists").document(selectedPullList.id)
     }
     
-    init(selectedPullList: RDList = RDList(listType: .pull)) {
+    init(selectedPullList: RDList = RDList(listType: .pull_list)) {
         self.selectedPullList = selectedPullList
     }
     
@@ -150,7 +150,7 @@ class PullListViewModel {
     func createInstalledFromPull() async -> RDList {
         
         // creating installed list
-        var installedList: RDList = RDList(pullList: selectedPullList, listType: .installed)
+        var installedList: RDList = RDList(pullList: selectedPullList, listType: .installed_list)
         let installedListReference: DocumentReference = db.collection("installed_lists").document(installedList.id)
         
         do {

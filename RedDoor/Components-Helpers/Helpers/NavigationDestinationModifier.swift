@@ -22,10 +22,10 @@ struct NavigationDestinationsModifier: ViewModifier {
                 ItemDetailView(item: item)
             }
             .navigationDestination(for: RDList.self) { list in
-                if list.listType == .pull {
+                if list.listType == .pull_list {
                     PullListDetailsView(pullList: list, path: $path)
-                } else if list.listType == .installed {
-                    InstalledListDetailView(installedList: list)
+                } else if list.listType == .installed_list {
+                    InstalledListDetailView(installedList: list, path: $path)
                 }
             }
             .navigationDestination(for: String.self) { string in

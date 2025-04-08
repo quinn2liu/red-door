@@ -10,7 +10,7 @@ import SwiftUI
 struct InstalledListDocumentView: View {
     
     @State private var path: NavigationPath = NavigationPath()
-    @State private var viewModel = DocumentsListViewModel(.installed_lists)
+    @State private var viewModel = DocumentsListViewModel(.installed_list)
     
     @State private var searchText: String = ""
     
@@ -130,13 +130,13 @@ struct InstalledListDocumentView: View {
     @ViewBuilder private func InstalledListList() -> some View {
         ScrollView {
             LazyVStack(spacing: 8) {
-                ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { pullList in
-                    NavigationLink(value: pullList) {
-                        Text(pullList.id) // TODO: make a PL list item
+                ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { installedList in
+                    NavigationLink(value: installedList) {
+                        Text(installedList.id) // TODO: make a InstalledListView
                     }
                     .buttonStyle(PlainButtonStyle())
                     .onAppear {
-                        if pullList == viewModel.documentsArray.last as? RDList {
+                        if installedList == viewModel.documentsArray.last as? RDList {
                             Task {
                                 if !isLoadingLists {
                                     await fetchInstalledLists(initial: false, searchText: !searchText.isEmpty ? searchText : nil)

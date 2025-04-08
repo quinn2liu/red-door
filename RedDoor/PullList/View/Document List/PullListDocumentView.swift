@@ -10,7 +10,7 @@ import SwiftUI
 struct PullListDocumentView: View {
     
     @State private var path: NavigationPath = NavigationPath()
-    @State private var viewModel = DocumentsListViewModel(.pull_lists)
+    @State private var viewModel = DocumentsListViewModel(.pull_list)
     
     @State private var searchText: String = ""
     

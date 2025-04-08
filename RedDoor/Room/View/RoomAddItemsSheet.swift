@@ -13,7 +13,7 @@ struct RoomAddItemsSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     // MARK: View Parameters
-    @State private var inventoryViewModel: DocumentsListViewModel = DocumentsListViewModel(.models)
+    @State private var inventoryViewModel: DocumentsListViewModel = DocumentsListViewModel(.model)
     @Binding var roomViewModel: RoomViewModel
     @Binding var showSheet: Bool
     
