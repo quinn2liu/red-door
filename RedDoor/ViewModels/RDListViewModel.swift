@@ -141,18 +141,48 @@ extension RDListViewModel {
             print("Error creating installed list rooms: \(error.localizedDescription)")
         }
         
-        // delete pull list
-        deletePullList()
+        // update listID of each of the items and the items
+        let itemsBatch = db.batch()
+        var modelIdSet: Set<String> = []
+        var itemIdSet: Set<String> = []
+        do {
+            for room in rooms {
+                for itemId in room.itemIds {
+                    let docRef = db.collection("items").document(itemId)
+                    itemsBatch.updateData(["listId": installedList.id], forDocument: docRef)
+                    
+                    itemIdSet.insert(itemId)
+                    
+                    let snapshot = try await docRef.getDocument()
+                    if let itemData = snapshot.data(), let modelId = itemData["modelId"] as? String {
+                        modelIdSet.insert(modelId)
+                    }
+                }
+            }
+
+            try await itemsBatch.commit()
+        } catch {
+            print("Batch items listId update failed: \(error.localizedDescription)")
+        }
+        
+        // update models' availableItemIds by removing updated itemIds
+        do {
+            for modelId in modelIdSet {
+                let modelRef = db.collection("models").document(modelId)
+                let snapshot = try await modelRef.getDocument()
+                if let data = snapshot.data(), var availableItemIds = data["available_item_ids"] as? [String] {
+                    availableItemIds.removeAll(where: { itemIdSet.contains($0) })
+                    let update: [String: [String]] = ["available_item_ids": availableItemIds]
+                    try await modelRef.updateData(update)
+                }
+            }
+        } catch {
+            print("Error updating Models' availableItemIds: \(error.localizedDescription)")
+        }
+        
+        // DELETE PULL LIST (not implemented for now)
         
         return installedList
-    }
-//      TODO: what to update after creating the installed list:
-//    1. delete the pull list.
-//    2. update the listID of each of the items.
-//    3. update the available_item_ids of the models.
-    
-    func updateItemsLocations() async {
-        //
     }
     
 }

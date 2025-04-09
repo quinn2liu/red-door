@@ -29,13 +29,13 @@ class ModelViewModel {
     func printViewModelValues() {
         print(
     """
-    selectedModel.primaryColor = \(selectedModel.primaryColor)
+    selectedModel.primaryColor = \(selectedModel.primary_color)
     selectedModel.type = \(selectedModel.type)
-    selectedModel.primaryMaterial = \(selectedModel.primaryMaterial)
+    selectedModel.primaryMaterial = \(selectedModel.primary_material)
     selectedModel.count = \(selectedModel.count)
-    selectedModel.imageURLDict.count = \(selectedModel.imageURLDict.count)
+    selectedModel.imageURLDict.count = \(selectedModel.image_url_dict.count)
     """)
-        for (imageID, imageURL) in selectedModel.imageURLDict {
+        for (imageID, imageURL) in selectedModel.image_url_dict {
             print("imageID: \(imageID), imageURL: \(imageURL)")
         }
     }
@@ -145,7 +145,7 @@ class ModelViewModel {
         let dispatchGroup = DispatchGroup()
         var loadedImages: [UIImage] = []
         
-        for (_, urlString) in selectedModel.imageURLDict {
+        for (_, urlString) in selectedModel.image_url_dict {
             guard let url = URL(string: urlString) else { continue }
             //            print("Attempting to load imageURL: \(urlString)")
             dispatchGroup.enter()
@@ -180,14 +180,14 @@ class ModelViewModel {
                     
                     group.addTask {
                         
-                        self.selectedModel.imageURLDict.removeAll()
-                        self.selectedModel.imageIDs.removeAll()
+                        self.selectedModel.image_url_dict.removeAll()
+                        self.selectedModel.image_ids.removeAll()
                         
                         // now update the images
                         for (index, image) in images.enumerated() {
                             let imageID = "\(self.selectedModel.id)-\(index)"
                             let imageRef = self.storageRef.child(imageID)
-                            self.selectedModel.imageIDs.append(imageID)
+                            self.selectedModel.image_ids.append(imageID)
                             
                             // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
                             guard let imageData = image.jpegData(compressionQuality: 0.3) else {
@@ -201,7 +201,7 @@ class ModelViewModel {
                             do {
                                 let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
                                 let imageURL = try await imageRef.downloadURL().absoluteString
-                                self.selectedModel.imageURLDict.updateValue(imageURL, forKey: imageID)
+                                self.selectedModel.image_url_dict.updateValue(imageURL, forKey: imageID)
                             } catch {
                                 print("Error occurred when uploading image \(error.localizedDescription)")
                             }
@@ -220,7 +220,7 @@ class ModelViewModel {
     func deleteModelImagesFirebase() async {
         do {
             try await withThrowingTaskGroup(of: Void.self) { group in
-                for imageID in selectedModel.imageIDs {
+                for imageID in selectedModel.image_ids {
                     group.addTask {
                         let deleteRef = self.storageRef.child(imageID)
                         do {

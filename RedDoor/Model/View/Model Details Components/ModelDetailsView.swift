@@ -14,7 +14,7 @@ struct ModelDetailsView: View {
         
     var body: some View {
         if (isEditing) {
-            Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
+            Picker("Primary Color", selection: $viewModel.selectedModel.primary_color) {
                 ForEach(Array(ModelViewModel.colorMap), id: \.key) { option, color in
                     HStack(spacing: 0) {
                         Text(option)
@@ -40,7 +40,7 @@ struct ModelDetailsView: View {
                 }
             }
 
-            Picker("Material", selection: $viewModel.selectedModel.primaryMaterial) {
+            Picker("Material", selection: $viewModel.selectedModel.primary_material) {
                 ForEach(ModelViewModel.materialOptions, id: \.self) { material in
                     Text(material)
                 }
@@ -48,9 +48,9 @@ struct ModelDetailsView: View {
 
         } else {
             HStack {
-                Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
+                Text("Primary Color: \(viewModel.selectedModel.primary_color)")
                 Image(systemName: "circle.fill")
-                    .foregroundStyle(ModelViewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
+                    .foregroundStyle(ModelViewModel.colorMap[viewModel.selectedModel.primary_color] ?? .black)
                     .overlay(
                         Image(systemName: "circle")
                             .foregroundColor(.black.opacity(0.5))
@@ -62,7 +62,7 @@ struct ModelDetailsView: View {
                 Image(systemName: ModelViewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
             }
 
-            Text("Material: \(viewModel.selectedModel.primaryMaterial)")
+            Text("Material: \(viewModel.selectedModel.primary_material)")
         }
     }
 }

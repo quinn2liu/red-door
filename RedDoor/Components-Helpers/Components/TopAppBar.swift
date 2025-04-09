@@ -34,9 +34,11 @@ struct BackButton: View {
 
     var body: some View {
         Button {
-            if let path = path {
-                path.wrappedValue = NavigationPath()
+            if path != nil {
+                print("path reset triggered")
+                self.path?.wrappedValue = NavigationPath()
             } else {
+                print("dismiss triggered")
                 dismiss()
             }
         } label: {
