@@ -10,7 +10,7 @@ import SwiftUI
 struct CreatePullListView: View {
     @Environment(\.dismiss) private var dismiss
     
-    @State private var viewModel: PullListViewModel = PullListViewModel()
+    @State private var viewModel: RDListViewModel = RDListViewModel()
     
     @State private var addressQuery: String = ""
     @State private var date: Date = Date()
@@ -31,7 +31,7 @@ struct CreatePullListView: View {
             
             HStack {
                 Text("Client:")
-                TextField("", text: $viewModel.selectedPullList.client)
+                TextField("", text: $viewModel.selectedList.client)
                     .padding(6)
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
@@ -40,7 +40,7 @@ struct CreatePullListView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
-                        ForEach(viewModel.selectedPullList.roomNames, id: \.self) { roomId in
+                        ForEach(viewModel.selectedList.roomNames, id: \.self) { roomId in
                             EmptyRoomListItem(roomId)
                         }
                     }
@@ -74,7 +74,7 @@ struct CreatePullListView: View {
                 .onChange(of: addressQuery) { _, newValue in
                     // do the address searching stuff (use a sheet?)
                     let address = Address(fullAddress: newValue)
-                    viewModel.selectedPullList.id = address.toUniqueID()
+                    viewModel.selectedList.id = address.toUniqueID()
                 }
                 .padding(6)
                 .background(Color(.systemGray5))
@@ -82,7 +82,7 @@ struct CreatePullListView: View {
                 .multilineTextAlignment(.center)
         }, trailingIcon: {
             Button {
-                viewModel.selectedPullList.installDate = date.formatted(.dateTime.year().month().day())
+                viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
                 viewModel.createPullList()
                 dismiss()
             } label: {

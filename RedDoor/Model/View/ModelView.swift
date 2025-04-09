@@ -14,7 +14,7 @@ struct ModelView: View {
     // MARK: Environment variables
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ModelViewModel
-
+    
     // MARK: Image variables
     @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen: Bool = false
@@ -25,7 +25,7 @@ struct ModelView: View {
     @State private var isEditing: Bool = false
     @State private var items: [Item] = []
     @State private var showingDeleteAlert = false
-
+    
     // MARK: Initializer
     init(model: Model, editable: Bool = true) {
         self.viewModel = ModelViewModel(selectedModel: model)
@@ -34,39 +34,21 @@ struct ModelView: View {
     // MARK: Body
     var body: some View {
         VStack(spacing: 0) {
-            Form {
-                Section("Images") {
-                    if isEditing {
-                        AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
-                    }
-                    if !viewModel.images.isEmpty {
-                        ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
-                    } else {
-                        Text("No Images")
-                    }
-                }
-                
-                Section("Details") {
-                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
-                }
-                Section("Items") {
-                    ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
-                }
+            TopBar()
+            
+            if isEditing {
+                AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
             }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ModelNameView()
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        saveModel()
-                    } label: {
-                        Text(isEditing ? "Done" : "Edit")
-                    }
-                }
+            if !viewModel.images.isEmpty {
+                ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
+            } else {
+                Text("No Images")
             }
-            .navigationBarTitleDisplayMode(.inline)
+            
+            ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+            
+            ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
+            
             
             HStack {
                 if isEditing {
@@ -91,6 +73,9 @@ struct ModelView: View {
                 }
             }.padding(.top)
         }
+        .frameTop()
+        .frameHorizontalPadding()
+        .toolbar(.hidden)
         .overlay(
             ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
@@ -122,7 +107,7 @@ struct ModelView: View {
     
     // MARK: saveModel()
     private func saveModel() {
-
+        
         if isEditing {
             isEditing = false
             Task {
@@ -157,6 +142,33 @@ struct ModelView: View {
             }
         }
     }
+    
+    @ViewBuilder private func TopBar() -> some View {
+        TopAppBar(
+            leadingIcon: {
+                if isEditing {
+                    Button {
+                        isEditing.toggle()
+                    } label: {
+                        Text("Cancel")
+                    }
+                } else {
+                    BackButton()
+                }
+            },
+            header: {
+                ModelNameView()
+            },
+            trailingIcon: {
+                Button {
+                    saveModel()
+                } label: {
+                    Text(isEditing ? "Done" : "Edit")
+                }
+            }
+        )
+    }
+    
 } // struct
 
 //#Preview {

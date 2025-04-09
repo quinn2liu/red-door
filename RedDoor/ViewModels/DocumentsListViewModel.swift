@@ -9,41 +9,6 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 
-enum DocumentType {
-    case models, pull_lists, installed_lists, storage
-    
-    var collectionString: String {
-        switch self {
-        case .models:
-            return "models"
-        case .pull_lists:
-            return "pull_lists"
-        case .installed_lists:
-            return "installed_lists"
-        case .storage:
-            return "storage"
-        }
-    }
-    
-    var documentDataType: Codable.Type {
-        switch self {
-            case .models:
-                return Model.self
-            case .pull_lists, .installed_lists, .storage:
-                return RDList.self
-        }
-    }
-    
-    var orderByField: String {
-        switch self {
-        case .models:
-            return "name_lowercased"
-        case .pull_lists, .installed_lists, .storage:
-            return "id"
-        }
-    }
-}
-
 //  MARK: Could be abstracted for all lists
 @Observable
 class DocumentsListViewModel {
@@ -105,7 +70,6 @@ class DocumentsListViewModel {
         filters: [String: Any]? = nil
     ) async {
         guard hasMoreData, let lastDocument else {
-            print("hasMoreData: \(hasMoreData)")
             return
         }
         

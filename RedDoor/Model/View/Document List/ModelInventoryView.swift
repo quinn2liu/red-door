@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ModelInventoryView: View {
     
-    @State private var viewModel = DocumentsListViewModel(.models)
+    @State private var viewModel = DocumentsListViewModel(.model)
     @State private var path: NavigationPath = NavigationPath()
     
     // MARK: Filter Variables

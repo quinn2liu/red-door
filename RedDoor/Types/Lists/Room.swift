@@ -24,6 +24,11 @@ struct Room: Codable, Identifiable, Hashable {
 }
 
 extension Room {
+    
+    static func roomNameToId(listId: String, roomName: String) -> String {
+        return listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
+    }
+    
     static var MOCK_DATA: [Room] = [
         .init(roomName: "test room name", listId: "test list id")
     ]

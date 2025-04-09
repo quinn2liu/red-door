@@ -10,11 +10,11 @@ import SwiftUI
 struct PullListDetailsView: View {
     
     @Environment(\.dismiss) private var dismiss
-    @State private var viewModel: PullListViewModel
+    @State private var viewModel: RDListViewModel
     @Binding var path: NavigationPath
     
     init(pullList: RDList, path: Binding<NavigationPath>) {
-        self.viewModel = PullListViewModel(selectedPullList: pullList)
+        self.viewModel = RDListViewModel(selectedList: pullList)
         self._path = path
     }
     
@@ -63,22 +63,22 @@ struct PullListDetailsView: View {
             }
         }, header: {
             if isEditing {
-                TextField(viewModel.selectedPullList.id, text: $addressQuery)
+                TextField(viewModel.selectedList.id, text: $addressQuery)
                     .onChange(of: addressQuery) { _, newValue in
                         // do the address searching stuff (use a sheet?)
                         let address = Address(fullAddress: newValue)
-                        viewModel.selectedPullList.id = address.toUniqueID()
+                        viewModel.selectedList.id = address.toUniqueID()
                     }
             } else {
-                Text(viewModel.selectedPullList.id)
+                Text(viewModel.selectedList.id)
             }
             
         }, trailingIcon: {
             Button {
                 if isEditing {
                     let dateString = date.formatted(.dateTime.year().month().day())
-                    if dateString != viewModel.selectedPullList.installDate {
-                        viewModel.selectedPullList.installDate = date.formatted(.dateTime.year().month().day())
+                    if dateString != viewModel.selectedList.installDate {
+                        viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
                     }
                     viewModel.updatePullList()
                 }
@@ -104,14 +104,14 @@ struct PullListDetailsView: View {
                 
                 HStack {
                     Text("Client:")
-                    TextField("", text: $viewModel.selectedPullList.client)
+                    TextField("", text: $viewModel.selectedList.client)
                         .padding(6)
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
                 }
             } else {
-                Text("Install Date: \(viewModel.selectedPullList.installDate)")
-                Text("Client: \(viewModel.selectedPullList.client)")
+                Text("Install Date: \(viewModel.selectedList.installDate)")
+                Text("Client: \(viewModel.selectedList.client)")
             }
         }
     }
@@ -154,14 +154,10 @@ struct PullListDetailsView: View {
                 }
             }
         } else {
-            Button {
-                // turn into installed list
-            } label: {
-                RedDoorButton(type: .green, text: "Create Installed List") {
-                    Task {
-                        var installedList = await viewModel.createInstalledFromPull()
-                        path.append(installedList)
-                    }
+            RedDoorButton(type: .green, text: "Create Installed List") {
+                Task {
+                    let installedList = await viewModel.createInstalledFromPull()
+                    path.append(installedList)
                 }
             }
         }

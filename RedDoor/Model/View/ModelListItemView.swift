@@ -14,7 +14,7 @@ struct ModelListItemView: View {
     
     // TODO: add primary image
     var urlString: String {
-        return model.imageURLDict.values.first ?? ""
+        return model.image_url_dict.values.first ?? ""
     }
     
     var body: some View {
@@ -31,11 +31,11 @@ struct ModelListItemView: View {
             
             Spacer()
 
-            Text(model.primaryMaterial)
+            Text(model.primary_material)
             
             Spacer()
 
-            Text(model.primaryColor)
+            Text(model.primary_color)
             
             Spacer()
 
