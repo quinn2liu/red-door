@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import PhotosUI
 
-struct ImagePickerWrapper: UIViewControllerRepresentable {
+struct ModelImagesPickerWrapper: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Binding var isPresented: Bool
     var sourceType: UIImagePickerController.SourceType
@@ -28,9 +28,9 @@ struct ImagePickerWrapper: UIViewControllerRepresentable {
     }
 
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: ImagePickerWrapper
+        let parent: ModelImagesPickerWrapper
 
-        init(_ parent: ImagePickerWrapper) {
+        init(_ parent: ModelImagesPickerWrapper) {
             self.parent = parent
         }
 

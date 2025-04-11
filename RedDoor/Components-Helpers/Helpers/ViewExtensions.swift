@@ -53,4 +53,39 @@ extension View {
         self
             .frame(width: size, height: size)
     }
+    
+    func cornerRadius(_ radius: CGFloat) -> some View {
+        self
+            .clipShape(.rect(cornerRadius: radius))
+    }
+}
+
+// MARK: UIWindow
+extension UIWindow {
+    static var current: UIWindow? {
+        return MainActor.assumeIsolated {
+            for scene in UIApplication.shared.connectedScenes {
+                guard let windowScene = scene as? UIWindowScene else { continue }
+                for window in windowScene.windows {
+                    if window.isKeyWindow { return window }
+                }
+            }
+            return nil
+        }
+    }
+}
+
+// MARK: UIScreen
+extension UIScreen {
+    static var current: UIScreen? {
+        UIWindow.current?.screen
+    }
+    
+    static var width: CGFloat {
+        UIScreen.current?.bounds.width ?? 0
+    }
+    
+    static var height: CGFloat {
+        UIScreen.current?.bounds.height ?? 0
+    }
 }

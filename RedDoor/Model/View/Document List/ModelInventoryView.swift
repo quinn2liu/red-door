@@ -12,7 +12,7 @@ struct ModelInventoryView: View {
     // MARK: View Modifier Variables
     @State private var isLoadingModels: Bool = false
     @State private var searchFocused: Bool = false
-    @FocusState var searchTextFocused: Bool
+    @FocusState private var searchTextFocused: Bool
     
     // MARK: Body
     var body: some View {
@@ -79,8 +79,8 @@ struct ModelInventoryView: View {
                 HStack(spacing: 12) {
                     if !searchFocused {
                         Button {
-                            searchTextFocused = true
                             searchFocused = true
+                            searchTextFocused = true
                         } label: {
                             Image(systemName: "magnifyingglass")
                         }
