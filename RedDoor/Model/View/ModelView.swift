@@ -37,7 +37,7 @@ struct ModelView: View {
             TopBar()
             
             if isEditing {
-                AddImagesView(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
+                AddSecondaryImages(images: $viewModel.images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
             }
             if !viewModel.images.isEmpty {
                 ModelImagesView(images: $viewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
@@ -56,21 +56,30 @@ struct ModelView: View {
                         showingDeleteAlert = true
                     }
                     .foregroundColor(.red)
-                    .alert(isPresented: $showingDeleteAlert) {
-                        Alert(
-                            title: Text("Confirm Delete"),
-                            primaryButton: .cancel(Text("Cancel")),
-                            secondaryButton: .destructive(Text("Delete")) {
-                                Task {
-                                    await viewModel.deleteModelFirebase()
-                                    dismiss()
-                                }
+                    .alert(
+                        "Confirm Delete",
+                        isPresented: $showingDeleteAlert
+                    ) {
+                        
+                        Button(role: .destructive) {
+                            Task {
+                                await viewModel.deleteModelFirebase()
+                                dismiss()
                             }
-                        )
+                        } label: {
+                            Text("Delete")
+                        }
+                        
+                        Button(role: .cancel) {
+                            
+                        } label: {
+                            Text("Cancel")
+                        }
                     }
                 } else {
                     Button("Add Item to Pull List") { }
                 }
+                
             }.padding(.top)
         }
         .frameTop()

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddImagesView: View {
+struct AddSecondaryImages: View {
     
     @Binding var images: [UIImage]
     @Binding var isImagePickerPresented: Bool

@@ -12,7 +12,6 @@ struct CreateModelView: View {
     
     @State private var viewModel: ModelViewModel = ModelViewModel()
     @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
     
     @State private var isImagePickerPresented = false
     @State private var sourceType: UIImagePickerController.SourceType?
@@ -23,43 +22,64 @@ struct CreateModelView: View {
     @State private var isEditing: Bool = true
     
     var body: some View {
-        
-        VStack(spacing: 0) {
-                    VStack(spacing: 8) {
-                        AddImagesView(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
-                        
-                        if (!images.isEmpty) {
-                            ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
-                        }
-                    }
-                
-                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+        VStack(spacing: 8) {
                     
-                    Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
+            TopBar()
+            
+            HStack(spacing: 0) {
+                ModelPrimaryImage()
                 
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ModelNameEntry()
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $isImagePickerPresented) {
-                ImagePickerSheetView()
+                Spacer()
+                
+                Text("info here")
             }
             
+            SecondaryImages()
+        
+            ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
             
-            RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Item to Inventory", semibold: true) {
+            Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
+                
+            RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
                 createModel()
             }
-            
+        }
+        .sheet(isPresented: $isImagePickerPresented) {
+            ImagePickerSheetView()
         }
         .ignoresSafeArea(.keyboard)
         .overlay(
             ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
+        .frameTop()
+        .frameHorizontalPadding()
     }
     
+    @ViewBuilder private func TopBar() -> some View {
+        TopAppBar(
+            leadingIcon: {
+                BackButton()
+            },
+            header: {
+                ModelNameEntry()
+            },
+            trailingIcon: {
+                
+            }
+        )
+    }
+    
+    // MARK: Secondary Images
+    @ViewBuilder private func SecondaryImages() -> some View {
+        AddSecondaryImages(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
+        
+        if (!images.isEmpty) {
+            ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
+        }
+    }
+        
+    // MARK: Model Name Entry
     @ViewBuilder private func ModelNameEntry() -> some View {
         TextField("Item Name", text: $viewModel.selectedModel.name)
             .padding(6)
@@ -70,14 +90,14 @@ struct CreateModelView: View {
     
     @ViewBuilder private func ImagePickerSheetView() -> some View {
         if sourceType == .camera {
-            ImagePickerWrapper(
+            ModelImagesPickerWrapper(
                 images: $images,
                 isPresented: $isImagePickerPresented,
                 sourceType: .camera
             )
             .background(Color.black)
         } else {
-            ImagePickerWrapper(
+            ModelImagesPickerWrapper(
                 images: $images,
                 isPresented: $isImagePickerPresented,
                 sourceType: .photoLibrary

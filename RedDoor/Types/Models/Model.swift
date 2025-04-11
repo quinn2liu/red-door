@@ -17,6 +17,7 @@ struct Model: Identifiable, Codable, Hashable {
     var type: String
     var primary_color: String
     var primary_material: String
+    var primary_image_url: String
     var image_ids: [String]
     var image_url_dict: [String: String]
     var count: Int
@@ -29,6 +30,7 @@ struct Model: Identifiable, Codable, Hashable {
         type: String = "No Selection",
         primary_color: String = "No Selection",
         primary_material: String = "No Selection",
+        primary_image_url: String = "",
         image_ids: [String] = [],
         image_url_dict: [String: String] = [String: String](), // [imageID : imageURL]
         count: Int = 1,
@@ -40,6 +42,7 @@ struct Model: Identifiable, Codable, Hashable {
             self.type = type
             self.primary_color = primary_color
             self.primary_material = primary_material
+            self.primary_image_url = primary_image_url
             self.image_ids = image_ids
             self.image_url_dict = image_url_dict
             self.count = count

@@ -19,7 +19,6 @@ struct ModelImagesView: View {
     
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
-            
             ForEach(images.indices, id: \.self) { index in
                 ZStack(alignment: .topTrailing) {
                     Image(uiImage: images[index])
@@ -32,24 +31,14 @@ struct ModelImagesView: View {
                             selectedImage = images[index]
                             isImageFullScreen = true
                         }
+                    
                     if (isEditing) {
-                        Button(action: {
+                        DeleteButton {
                             selectedImageIndex = index
                             showDeleteConfirmation = true
-                        }) {
-                            Image(systemName: "xmark.circle.fill") // X icon
-                                .foregroundColor(.gray)
-                                .background(.white)
-                                .font(.system(size: 16))
-                                .clipShape(Circle())
-                                .padding(.top, -8)
-                                .padding(.trailing, -8)
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
-                    
                 }
-                
             }
             .confirmationDialog("Are you sure you want to delete this photo?", isPresented: $showDeleteConfirmation) {
                 Button("Delete", role: .destructive) {
