@@ -15,27 +15,36 @@ struct CreateModelView: View {
     
     @State private var isImagePickerPresented = false
     @State private var sourceType: UIImagePickerController.SourceType?
-    @State private var images: [UIImage] = []
+    @State private var primaryImage: UIImage? = nil
+    @State private var secondaryImages: [UIImage] = []
     
     @State private var selectedImage: UIImage?
     @State private var isImageFullScreen: Bool = false
     @State private var isEditing: Bool = true
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
                     
             TopBar()
             
-            HStack(spacing: 0) {
-                ModelPrimaryImage()
-                
-                Spacer()
-                
-                Text("info here")
+            if primaryImage != nil {
+                HStack {
+                    Spacer()
+                    
+                    ModelPrimaryImage(primaryImage: $primaryImage)
+                        
+                    Spacer()
+                }
+            } else {
+                HStack(spacing: 0) {
+                    ModelPrimaryImage(primaryImage: $primaryImage)
+                    
+                    Spacer()
+
+                    SecondaryImages()
+                }
             }
-            
-            SecondaryImages()
-        
+                    
             ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
             
             Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
@@ -44,19 +53,21 @@ struct CreateModelView: View {
                 createModel()
             }
         }
+        .toolbar(.hidden)
+        .frameTop()
+        .frameHorizontalPadding()
+        .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isImagePickerPresented) {
             ImagePickerSheetView()
         }
-        .ignoresSafeArea(.keyboard)
         .overlay(
             ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
-        .frameTop()
-        .frameHorizontalPadding()
     }
     
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder
+    private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
                 BackButton()
@@ -65,22 +76,26 @@ struct CreateModelView: View {
                 ModelNameEntry()
             },
             trailingIcon: {
-                
+                Spacer().frame(24)
             }
         )
     }
     
     // MARK: Secondary Images
-    @ViewBuilder private func SecondaryImages() -> some View {
-        AddSecondaryImages(images: $images, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
+    @ViewBuilder
+    private func SecondaryImages() -> some View {
+        ModelSecondaryImages(secondaryImages: $secondaryImages)
         
-        if (!images.isEmpty) {
-            ModelImagesView(images: $images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
-        }
+//        AddSecondaryImages(images: $secondaryImages, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
+//        
+//        if (!secondaryImages.isEmpty) {
+//            ModelImagesView(images: $secondaryImages, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
+//        }
     }
         
     // MARK: Model Name Entry
-    @ViewBuilder private func ModelNameEntry() -> some View {
+    @ViewBuilder
+    private func ModelNameEntry() -> some View {
         TextField("Item Name", text: $viewModel.selectedModel.name)
             .padding(6)
             .background(isImageFullScreen ? Color.clear : Color(.systemGray5))
@@ -88,17 +103,18 @@ struct CreateModelView: View {
             .multilineTextAlignment(.center)
     }
     
-    @ViewBuilder private func ImagePickerSheetView() -> some View {
+    @ViewBuilder
+    private func ImagePickerSheetView() -> some View {
         if sourceType == .camera {
             ModelImagesPickerWrapper(
-                images: $images,
+                images: $secondaryImages,
                 isPresented: $isImagePickerPresented,
                 sourceType: .camera
             )
             .background(Color.black)
         } else {
             ModelImagesPickerWrapper(
-                images: $images,
+                images: $secondaryImages,
                 isPresented: $isImagePickerPresented,
                 sourceType: .photoLibrary
             )
@@ -108,7 +124,7 @@ struct CreateModelView: View {
     // TODO: move to model view model
     private func createModel() {
         Task {
-            await viewModel.updateModelUIImagesFirebase(images: images)
+            await viewModel.updateModelUIImagesFirebase(images: secondaryImages)
             await withCheckedContinuation { continuation in
                 viewModel.createModelItemsFirebase()
                 continuation.resume()

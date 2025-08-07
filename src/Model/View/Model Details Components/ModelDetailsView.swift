@@ -13,6 +13,13 @@ struct ModelDetailsView: View {
     @Binding var viewModel: ModelViewModel
         
     var body: some View {
+        
+        Button {
+            
+        } label: {
+            Text("Show QR Code")
+        }
+        
         if (isEditing) {
             Picker("Primary Color", selection: $viewModel.selectedModel.primary_color) {
                 ForEach(Array(ModelViewModel.colorMap), id: \.key) { option, color in
@@ -29,7 +36,6 @@ struct ModelDetailsView: View {
                 }
             }
             .pickerStyle(.navigationLink)
-
 
             Picker("Item Type", selection: $viewModel.selectedModel.type) {
                 ForEach(Array(ModelViewModel.typeMap), id: \.key) { option, iconName in

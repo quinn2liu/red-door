@@ -22,18 +22,8 @@
 		5011BBB82C63159200A82219 /* RedDoor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RedDoor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		50C8DDFD2D39CAC7007B3E7B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				README.md,
-			);
-			target = 5011BBB72C63159200A82219 /* RedDoor */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		50C8DDD22D39CAC7007B3E7B /* RedDoor */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (50C8DDFD2D39CAC7007B3E7B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = RedDoor; sourceTree = "<group>"; };
+		50C8DDD22D39CAC7007B3E7B /* src */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = src; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +49,7 @@
 		5011BBAF2C63159200A82219 = {
 			isa = PBXGroup;
 			children = (
-				50C8DDD22D39CAC7007B3E7B /* RedDoor */,
+				50C8DDD22D39CAC7007B3E7B /* src */,
 				5011BBB92C63159200A82219 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,7 +78,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				50C8DDD22D39CAC7007B3E7B /* RedDoor */,
+				50C8DDD22D39CAC7007B3E7B /* src */,
 			);
 			name = RedDoor;
 			packageProductDependencies = (
@@ -291,7 +281,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"RedDoor/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"src/Preview Content\"";
 				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -324,7 +314,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"RedDoor/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"src/Preview Content\"";
 				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
