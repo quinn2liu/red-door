@@ -11,7 +11,12 @@ struct ModelSecondaryImages: View {
     
     @State private var activeSheet: ImageSourceEnum?
     @State private var showAlert: Bool = false
+    @State private var editIndex: Int? = nil
+    
     @Binding var secondaryImages: [UIImage]
+    @Binding var selectedImage: UIImage?
+    @Binding var isImageFullScreen: Bool
+    @Binding var isEditing: Bool
     
     var body: some View {
         Group {
@@ -21,31 +26,7 @@ struct ModelSecondaryImages: View {
                         ForEach(0..<2) { col in
                             let index = 2 * row + col
                             
-                            if index < secondaryImages.count {
-                                Image(uiImage: secondaryImages[index])
-                                    .resizable()
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .cornerRadius(12)
-                                    .clipped()
-                                
-                            } else if index < 4 {
-                                Button {
-                                    showAlert = true
-                                } label: {
-                                    ZStack (alignment: .center) {
-                                        placeholderRectangle()
-                                        
-                                        Image(systemName: "plus")
-                                            .font(.largeTitle)
-                                            .bold()
-                                            .foregroundColor(.white)
-                                        
-                                    }
-                                }
-                            } else {
-                                placeholderRectangle()
-                                
-                            }
+                            SecondaryImage(index: index)
                         }
                     }
                 }
@@ -63,6 +44,14 @@ struct ModelSecondaryImages: View {
             } label: {
                 Text("Camera")
             }
+            
+            if isEditing {
+                Button(role: .destructive) {
+                    DeleteSecondaryImage(index: editIndex)
+                } label: {
+                    Text("Delete")
+                }
+            }
 
             Button(role: .cancel) {
 
@@ -70,35 +59,84 @@ struct ModelSecondaryImages: View {
                 Text("Cancel")
             }
         }
-        .sheet(item: $activeSheet) { item in
-            PickerSheet(item: item)
+        .sheet(item: $activeSheet) { activeSheet in
+            if let editIndex = editIndex {
+                PickerSheet(item: activeSheet, editIndex: editIndex)
+            }
         }
         .frame(maxWidth: Constants.screenWidth / 2,
                maxHeight: Constants.screenWidth / 2)
     }
+
+    @ViewBuilder
+    private func SecondaryImage(index: Int) -> some View {
+        if index < secondaryImages.count {
+            Button {
+                if isEditing {
+                    showAlert = true
+                    editIndex = index
+                } else {
+                    selectedImage = secondaryImages[index]
+                    isImageFullScreen = true
+                }
+                
+            } label: {
+                Image(uiImage: secondaryImages[index])
+                    .resizable()
+                    .aspectRatio(1, contentMode: .fit)
+                    .cornerRadius(12)
+                    .clipped()
+            }
+        } else if index == secondaryImages.count {
+            Button {
+                showAlert = true
+                editIndex = index
+            } label: {
+                ZStack (alignment: .center) {
+                    PlaceholderRectangle()
+                    
+                    Image(systemName: "plus")
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(.secondary)
+                }
+            }
+        } else {
+            PlaceholderRectangle()
+        }
+    }
+    
+    private func DeleteSecondaryImage(index: Int?) {
+        // TODO: Delete the secondary image
+    }
     
     @ViewBuilder
-    private func PickerSheet(item: ImageSourceEnum) -> some View {
+    private func PickerSheet(item: ImageSourceEnum, editIndex: Int) -> some View {
         Group {
             switch item {
             case .library:
-                MultiLibraryPicker(selectedImages: $secondaryImages) {
+                MultiLibraryPicker(selectedImages: $secondaryImages, editIndex: editIndex) {
                     activeSheet = nil
                 }
             case .camera:
-                MultiCameraPicker(selectedImages: $secondaryImages) {
+                MultiCameraPicker(selectedImages: $secondaryImages, editIndex: editIndex) {
                     activeSheet = nil
                 }
             }
         }
     }
     
+    
+    
     @ViewBuilder
-    private func placeholderRectangle() -> some View {
-        Rectangle()
-            .fill(Color.gray)
-            .cornerRadius(12)
+    private func PlaceholderRectangle() -> some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(Color.clear)
             .aspectRatio(1, contentMode: .fit)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(.gray, lineWidth: 1)
+            )
     }
 }
 

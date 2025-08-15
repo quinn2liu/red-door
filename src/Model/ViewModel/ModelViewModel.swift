@@ -15,15 +15,15 @@ import FirebaseStorage
 
 @Observable
 class ModelViewModel {
-    let db = Firestore.firestore()
-    let storageRef = Storage.storage().reference().child("model_images")
-    
-    var selectedModel: Model
-    
     var images: [UIImage] = []
+    let db = Firestore.firestore()
+    
+    let storageRef: StorageReference
+    var selectedModel: Model
     
     init(selectedModel: Model = Model()) {
         self.selectedModel = selectedModel
+        self.storageRef = Storage.storage().reference().child("model_images").child(selectedModel.id)
     }
     
     func printViewModelValues() {
@@ -260,6 +260,30 @@ class ModelViewModel {
             }
             
         }
+    }
+    
+    // MARK: uploadPrimaryImage
+    func uploadPrimaryImage(image: UIImage) async {
+        // now update the images
+            let imageID = "primary"
+            let imageRef = self.storageRef.child(imageID)
+            
+            // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
+            guard let imageData = image.jpegData(compressionQuality: 0.3) else {
+                print("Error converting UIImage to jpegData")
+                return
+            }
+            
+            let metaData = StorageMetadata()
+            metaData.contentType = "image/jpeg"
+            
+            do {
+                let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
+                let imageURL = try await imageRef.downloadURL().absoluteString
+                self.selectedModel.primary_image_url = imageURL
+            } catch {
+                print("Error occurred when uploading image \(error.localizedDescription)")
+            }
     }
 }
 

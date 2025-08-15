@@ -27,17 +27,19 @@ struct CreateModelView: View {
                     
             TopBar()
             
-            if primaryImage != nil {
+//            ModelImages(primaryImage: $primaryImage, secondaryImages: $secondaryImages, isEditing: $isEditing)
+            
+            if primaryImage == nil {
                 HStack {
                     Spacer()
                     
-                    ModelPrimaryImage(primaryImage: $primaryImage)
+                    ModelPrimaryImage(primaryImage: $primaryImage, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                         
                     Spacer()
                 }
             } else {
                 HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryImage: $primaryImage)
+                    ModelPrimaryImage(primaryImage: $primaryImage, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                     
                     Spacer()
 
@@ -84,7 +86,7 @@ struct CreateModelView: View {
     // MARK: Secondary Images
     @ViewBuilder
     private func SecondaryImages() -> some View {
-        ModelSecondaryImages(secondaryImages: $secondaryImages)
+        ModelSecondaryImages(secondaryImages: $secondaryImages, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
         
 //        AddSecondaryImages(images: $secondaryImages, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
 //        

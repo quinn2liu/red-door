@@ -12,34 +12,35 @@ import AVFoundation
 
 struct ModelPrimaryImage: View {
     
-    @Binding var primaryImage: UIImage?
-    @State private var isEditing: Bool = false
     @State private var showEditAlert: Bool = false
     @State private var activeSheet: ImageSourceEnum?
     
-    //    let size = (UIScreen.width - 32) / 2
-    
+    @Binding var primaryImage: UIImage?
+    @Binding var selectedImage: UIImage?
+    @Binding var isImageFullScreen: Bool
+    @Binding var isEditing: Bool
+        
     var body: some View {
         Group {
-            if let primaryImage {
-                ZStack(alignment: .topTrailing) {
-                    Image(uiImage: primaryImage)
-                        .resizable()
-                        .scaledToFill()
-                    
-                    if isEditing {
-                        DeleteButton {
-                            // remove the image
-                        }
-                    }
+            Button {
+                if isEditing && primaryImage == nil {
+                    showEditAlert = true
+                } else {
+                    selectedImage = primaryImage
+                    isImageFullScreen = true
                 }
-            } else {
-                Rectangle()
-                    .foregroundStyle(.blue)
+            } label: {
+                if let primaryImage {
+                    ZStack(alignment: .topTrailing) {
+                        Image(uiImage: primaryImage)
+                            .resizable()
+                            .scaledToFill()
+                    }
+                } else {
+                    Rectangle()
+                        .foregroundStyle(.blue)
+                }
             }
-        }
-        .onTapGesture {
-            showEditAlert = true
         }
         .alert(primaryImage == nil ? "Upload Method" : "Update Image", isPresented: $showEditAlert) {
             EditPhotoAlert()
@@ -76,6 +77,14 @@ struct ModelPrimaryImage: View {
                 Text("Camera")
             }
             
+            if isEditing {
+                Button(role: .destructive) {
+                    
+                } label: {
+                    Text("Delete")
+                }
+            }
+            
             Button(role: .cancel) {
                 
             } label: {
@@ -85,8 +94,8 @@ struct ModelPrimaryImage: View {
     }
 }
 
-
-#Preview {
-    @Previewable @State var primaryImage: UIImage? = nil
-    ModelPrimaryImage(primaryImage: $primaryImage)
-}
+//
+//#Preview {
+//    @Previewable @State var primaryImage: UIImage? = nil
+//    ModelPrimaryImage(primaryImage: $primaryImage)
+//}

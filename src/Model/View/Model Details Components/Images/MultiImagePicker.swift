@@ -12,6 +12,7 @@ import AVFoundation
 
 struct MultiCameraPicker: UIViewControllerRepresentable {
     @Binding var selectedImages: [UIImage]
+    var editIndex: Int
     var dismiss: () -> Void
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
@@ -36,7 +37,13 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
-                parent.selectedImages.append(image)
+                if parent.editIndex >= 0 && parent.editIndex < parent.selectedImages.count {
+                    // Replace existing image at editIndex
+                    parent.selectedImages[parent.editIndex] = image
+                } else {
+                    // Append if index is invalid or beyond array bounds
+                    parent.selectedImages.append(image)
+                }
             }
             parent.dismiss()
         }
@@ -49,6 +56,7 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
 
 struct MultiLibraryPicker: UIViewControllerRepresentable {
     @Binding var selectedImages: [UIImage]
+    var editIndex: Int
     var dismiss: () -> Void
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
@@ -85,7 +93,13 @@ struct MultiLibraryPicker: UIViewControllerRepresentable {
                 result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
                     if let image = object as? UIImage {
                         DispatchQueue.main.async {
-                            self.parent.selectedImages.append(image)
+                            if self.parent.editIndex >= 0 && self.parent.editIndex < self.parent.selectedImages.count {
+                                // Replace existing image
+                                self.parent.selectedImages[self.parent.editIndex] = image
+                            } else {
+                                // Append if index is invalid or beyond array bounds
+                                self.parent.selectedImages.append(image)
+                            }
                         }
                     }
                     group.leave()
