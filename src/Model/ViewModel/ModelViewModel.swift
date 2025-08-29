@@ -285,6 +285,57 @@ class ModelViewModel {
                 print("Error occurred when uploading image \(error.localizedDescription)")
             }
     }
+    
+    // MARK: uploadSecondaryImages
+    func uploadSecondaryImages(images: [UIImage]) async {
+        
+        // TODO: old code, refactor
+        if images.count > 0 {
+            do {
+                try await withThrowingTaskGroup(of: Void.self) { group in
+                    
+                    // delete og images
+                    group.addTask {
+                        await self.deleteModelImagesFirebase()
+                    }
+                    
+                    group.addTask {
+                        
+                        self.selectedModel.image_url_dict.removeAll()
+                        self.selectedModel.image_ids.removeAll()
+                        
+                        // now update the images
+                        for (index, image) in images.enumerated() {
+                            let imageID = "\(self.selectedModel.id)-\(index)"
+                            let imageRef = self.storageRef.child(imageID)
+                            self.selectedModel.image_ids.append(imageID)
+                            
+                            // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
+                            guard let imageData = image.jpegData(compressionQuality: 0.3) else {
+                                print("Error converting UIImage to jpegData")
+                                return
+                            }
+                            
+                            let metaData = StorageMetadata()
+                            metaData.contentType = "image/jpeg"
+                            
+                            do {
+                                let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
+                                let imageURL = try await imageRef.downloadURL().absoluteString
+                                self.selectedModel.image_url_dict.updateValue(imageURL, forKey: imageID)
+                            } catch {
+                                print("Error occurred when uploading image \(error.localizedDescription)")
+                            }
+                        }
+                    }
+                    try await group.waitForAll()
+                    
+                }
+            } catch {
+                print("Error updating images: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 // MARK: - Model Options

@@ -9,50 +9,67 @@ import Foundation
 import SwiftUI
 import PhotosUI
 import AVFoundation
+import CachedAsyncImage
 
 struct ModelPrimaryImage: View {
     
     @State private var showEditAlert: Bool = false
     @State private var activeSheet: ImageSourceEnum?
     
-    @Binding var primaryImage: UIImage?
-    @Binding var selectedImage: UIImage?
+    @Binding var primaryRDImage: RDImage
+    @Binding var primaryUIImage: UIImage?
+    
+    @Binding var selectedRDImage: RDImage?
+    @Binding var selectedUIImage: UIImage?
+    
     @Binding var isImageFullScreen: Bool
     @Binding var isEditing: Bool
-        
+    
     var body: some View {
-        Group {
-            Button {
-                if isEditing && primaryImage == nil {
-                    showEditAlert = true
-                } else {
-                    selectedImage = primaryImage
-                    isImageFullScreen = true
+        Button {
+            if isEditing {
+                showEditAlert = true
+                isEditing = false
+            } else {
+                if primaryRDImage.imageUrl != URL(string: "") {
+                    selectedRDImage = primaryRDImage
                 }
-            } label: {
-                if let primaryImage {
-                    ZStack(alignment: .topTrailing) {
-                        Image(uiImage: primaryImage)
-                            .resizable()
-                            .scaledToFill()
-                    }
-                } else {
-                    Rectangle()
-                        .foregroundStyle(.blue)
+                
+                if primaryUIImage != nil {
+                    selectedUIImage = primaryUIImage
                 }
+                
+                isImageFullScreen = true
+            }
+        } label: {
+            if primaryRDImage.imageUrl != URL(string: "") { // image exists in cloud
+                CachedAsyncImage(url: primaryRDImage.imageUrl)
+                    .scaledToFill()
+                
+            } else if let primaryUIImage { // new image selected
+                Image(uiImage: primaryUIImage)
+                    .resizable()
+                    .scaledToFill()
+                
+            } else { // no image selected
+                Rectangle()
+                    .foregroundStyle(.blue)
             }
         }
-        .alert(primaryImage == nil ? "Upload Method" : "Update Image", isPresented: $showEditAlert) {
+        .alert(
+            primaryRDImage.imageUrl != URL(string: "") ? "Upload Method" : "Update Image",
+            isPresented: $showEditAlert
+        ) {
             EditPhotoAlert()
         }
         .sheet(item: $activeSheet) { item in
             switch item {
             case .library:
-                SingleLibraryPicker(primaryImage: $primaryImage) {
+                SingleLibraryPicker(primaryImage: $primaryUIImage) {
                     activeSheet = nil
                 }
             case .camera:
-                SingleCameraPicker(primaryImage: $primaryImage) {
+                SingleCameraPicker(primaryImage: $primaryUIImage) {
                     activeSheet = nil
                 }
             }

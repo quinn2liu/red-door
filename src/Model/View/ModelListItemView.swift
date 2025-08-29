@@ -65,6 +65,6 @@ struct ModelListItemView: View {
     }
 }
 
-#Preview {
-    ModelListItemView(model: Model())
-}
+//#Preview {
+//    ModelListItemView(model: Model())
+//}

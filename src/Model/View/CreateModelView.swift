@@ -22,6 +22,8 @@ struct CreateModelView: View {
     @State private var isImageFullScreen: Bool = false
     @State private var isEditing: Bool = true
     
+    @State private var selectedRDImage: RDImage?
+    
     var body: some View {
         VStack(spacing: 12) {
                     
@@ -33,13 +35,13 @@ struct CreateModelView: View {
                 HStack {
                     Spacer()
                     
-                    ModelPrimaryImage(primaryImage: $primaryImage, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, primaryUIImage: $primaryImage, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                         
                     Spacer()
                 }
             } else {
                 HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryImage: $primaryImage, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, primaryUIImage: $primaryImage, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                     
                     Spacer()
 
@@ -59,11 +61,11 @@ struct CreateModelView: View {
         .frameTop()
         .frameHorizontalPadding()
         .ignoresSafeArea(.keyboard)
-        .sheet(isPresented: $isImagePickerPresented) {
-            ImagePickerSheetView()
-        }
+//        .sheet(isPresented: $isImagePickerPresented) {
+//            ImagePickerSheetView()
+//        }
         .overlay(
-            ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
+            ModelRDImageOverlay(selectedRDImage: selectedRDImage, selectedUIImage: selectedImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
     }
