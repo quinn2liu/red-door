@@ -69,11 +69,6 @@ extension Model {
             primary_color: "Black",
             primary_material: "Wood",
             id: "mock_Chair_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Chair_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Desk",
@@ -81,11 +76,6 @@ extension Model {
             primary_color: "Brown",
             primary_material: "Metal",
             id: "mock_Desk_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Desk_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Table",
@@ -93,11 +83,6 @@ extension Model {
             primary_color: "White",
             primary_material: "Glass",
             id: "mock_Table_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Table_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Couch",
@@ -105,11 +90,6 @@ extension Model {
             primary_color: "Gray",
             primary_material: "Fabric",
             id: "mock_Couch_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Couch_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Lamp",
@@ -117,11 +97,6 @@ extension Model {
             primary_color: "Yellow",
             primary_material: "Plastic",
             id: "mock_Lamp_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Lamp_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Art",
@@ -129,11 +104,6 @@ extension Model {
             primary_color: "Red",
             primary_material: "Canvas",
             id: "mock_Art_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Art_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Decor",
@@ -141,11 +111,6 @@ extension Model {
             primary_color: "Green",
             primary_material: "Stone",
             id: "mock_Decor_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Decor_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Misc1",
@@ -153,11 +118,6 @@ extension Model {
             primary_color: "Blue",
             primary_material: "Resin",
             id: "mock_Misc1_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Misc1_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Misc2",
@@ -165,11 +125,6 @@ extension Model {
             primary_color: "Indigo",
             primary_material: "Bamboo",
             id: "mock_Misc2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Misc2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Misc3",
@@ -177,11 +132,6 @@ extension Model {
             primary_color: "Pink",
             primary_material: "Acrylic",
             id: "mock_Misc3_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Misc3_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Chair2",
@@ -189,11 +139,6 @@ extension Model {
             primary_color: "Teal",
             primary_material: "Metal",
             id: "mock_Chair2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Chair2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Desk2",
@@ -201,11 +146,6 @@ extension Model {
             primary_color: "Cyan",
             primary_material: "Wood",
             id: "mock_Desk2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Desk2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Table2",
@@ -213,11 +153,6 @@ extension Model {
             primary_color: "Purple",
             primary_material: "Glass",
             id: "mock_Table2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Table2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Couch2",
@@ -225,11 +160,6 @@ extension Model {
             primary_color: "Mint",
             primary_material: "Leather",
             id: "mock_Couch2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Couch2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Lamp2",
@@ -237,11 +167,6 @@ extension Model {
             primary_color: "Orange",
             primary_material: "Plastic",
             id: "mock_Lamp2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Lamp2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Art2",
@@ -249,11 +174,6 @@ extension Model {
             primary_color: "White",
             primary_material: "Fabric",
             id: "mock_Art2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Art2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Decor2",
@@ -261,11 +181,6 @@ extension Model {
             primary_color: "Gray",
             primary_material: "Concrete",
             id: "mock_Decor2_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Decor2_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Rug",
@@ -273,11 +188,6 @@ extension Model {
             primary_color: "Brown",
             primary_material: "Wicker",
             id: "mock_Rug_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Rug_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Shelf",
@@ -285,11 +195,6 @@ extension Model {
             primary_color: "Blue",
             primary_material: "Veneer",
             id: "mock_Shelf_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Shelf_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         ),
         .init(
             name: "mock_Stand",
@@ -297,11 +202,6 @@ extension Model {
             primary_color: "Red",
             primary_material: "Stainless Steel",
             id: "mock_Stand_id",
-            primary_image: {
-                var img = RDImage(objectId: "mock_Stand_id", imageType: .model_primary)
-                img.imageUrl = URL(string: "https://via.placeholder.com/300")
-                return img
-            }()
         )
     ]
 }

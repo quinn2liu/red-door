@@ -17,7 +17,6 @@ struct ModelPrimaryImage: View {
     @State private var activeSheet: ImageSourceEnum?
     
     @Binding var primaryRDImage: RDImage
-    @Binding var primaryUIImage: UIImage?
     
     @Binding var selectedRDImage: RDImage?
     @Binding var selectedUIImage: UIImage?
@@ -29,28 +28,22 @@ struct ModelPrimaryImage: View {
         Button {
             if isEditing {
                 showEditAlert = true
-                isEditing = false
             } else {
-                if primaryRDImage.imageUrl != URL(string: "") {
+                if let uiImage = primaryRDImage.uiImage {
+                    selectedRDImage = RDImage(uiImage: uiImage)
+                } else if primaryRDImage.imageUrl != nil {
                     selectedRDImage = primaryRDImage
                 }
-                
-                if primaryUIImage != nil {
-                    selectedUIImage = primaryUIImage
-                }
-                
                 isImageFullScreen = true
             }
         } label: {
-            if primaryRDImage.imageUrl != URL(string: "") { // image exists in cloud
-                CachedAsyncImage(url: primaryRDImage.imageUrl)
-                    .scaledToFill()
-                
-            } else if let primaryUIImage { // new image selected
-                Image(uiImage: primaryUIImage)
+            if let uiImage = primaryRDImage.uiImage {
+                Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
-                
+            } else if let imageUrl = primaryRDImage.imageUrl {
+                CachedAsyncImage(url: imageUrl)
+                    .scaledToFill()
             } else { // no image selected
                 Rectangle()
                     .foregroundStyle(.blue)
@@ -65,11 +58,11 @@ struct ModelPrimaryImage: View {
         .sheet(item: $activeSheet) { item in
             switch item {
             case .library:
-                SingleLibraryPicker(primaryImage: $primaryUIImage) {
+                SingleLibraryPicker(primaryImage: $primaryRDImage.uiImage) {
                     activeSheet = nil
                 }
             case .camera:
-                SingleCameraPicker(primaryImage: $primaryUIImage) {
+                SingleCameraPicker(primaryImage: $primaryRDImage.uiImage) {
                     activeSheet = nil
                 }
             }

@@ -15,7 +15,6 @@ struct CreateModelView: View {
     
     @State private var isImagePickerPresented = false
     @State private var sourceType: UIImagePickerController.SourceType?
-    @State private var primaryImage: UIImage? = nil
     @State private var secondaryImages: [UIImage] = []
     
     @State private var selectedImage: UIImage?
@@ -28,24 +27,22 @@ struct CreateModelView: View {
         VStack(spacing: 12) {
                     
             TopBar()
-            
-//            ModelImages(primaryImage: $primaryImage, secondaryImages: $secondaryImages, isEditing: $isEditing)
-            
-            if primaryImage == nil {
+                        
+            if viewModel.selectedModel.primary_image.imageUrl == nil && viewModel.selectedModel.primary_image.uiImage == nil {
                 HStack {
                     Spacer()
                     
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, primaryUIImage: $primaryImage, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                         
                     Spacer()
                 }
             } else {
                 HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, primaryUIImage: $primaryImage, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                     
                     Spacer()
 
-                    SecondaryImages()
+                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondary_images, selectedRDImage: $selectedRDImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
                 }
             }
                     
@@ -61,11 +58,8 @@ struct CreateModelView: View {
         .frameTop()
         .frameHorizontalPadding()
         .ignoresSafeArea(.keyboard)
-//        .sheet(isPresented: $isImagePickerPresented) {
-//            ImagePickerSheetView()
-//        }
         .overlay(
-            ModelRDImageOverlay(selectedRDImage: selectedRDImage, selectedUIImage: selectedImage, isImageFullScreen: $isImageFullScreen)
+            ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageFullScreen: $isImageFullScreen)
                 .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
         )
     }
@@ -83,18 +77,6 @@ struct CreateModelView: View {
                 Spacer().frame(24)
             }
         )
-    }
-    
-    // MARK: Secondary Images
-    @ViewBuilder
-    private func SecondaryImages() -> some View {
-        ModelSecondaryImages(secondaryImages: $secondaryImages, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
-        
-//        AddSecondaryImages(images: $secondaryImages, isImagePickerPresented: $isImagePickerPresented, sourceType: $sourceType)
-//        
-//        if (!secondaryImages.isEmpty) {
-//            ModelImagesView(images: $secondaryImages, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: isEditing)
-//        }
     }
         
     // MARK: Model Name Entry

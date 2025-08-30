@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct ModelSecondaryImages: View {
     
@@ -13,8 +14,8 @@ struct ModelSecondaryImages: View {
     @State private var showAlert: Bool = false
     @State private var editIndex: Int? = nil
     
-    @Binding var secondaryImages: [UIImage]
-    @Binding var selectedImage: UIImage?
+    @Binding var secondaryRDImages: [RDImage]
+    @Binding var selectedRDImage: RDImage?
     @Binding var isImageFullScreen: Bool
     @Binding var isEditing: Bool
     
@@ -26,38 +27,14 @@ struct ModelSecondaryImages: View {
                         ForEach(0..<2) { col in
                             let index = 2 * row + col
                             
-                            SecondaryImage(index: index)
+                            SecondaryImageItem(index: index)
                         }
                     }
                 }
             }
         }
         .alert("Upload Type", isPresented: $showAlert) {
-            Button(role: .none) {
-                activeSheet = .library
-            } label: {
-                Text("Library")
-            }
-
-            Button(role: .none) {
-                activeSheet = .camera
-            } label: {
-                Text("Camera")
-            }
-            
-            if isEditing {
-                Button(role: .destructive) {
-                    DeleteSecondaryImage(index: editIndex)
-                } label: {
-                    Text("Delete")
-                }
-            }
-
-            Button(role: .cancel) {
-
-            } label: {
-                Text("Cancel")
-            }
+            EditImageAlert()
         }
         .sheet(item: $activeSheet) { activeSheet in
             if let editIndex = editIndex {
@@ -67,27 +44,64 @@ struct ModelSecondaryImages: View {
         .frame(maxWidth: Constants.screenWidth / 2,
                maxHeight: Constants.screenWidth / 2)
     }
-
+    
+    // MARK: Edit Image Alert
     @ViewBuilder
-    private func SecondaryImage(index: Int) -> some View {
-        if index < secondaryImages.count {
+    private func EditImageAlert() -> some View {
+        Button(role: .none) {
+            activeSheet = .library
+        } label: {
+            Text("Library")
+        }
+
+        Button(role: .none) {
+            activeSheet = .camera
+        } label: {
+            Text("Camera")
+        }
+        
+        if isEditing {
+            Button(role: .destructive) {
+                DeleteSecondaryImage(index: editIndex)
+            } label: {
+                Text("Delete")
+            }
+        }
+
+        Button(role: .cancel) {
+
+        } label: {
+            Text("Cancel")
+        }
+    }
+
+    // MARK: Secondary Image Item
+    @ViewBuilder
+    private func SecondaryImageItem(index: Int) -> some View {
+        if index < secondaryRDImages.count {
             Button {
                 if isEditing {
                     showAlert = true
                     editIndex = index
                 } else {
-                    selectedImage = secondaryImages[index]
+                    selectedRDImage?.uiImage = secondaryRDImages[index].uiImage
                     isImageFullScreen = true
                 }
                 
             } label: {
-                Image(uiImage: secondaryImages[index])
-                    .resizable()
-                    .aspectRatio(1, contentMode: .fit)
-                    .cornerRadius(12)
-                    .clipped()
+                if let uiImage = secondaryRDImages[index].uiImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(1, contentMode: .fit)
+                        .cornerRadius(12)
+                        .clipped()
+                } else if let imageUrl = secondaryRDImages[index].imageUrl {
+                    CachedAsyncImage(url: imageUrl)
+                } else {
+                    PlaceholderRectangle()
+                }
             }
-        } else if index == secondaryImages.count {
+        } else if index == secondaryRDImages.count {
             Button {
                 showAlert = true
                 editIndex = index
@@ -115,18 +129,16 @@ struct ModelSecondaryImages: View {
         Group {
             switch item {
             case .library:
-                MultiLibraryPicker(selectedImages: $secondaryImages, editIndex: editIndex) {
+                MultiLibraryPicker(selectedRDImages: $secondaryRDImages, editIndex: editIndex) {
                     activeSheet = nil
                 }
             case .camera:
-                MultiCameraPicker(selectedImages: $secondaryImages, editIndex: editIndex) {
+                MultiCameraPicker(selectedRDImages: $secondaryRDImages, editIndex: editIndex) {
                     activeSheet = nil
                 }
             }
         }
     }
-    
-    
     
     @ViewBuilder
     private func PlaceholderRectangle() -> some View {
@@ -139,8 +151,6 @@ struct ModelSecondaryImages: View {
             )
     }
 }
-
-
 
 //#Preview {
 //    ModelSecondaryImages()

@@ -11,7 +11,7 @@ import PhotosUI
 import AVFoundation
 
 struct MultiCameraPicker: UIViewControllerRepresentable {
-    @Binding var selectedImages: [UIImage]
+    @Binding var selectedRDImages: [RDImage]
     var editIndex: Int
     var dismiss: () -> Void
 
@@ -37,12 +37,13 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
-                if parent.editIndex >= 0 && parent.editIndex < parent.selectedImages.count {
+                let newRDImage = RDImage(uiImage: image)
+                if parent.editIndex >= 0 && parent.editIndex < parent.selectedRDImages.count {
                     // Replace existing image at editIndex
-                    parent.selectedImages[parent.editIndex] = image
+                    parent.selectedRDImages[parent.editIndex] = newRDImage
                 } else {
                     // Append if index is invalid or beyond array bounds
-                    parent.selectedImages.append(image)
+                    parent.selectedRDImages.append(newRDImage)
                 }
             }
             parent.dismiss()
@@ -55,14 +56,14 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
 }
 
 struct MultiLibraryPicker: UIViewControllerRepresentable {
-    @Binding var selectedImages: [UIImage]
+    @Binding var selectedRDImages: [RDImage]
     var editIndex: Int
     var dismiss: () -> Void
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.filter = .images
-        config.selectionLimit = 4
+        config.selectionLimit = 1
 
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
@@ -92,13 +93,14 @@ struct MultiLibraryPicker: UIViewControllerRepresentable {
                 group.enter()
                 result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
                     if let image = object as? UIImage {
+                        let newRDImage = RDImage(uiImage: image)
                         DispatchQueue.main.async {
-                            if self.parent.editIndex >= 0 && self.parent.editIndex < self.parent.selectedImages.count {
+                            if self.parent.editIndex >= 0 && self.parent.editIndex < self.parent.selectedRDImages.count {
                                 // Replace existing image
-                                self.parent.selectedImages[self.parent.editIndex] = image
+                                self.parent.selectedRDImages[self.parent.editIndex] = newRDImage
                             } else {
                                 // Append if index is invalid or beyond array bounds
-                                self.parent.selectedImages.append(image)
+                                self.parent.selectedRDImages.append(newRDImage)
                             }
                         }
                     }

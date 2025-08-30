@@ -11,30 +11,31 @@ import CachedAsyncImage
 struct ModelRDImageOverlay: View {
     
     let selectedRDImage: RDImage?
-    let selectedUIImage: UIImage?
     @Binding var isImageFullScreen: Bool
     
     var body: some View {
-        if isImageFullScreen {
-            Color.black.opacity(0.8)
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    isImageFullScreen = false
+        if let selectedRDImage {
+            if isImageFullScreen {
+                Color.black.opacity(0.8)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        isImageFullScreen = false
+                    }
+                
+                if let uiImage = selectedRDImage.uiImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .cornerRadius(8)
+                        .shadow(radius: 10)
+                } else if selectedRDImage.imageUrl != nil {
+                    CachedAsyncImage(url: selectedRDImage.imageUrl)
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .cornerRadius(8)
+                        .shadow(radius: 10)
                 }
-            
-            if let selectedRDImage {
-                CachedAsyncImage(url: selectedRDImage.imageUrl)
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .cornerRadius(8)
-                    .shadow(radius: 10)
-            } else if let selectedUIImage {
-                Image(uiImage: selectedUIImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .cornerRadius(8)
-                    .shadow(radius: 10)
             }
         }
     }
