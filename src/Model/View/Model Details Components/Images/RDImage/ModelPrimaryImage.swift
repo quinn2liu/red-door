@@ -58,11 +58,11 @@ struct ModelPrimaryImage: View {
         .sheet(item: $activeSheet) { item in
             switch item {
             case .library:
-                SingleLibraryPicker(primaryImage: $primaryRDImage.uiImage) {
+                SingleLibraryPicker(primaryRDImage: $primaryRDImage) {
                     activeSheet = nil
                 }
             case .camera:
-                SingleCameraPicker(primaryImage: $primaryRDImage.uiImage) {
+                SingleCameraPicker(primaryRDImage: $primaryRDImage) {
                     activeSheet = nil
                 }
             }

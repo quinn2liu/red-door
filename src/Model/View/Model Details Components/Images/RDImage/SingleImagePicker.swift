@@ -12,7 +12,7 @@ import AVFoundation
 
 // TODO: Figure out how this works lol
 struct SingleCameraPicker: UIViewControllerRepresentable {
-    @Binding var primaryImage: UIImage?
+    @Binding var primaryRDImage: RDImage
     var dismiss: () -> Void
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
@@ -37,7 +37,8 @@ struct SingleCameraPicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
-                parent.primaryImage = image
+                let newRDImage = RDImage(uiImage: image)
+                parent.primaryRDImage = newRDImage
             }
             parent.dismiss()
         }
@@ -49,7 +50,7 @@ struct SingleCameraPicker: UIViewControllerRepresentable {
 }
 
 struct SingleLibraryPicker: UIViewControllerRepresentable {
-    @Binding var primaryImage: UIImage?
+    @Binding var primaryRDImage: RDImage
     var dismiss: () -> Void
     
     func makeUIViewController(context: Context) -> UIViewController {
@@ -90,7 +91,8 @@ struct SingleLibraryPicker: UIViewControllerRepresentable {
             
             provider.loadObject(ofClass: UIImage.self) { image, _ in
                 DispatchQueue.main.async {
-                    self.parent.primaryImage = image as? UIImage
+                    let newRDImage = RDImage(uiImage: image as? UIImage)
+                    self.parent.primaryRDImage = newRDImage
                     self.parent.dismiss()
                 }
             }
