@@ -5,6 +5,8 @@
 //  Created by Quinn Liu on 12/21/24.
 //
 
+// MARK: DEPRECATE THIS
+
 import SwiftUI
 
 struct AddSecondaryImages: View {
