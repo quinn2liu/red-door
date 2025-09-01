@@ -14,7 +14,7 @@ struct ModelListItemView: View {
     
     // TODO: add primary image
     var urlString: String {
-        return model.image_url_dict.values.first ?? ""
+        return model.imageUrlDict.values.first ?? ""
     }
     
     var body: some View {
@@ -31,11 +31,11 @@ struct ModelListItemView: View {
             
             Spacer()
 
-            Text(model.primary_material)
+            Text(model.primaryMaterial)
             
             Spacer()
 
-            Text(model.primary_color)
+            Text(model.primaryColor)
             
             Spacer()
 
@@ -44,8 +44,8 @@ struct ModelListItemView: View {
     }
     
     @ViewBuilder private func ModelImage() -> some View {
-        if urlString != "" {
-            CachedAsyncImage(url: URL(string: urlString)) { phase in
+        if let imageURL = model.primaryImage.imageURL {
+            CachedAsyncImage(url: imageURL) { phase in
                 switch phase {
                 case .empty:
                     ProgressView() // Placeholder while loading

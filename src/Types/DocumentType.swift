@@ -35,7 +35,7 @@ enum DocumentType: String, Codable {
     var orderByField: String {
         switch self {
         case .model:
-            return "name_lowercased"
+            return "nameLowercased"
         case .pull_list, .installed_list, .storage:
             return "id"
         }

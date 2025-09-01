@@ -28,21 +28,32 @@ struct CreateModelView: View {
                     
             TopBar()
                         
-            if viewModel.selectedModel.primary_image.imageUrl == nil && viewModel.selectedModel.primary_image.uiImage == nil {
+            if !viewModel.selectedModel.primaryImageExists {
                 HStack {
                     Spacer()
                     
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
+                                      selectedRDImage: $selectedRDImage,
+                                      selectedUIImage: $selectedImage,
+                                      isImageFullScreen: $isImageFullScreen,
+                                      isEditing: $isEditing)
                         
                     Spacer()
                 }
             } else {
                 HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
+                                      selectedRDImage: $selectedRDImage,
+                                      selectedUIImage: $selectedImage,
+                                      isImageFullScreen: $isImageFullScreen,
+                                      isEditing: $isEditing)
                     
                     Spacer()
 
-                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondary_images, selectedRDImage: $selectedRDImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
+                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondaryImages,
+                                         selectedRDImage: $selectedRDImage,
+                                         isImageFullScreen: $isImageFullScreen,
+                                         isEditing: $isEditing)
                 }
             }
                     
@@ -51,7 +62,8 @@ struct CreateModelView: View {
             Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
                 
             RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
-                createModel()
+                viewModel.updateModel()
+                dismiss()
             }
         }
         .toolbar(.hidden)

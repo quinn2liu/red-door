@@ -203,7 +203,7 @@ struct RoomAddItemsSheet: View {
         }
         
         if let searchText {
-            filters.updateValue(searchText.lowercased(), forKey: "name_lowercased")
+            filters.updateValue(searchText.lowercased(), forKey: "nameLowercased")
         }
         
         DispatchQueue.main.async {

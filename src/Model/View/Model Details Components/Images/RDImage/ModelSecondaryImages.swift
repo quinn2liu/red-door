@@ -95,7 +95,7 @@ struct ModelSecondaryImages: View {
                         .aspectRatio(1, contentMode: .fit)
                         .cornerRadius(12)
                         .clipped()
-                } else if let imageUrl = secondaryRDImages[index].imageUrl {
+                } else if let imageUrl = secondaryRDImages[index].imageURL {
                     CachedAsyncImage(url: imageUrl)
                 } else {
                     PlaceholderRectangle()

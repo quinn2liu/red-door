@@ -31,7 +31,7 @@ struct ModelPrimaryImage: View {
             } else {
                 if let uiImage = primaryRDImage.uiImage {
                     selectedRDImage = RDImage(uiImage: uiImage)
-                } else if primaryRDImage.imageUrl != nil {
+                } else if primaryRDImage.imageURL != nil {
                     selectedRDImage = primaryRDImage
                 }
                 isImageFullScreen = true
@@ -41,7 +41,7 @@ struct ModelPrimaryImage: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
-            } else if let imageUrl = primaryRDImage.imageUrl {
+            } else if let imageUrl = primaryRDImage.imageURL {
                 CachedAsyncImage(url: imageUrl)
                     .scaledToFill()
             } else { // no image selected
@@ -50,7 +50,7 @@ struct ModelPrimaryImage: View {
             }
         }
         .alert(
-            primaryRDImage.imageUrl != URL(string: "") ? "Upload Method" : "Update Image",
+            primaryRDImage.imageURL != URL(string: "") ? "Upload Method" : "Update Image",
             isPresented: $showEditAlert
         ) {
             EditPhotoAlert()

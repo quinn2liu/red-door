@@ -112,10 +112,10 @@ class DocumentsListViewModel {
         var updatedQuery = query
         
         for (key, value) in filters {
-            if key == "name_lowercased", let searchText = value as? String {
+            if key == "nameLowercased", let searchText = value as? String {
                 updatedQuery = updatedQuery
-                    .whereField("name_lowercased", isGreaterThanOrEqualTo: searchText)
-                    .whereField("name_lowercased", isLessThan: searchText + "\u{f8ff}")
+                    .whereField("nameLowercased", isGreaterThanOrEqualTo: searchText)
+                    .whereField("nameLowercased", isLessThan: searchText + "\u{f8ff}")
             } else {
                 updatedQuery = updatedQuery.whereField(key, isEqualTo: value)
             }

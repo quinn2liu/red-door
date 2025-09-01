@@ -11,16 +11,31 @@ import SwiftUI
 
 enum RDImageTypeEnum: String, Codable {
     case model_primary, model_secondary, item, rd_list, dirty, misc
+    
+    var objectPath: String? {
+        switch self {
+        case .model_primary, .model_secondary:
+            return "model_images"
+        case .item:
+            return "items"
+        case .rd_list:
+            return "rd_lists"
+        case .misc:
+            return "misc"
+        case .dirty:
+            return nil // no valid path for dirty
+        }
+    }
 }
 
 struct RDImage: Identifiable, Codable, Hashable {
     var id: String = UUID().uuidString
-    var imageUrl: URL? = nil
     var imageType: RDImageTypeEnum = .dirty
-    
+    var objectId: String? = nil
+    var imageURL: URL? = nil
     var uiImage: UIImage? = nil
     
     enum CodingKeys: String, CodingKey {
-        case id, imageUrl, imageType
+        case id, objectId, imageURL, imageType
     }
 }

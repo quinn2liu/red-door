@@ -91,7 +91,7 @@ struct RoomView: View {
     @ViewBuilder private func RoomItemListItem(_ item: Item) -> some View {
         HStack(spacing: 12) {
             if let model = viewModel.getModelForItem(item) {
-                if !model.image_ids.isEmpty, let imageURL = model.image_url_dict[model.image_ids[0]] {
+                if !model.imageIds.isEmpty, let imageURL = model.imageUrlDict[model.imageIds[0]] {
                     CachedAsyncImage(url: URL(string: imageURL)) { image in
                         image.resizable()
                     } placeholder: {
@@ -114,9 +114,9 @@ struct RoomView: View {
                     HStack {
                         Text(model.type)
                         Text("•")
-                        Text(model.primary_color)
+                        Text(model.primaryColor)
                         Text("•")
-                        Text(model.primary_material)
+                        Text(model.primaryMaterial)
                     }
                     .font(.caption)
                     .foregroundStyle(Color(.systemGray))

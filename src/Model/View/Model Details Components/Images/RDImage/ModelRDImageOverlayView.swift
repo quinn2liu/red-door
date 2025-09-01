@@ -29,8 +29,8 @@ struct ModelRDImageOverlay: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .cornerRadius(8)
                         .shadow(radius: 10)
-                } else if selectedRDImage.imageUrl != nil {
-                    CachedAsyncImage(url: selectedRDImage.imageUrl)
+                } else if selectedRDImage.imageURL != nil {
+                    CachedAsyncImage(url: selectedRDImage.imageURL)
                         .scaledToFit()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .cornerRadius(8)
