@@ -39,7 +39,7 @@ struct ModelListItemView: View {
             
             Spacer()
 
-            Text(String(model.count))
+            Text(String(model.itemCount))
         }
     }
     

@@ -11,15 +11,15 @@ import CachedAsyncImage
 struct ModelRDImageOverlay: View {
     
     let selectedRDImage: RDImage?
-    @Binding var isImageFullScreen: Bool
+    @Binding var isImageSelected: Bool
     
     var body: some View {
         if let selectedRDImage {
-            if isImageFullScreen {
+            if isImageSelected {
                 Color.black.opacity(0.8)
                     .edgesIgnoringSafeArea(.all)
                     .onTapGesture {
-                        isImageFullScreen = false
+                        isImageSelected = false
                     }
                 
                 if let uiImage = selectedRDImage.uiImage {
@@ -29,12 +29,18 @@ struct ModelRDImageOverlay: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .cornerRadius(8)
                         .shadow(radius: 10)
-                } else if selectedRDImage.imageURL != nil {
-                    CachedAsyncImage(url: selectedRDImage.imageURL)
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .cornerRadius(8)
-                        .shadow(radius: 10)
+                } else if let imageURL = selectedRDImage.imageURL {
+                    CachedAsyncImage(url: imageURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .cornerRadius(8)
+                            .shadow(radius: 10)
+                    } placeholder: {
+                        Rectangle()
+                            .foregroundStyle(.gray.opacity(0.3))
+                    }
                 }
             }
         }

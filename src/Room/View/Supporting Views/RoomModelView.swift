@@ -74,6 +74,8 @@ struct RoomModelView: View {
         }
     }
     
+    
+    
     private func getInitialData() {
         modelViewModel.loadImages()
         modelViewModel.getModelItems { result in

@@ -17,11 +17,8 @@ struct ModelPrimaryImage: View {
     @State private var activeSheet: ImageSourceEnum?
     
     @Binding var primaryRDImage: RDImage
-    
     @Binding var selectedRDImage: RDImage?
-    @Binding var selectedUIImage: UIImage?
-    
-    @Binding var isImageFullScreen: Bool
+    @Binding var isImageSelected: Bool
     @Binding var isEditing: Bool
     
     var body: some View {
@@ -34,7 +31,7 @@ struct ModelPrimaryImage: View {
                 } else if primaryRDImage.imageURL != nil {
                     selectedRDImage = primaryRDImage
                 }
-                isImageFullScreen = true
+                isImageSelected = true
             }
         } label: {
             if let uiImage = primaryRDImage.uiImage {
@@ -42,8 +39,14 @@ struct ModelPrimaryImage: View {
                     .resizable()
                     .scaledToFill()
             } else if let imageUrl = primaryRDImage.imageURL {
-                CachedAsyncImage(url: imageUrl)
-                    .scaledToFill()
+                CachedAsyncImage(url: imageUrl) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    Rectangle()
+                        .foregroundStyle(.gray.opacity(0.3))
+                }
             } else { // no image selected
                 Rectangle()
                     .foregroundStyle(.blue)
@@ -67,8 +70,8 @@ struct ModelPrimaryImage: View {
                 }
             }
         }
-        .frame(maxWidth: Constants.screenWidthPadding / 2,
-               maxHeight: Constants.screenWidthPadding / 2)
+        .frame(maxWidth: Constants.screenWidthPadding / 2, maxHeight: Constants.screenWidthPadding / 2)
+        .contentShape(Rectangle())
         .cornerRadius(12)
     }
     

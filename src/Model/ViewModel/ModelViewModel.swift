@@ -14,7 +14,7 @@ import FirebaseStorage
 
 
 @Observable
-class ModelViewModel {
+final class ModelViewModel {
     var images: [UIImage] = []
     let db = Firestore.firestore()
     
@@ -34,7 +34,7 @@ class ModelViewModel {
     selectedModel.primaryColor = \(selectedModel.primaryColor)
     selectedModel.type = \(selectedModel.type)
     selectedModel.primaryMaterial = \(selectedModel.primaryMaterial)
-    selectedModel.count = \(selectedModel.count)
+    selectedModel.count = \(selectedModel.itemCount)
     selectedModel.imageURLDict.count = \(selectedModel.imageUrlDict.count)
     """)
         for (imageID, imageURL) in selectedModel.imageUrlDict {
@@ -56,7 +56,7 @@ class ModelViewModel {
     func createModelItemsFirebase() {
         let batch = db.batch()
         
-        for _ in (1...selectedModel.count) {
+        for _ in (1...selectedModel.itemCount) {
             let itemId = "item-\(UUID().uuidString)"
             let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
             selectedModel.itemIds.append(itemId)
@@ -82,12 +82,12 @@ class ModelViewModel {
         let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
         selectedModel.itemIds.append(itemId)
         selectedModel.availableItemIds.append(itemId)
-        selectedModel.count += 1
+        selectedModel.itemCount += 1
         let itemRef = db.collection("items").document(itemId)
         let modelRef = db.collection("models").document(selectedModel.id)
         do {
             try itemRef.setData(from: item)
-            modelRef.updateData(["count": selectedModel.count])
+            modelRef.updateData(["count": selectedModel.itemCount])
             //            print("single item added")
         } catch {
             print("Error adding item: \(itemId): \(error)")
@@ -119,28 +119,6 @@ class ModelViewModel {
             }
         }
     }
-    
-    //    func updateModelItemsFirebase()  {
-    //        let batch = db.batch()
-    //
-    //        for itemId in (selectedModel.item_ids) {
-    //            selectedModel.item_ids.append(itemId)
-    //            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
-    //            let documentRef = db.collection("items").document(itemId)
-    //            do {
-    //                try batch.setData(from: item, forDocument: documentRef)
-    //            } catch {
-    //                print("Error adding item: \(itemId): \(error)")
-    //            }
-    //        }
-    //        batch.commit { err in
-    //            if let err {
-    //                print("Error writing batch: \(err)")
-    //            } else {
-    //                print("Batch write successful")
-    //            }
-    //        }
-    //    }
     
     // MARK: Load Images
     func loadImages() {
@@ -295,39 +273,38 @@ class ModelViewModel {
     }
     
     // MARK: New Update Model
-    func updateModel() {
-        Task {
-            do {
-                // upload primary image
-                self.selectedModel.primaryImage.objectId = self.selectedModel.id
-                let newPrimaryImage = try await imageManager.uploadImage(
-                    self.selectedModel.primaryImage,
-                    newImageType: .model_primary
-                )
-                
-                // upload secondary images
-                for index in selectedModel.secondaryImages.indices {
-                    selectedModel.secondaryImages[index].objectId = selectedModel.id
-                }
-                let newSecondaryImages = try await imageManager.uploadImages(
-                    self.selectedModel.secondaryImages,
-                    newImageType: .model_secondary
-                )
-                
-                // create model items
-                createModelItemsFirebase()
-                
-                // update model data
-                selectedModel.nameLowercased = selectedModel.name.lowercased()
-                selectedModel.primaryImage = newPrimaryImage
-                selectedModel.secondaryImages = newSecondaryImages
-                
-                // upload model data
-                let modelReference = db.collection("models").document(self.selectedModel.id)
-                try modelReference.setData(from: selectedModel)
-            } catch {
-                print("Error updating model: \(error)")
+    @MainActor
+    func updateModel() async {
+        do {
+            // upload primary image (runs background internally)
+            selectedModel.primaryImage.objectId = selectedModel.id
+            let newPrimaryImage = try await imageManager.uploadImage(
+                selectedModel.primaryImage,
+                newImageType: .model_primary
+            )
+
+            // upload secondary images
+            for index in selectedModel.secondaryImages.indices {
+                selectedModel.secondaryImages[index].objectId = selectedModel.id
             }
+            let newSecondaryImages = try await imageManager.uploadImages(
+                selectedModel.secondaryImages,
+                newImageType: .model_secondary
+            )
+
+            // create model items
+            createModelItemsFirebase()
+
+            // update model data (safe on main actor now)
+            selectedModel.nameLowercased = selectedModel.name.lowercased()
+            selectedModel.primaryImage = newPrimaryImage
+            selectedModel.secondaryImages = newSecondaryImages
+
+            // Firestore update
+            let modelReference = db.collection("models").document(selectedModel.id)
+            try modelReference.setData(from: selectedModel)
+        } catch {
+            print("Error updating model: \(error)")
         }
     }
 }

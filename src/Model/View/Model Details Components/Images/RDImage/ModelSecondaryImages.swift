@@ -28,6 +28,7 @@ struct ModelSecondaryImages: View {
                             let index = 2 * row + col
                             
                             SecondaryImageItem(index: index)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                     }
                 }
@@ -41,8 +42,9 @@ struct ModelSecondaryImages: View {
                 PickerSheet(item: activeSheet, editIndex: editIndex)
             }
         }
-        .frame(maxWidth: Constants.screenWidth / 2,
-               maxHeight: Constants.screenWidth / 2)
+        .frame(maxWidth: Constants.screenWidthPadding / 2,
+               maxHeight: Constants.screenWidthPadding / 2)
+
     }
     
     // MARK: Edit Image Alert
@@ -78,6 +80,7 @@ struct ModelSecondaryImages: View {
     // MARK: Secondary Image Item
     @ViewBuilder
     private func SecondaryImageItem(index: Int) -> some View {
+     
         if index < secondaryRDImages.count {
             Button {
                 if isEditing {
@@ -96,25 +99,36 @@ struct ModelSecondaryImages: View {
                         .cornerRadius(12)
                         .clipped()
                 } else if let imageUrl = secondaryRDImages[index].imageURL {
-                    CachedAsyncImage(url: imageUrl)
+                    CachedAsyncImage(url: imageUrl) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(1, contentMode: .fill)
+                            .clipped()
+                            .cornerRadius(12)
+                    } placeholder: {
+                        PlaceholderRectangle()
+                    }
                 } else {
                     PlaceholderRectangle()
                 }
             }
         } else if index == secondaryRDImages.count {
             Button {
-                showAlert = true
-                editIndex = index
+                if isEditing {
+                    showAlert = true
+                    editIndex = index
+                }
             } label: {
                 ZStack (alignment: .center) {
                     PlaceholderRectangle()
                     
-                    Image(systemName: "plus")
+                    Image(systemName: isEditing ? "plus" : "photo")
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.secondary)
                 }
             }
+
         } else {
             PlaceholderRectangle()
         }
@@ -149,6 +163,7 @@ struct ModelSecondaryImages: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(.gray, lineWidth: 1)
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

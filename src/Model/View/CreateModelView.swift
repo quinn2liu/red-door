@@ -10,72 +10,68 @@ import PhotosUI
 
 struct CreateModelView: View {
     
-    @State private var viewModel: ModelViewModel = ModelViewModel()
+    // MARK: Environment variables
+    @State private var viewModel: ModelViewModel = ModelViewModel() // initializes new blank model
     @Environment(\.dismiss) var dismiss
     
-    @State private var isImagePickerPresented = false
-    @State private var sourceType: UIImagePickerController.SourceType?
-    @State private var secondaryImages: [UIImage] = []
-    
-    @State private var selectedImage: UIImage?
-    @State private var isImageFullScreen: Bool = false
+    @State private var selectedRDImage: RDImage?
+    @State private var isImageSelected: Bool = false
     @State private var isEditing: Bool = true
     
-    @State private var selectedRDImage: RDImage?
-    
-    var body: some View {
-        VStack(spacing: 12) {
-                    
-            TopBar()
-                        
-            if !viewModel.selectedModel.primaryImageExists {
-                HStack {
-                    Spacer()
-                    
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
-                                      selectedRDImage: $selectedRDImage,
-                                      selectedUIImage: $selectedImage,
-                                      isImageFullScreen: $isImageFullScreen,
-                                      isEditing: $isEditing)
-                        
-                    Spacer()
-                }
-            } else {
-                HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
-                                      selectedRDImage: $selectedRDImage,
-                                      selectedUIImage: $selectedImage,
-                                      isImageFullScreen: $isImageFullScreen,
-                                      isEditing: $isEditing)
-                    
-                    Spacer()
+    @State private var errorMessage = ""
+    @State private var isLoading: Bool = false
+    @State private var showError = false
 
-                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondaryImages,
-                                         selectedRDImage: $selectedRDImage,
-                                         isImageFullScreen: $isImageFullScreen,
-                                         isEditing: $isEditing)
+    
+    
+    // MARK: - Body
+    var body: some View {
+        ZStack {
+            VStack(spacing: 12) {
+                TopBar()
+                            
+//                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                
+                ModelImages()
+                        
+                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                
+                Stepper("Item Count: \(viewModel.selectedModel.itemCount)", value: $viewModel.selectedModel.itemCount, in: 1...100, step: 1)
+                    
+                RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
+                    saveTapped()
                 }
             }
-                    
-            ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+            .toolbar(.hidden)
+            .frameTop()
+            .frameHorizontalPadding()
+            .ignoresSafeArea(.keyboard)
+            .overlay(
+                ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+                    .animation(.easeInOut(duration: 0.3), value: isImageSelected)
+            )
             
-            Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
-                
-            RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
-                viewModel.updateModel()
-                dismiss()
+            if isLoading {
+                Color.black.opacity(0.3).ignoresSafeArea()
+                ProgressView("Saving Model...")
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                    .shadow(radius: 10)
             }
         }
-        .toolbar(.hidden)
-        .frameTop()
-        .frameHorizontalPadding()
-        .ignoresSafeArea(.keyboard)
-        .overlay(
-            ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageFullScreen: $isImageFullScreen)
-                .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
-        )
     }
     
+    private func saveTapped() {
+        isLoading = true
+        Task {
+            await viewModel.updateModel()
+            isLoading = false
+            dismiss()
+        }
+    }
+    
+    
+    // MARK: - Top Bar
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(
@@ -90,51 +86,50 @@ struct CreateModelView: View {
             }
         )
     }
+    
+    
+    // MARK: - Model Images
+    @ViewBuilder
+    private func ModelImages() -> some View {
+        Group {
+            if !viewModel.selectedModel.primaryImageExists {
+                HStack {
+                    Spacer()
+                    
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
+                                      selectedRDImage: $selectedRDImage,
+                                      isImageSelected: $isImageSelected,
+                                      isEditing: $isEditing)
+                        
+                    Spacer()
+                }
+            } else {
+                HStack(spacing: 0) {
+                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
+                                      selectedRDImage: $selectedRDImage,
+                                      isImageSelected: $isImageSelected,
+                                      isEditing: $isEditing)
+                    
+                    Spacer()
+
+                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondaryImages,
+                                         selectedRDImage: $selectedRDImage,
+                                         isImageFullScreen: $isImageSelected,
+                                         isEditing: $isEditing)
+                }
+            }
+        }
+    }
         
     // MARK: Model Name Entry
     @ViewBuilder
     private func ModelNameEntry() -> some View {
         TextField("Item Name", text: $viewModel.selectedModel.name)
             .padding(6)
-            .background(isImageFullScreen ? Color.clear : Color(.systemGray5))
+            .background(isImageSelected ? Color.clear : Color(.systemGray5))
             .cornerRadius(8)
             .multilineTextAlignment(.center)
     }
-    
-    @ViewBuilder
-    private func ImagePickerSheetView() -> some View {
-        if sourceType == .camera {
-            ModelImagesPickerWrapper(
-                images: $secondaryImages,
-                isPresented: $isImagePickerPresented,
-                sourceType: .camera
-            )
-            .background(Color.black)
-        } else {
-            ModelImagesPickerWrapper(
-                images: $secondaryImages,
-                isPresented: $isImagePickerPresented,
-                sourceType: .photoLibrary
-            )
-        }
-    }
-    
-    // TODO: move to model view model
-    private func createModel() {
-        Task {
-            await viewModel.updateModelUIImagesFirebase(images: secondaryImages)
-            await withCheckedContinuation { continuation in
-                viewModel.createModelItemsFirebase()
-                continuation.resume()
-            }
-            await withCheckedContinuation { continuation in
-                viewModel.updateModelDataFirebase()
-                continuation.resume()
-            }
-        }
-        dismiss()
-    }
-    
 }
 
 #Preview {

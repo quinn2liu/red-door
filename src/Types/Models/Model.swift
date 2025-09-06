@@ -19,7 +19,7 @@ struct Model: Identifiable, Codable, Hashable {
     var primaryMaterial: String
     var imageIds: [String]
     var imageUrlDict: [String: String]
-    var count: Int
+    var itemCount: Int
     var id: String
     
     var primaryImage: RDImage
@@ -49,7 +49,7 @@ struct Model: Identifiable, Codable, Hashable {
         self.primaryMaterial = primaryMaterial
         self.imageIds = imageIds
         self.imageUrlDict = imageUrlDict
-        self.count = count
+        self.itemCount = count
         self.id = id
         
         self.primaryImage = primaryImage
