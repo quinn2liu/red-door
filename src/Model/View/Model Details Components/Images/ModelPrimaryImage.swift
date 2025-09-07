@@ -26,19 +26,15 @@ struct ModelPrimaryImage: View {
             if isEditing {
                 showEditAlert = true
             } else {
-                if let uiImage = primaryRDImage.uiImage {
-                    selectedRDImage = RDImage(uiImage: uiImage)
-                } else if primaryRDImage.imageURL != nil {
+                if primaryRDImage.imageURL != nil {
                     selectedRDImage = primaryRDImage
+                } else if let uiImage = primaryRDImage.uiImage {
+                    selectedRDImage = RDImage(uiImage: uiImage)
                 }
                 isImageSelected = true
             }
         } label: {
-            if let uiImage = primaryRDImage.uiImage {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-            } else if let imageUrl = primaryRDImage.imageURL {
+            if let imageUrl = primaryRDImage.imageURL {
                 CachedAsyncImage(url: imageUrl) { image in
                     image
                         .resizable()
@@ -47,6 +43,10 @@ struct ModelPrimaryImage: View {
                     Rectangle()
                         .foregroundStyle(.gray.opacity(0.3))
                 }
+            } else if let uiImage = primaryRDImage.uiImage {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
             } else { // no image selected
                 Rectangle()
                     .foregroundStyle(.blue)
@@ -70,7 +70,7 @@ struct ModelPrimaryImage: View {
                 }
             }
         }
-        .frame(maxWidth: Constants.screenWidthPadding / 2, maxHeight: Constants.screenWidthPadding / 2)
+        .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
         .contentShape(Rectangle())
         .cornerRadius(12)
     }

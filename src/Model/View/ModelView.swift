@@ -32,8 +32,8 @@
             VStack(spacing: 12) {
                 TopBar()
                 
-                ModelImages()
-                
+                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                                
                 ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
                 
                 ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
@@ -59,7 +59,7 @@
                             }
                             
                             Button(role: .cancel) {
-                                
+                                viewModel.selectedModel.primaryImage.uiImage = nil
                             } label: {
                                 Text("Cancel")
                             }
@@ -96,39 +96,6 @@
                     Text("Name:")
                         .font(.headline)
                     Text(viewModel.selectedModel.name)
-                }
-            }
-        }
-        
-        // MARK: - Model Images
-        @ViewBuilder
-        private func ModelImages() -> some View {
-            Group {
-                if !viewModel.selectedModel.primaryImageExists {
-                    HStack {
-                        Spacer()
-                        
-                        ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
-                                          selectedRDImage: $selectedRDImage,
-                                          isImageSelected: $isImageSelected,
-                                          isEditing: $isEditing)
-                            
-                        Spacer()
-                    }
-                } else {
-                    HStack(spacing: 0) {
-                        ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
-                                          selectedRDImage: $selectedRDImage,
-                                          isImageSelected: $isImageSelected,
-                                          isEditing: $isEditing)
-                        
-                        Spacer()
-
-                        ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondaryImages,
-                                             selectedRDImage: $selectedRDImage,
-                                             isImageFullScreen: $isImageSelected,
-                                             isEditing: $isEditing)
-                    }
                 }
             }
         }

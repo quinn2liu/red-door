@@ -13,16 +13,14 @@ struct RoomModelView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var modelViewModel: ModelViewModel
     @Binding private var roomViewModel: RoomViewModel
-
-    // MARK: Image variables
-    @State private var selectedImage: UIImage? = nil
-    @State private var isImageFullScreen: Bool = false
-    @State private var isImagePickerPresented = false
-    @State private var sourceType: UIImagePickerController.SourceType?
     
     // MARK: State Variables
     @State private var items: [Item] = []
     @State private var showingDeleteAlert = false
+    
+    // MARK: RD Image Refactor
+    @State private var selectedRDImage: RDImage? = nil
+    @State private var isImageSelected: Bool = false
 
     // MARK: Initializer
     init(model: Model, roomViewModel: Binding<RoomViewModel>) {
@@ -34,13 +32,7 @@ struct RoomModelView: View {
     var body: some View {
         VStack(spacing: 0) {
             Form {
-                Section("Images") {
-                    if !modelViewModel.images.isEmpty {
-                        ModelImagesView(images: $modelViewModel.images, selectedImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: false)
-                    } else {
-                        Text("No Images")
-                    }
-                }
+                ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
                 
                 Section("Details") {
                     ModelDetailsView(isEditing: false, viewModel: $modelViewModel)
@@ -60,12 +52,11 @@ struct RoomModelView: View {
             getInitialData()
         }
         .overlay(
-            ModelImageOverlay(selectedImage: selectedImage, isImageFullScreen: $isImageFullScreen)
-                .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
+            ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
         )
     }
     
-    // MARK: ModelNameView()
+    // MARK: - ModelNameView()
     @ViewBuilder private func ModelNameView() -> some View {
         HStack {
             Text("Name:")
@@ -73,7 +64,6 @@ struct RoomModelView: View {
             Text(modelViewModel.selectedModel.name)
         }
     }
-    
     
     
     private func getInitialData() {

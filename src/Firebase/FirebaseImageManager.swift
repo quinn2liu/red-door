@@ -16,20 +16,38 @@ protocol ImageManager {
 
 final class FirebaseImageManager: ImageManager {
     static let shared = FirebaseImageManager()
-
+    static let storageRef = Storage.storage().reference()
+    
     private init() {}
     
+    
+    // MARK: - Uploading
+    enum ImageUploadError: Error {
+        case notDirty, invalidType, noUIImage, cannotCompress, missingObjectId
+    }
+    
+    private func validateUploadRDImage(_ rdImage: RDImage, newImageType: RDImageTypeEnum) throws -> (uiImage: UIImage, objectPath: String, objectId: String) {
+        guard rdImage.imageType == .dirty else { throw ImageUploadError.notDirty }
+        guard let objectPath = newImageType.objectPath else { throw ImageUploadError.invalidType }
+        guard let uiImage = rdImage.uiImage else { throw ImageUploadError.noUIImage }
+        guard let objectId = rdImage.objectId else { throw ImageUploadError.missingObjectId }
+        
+        return (uiImage, objectPath, objectId)
+    }
+    
+    
+    // MARK: uploadImage()
     func uploadImage(_ rdImage: RDImage, newImageType: RDImageTypeEnum) async throws -> RDImage {
         let (uiImage, objectPath, objectId): (UIImage, String, String)
         
         do {
-            (uiImage, objectPath, objectId) = try validateRDImage(rdImage, newImageType: newImageType)
+            (uiImage, objectPath, objectId) = try validateUploadRDImage(rdImage, newImageType: newImageType)
         } catch {
             print("Upload skipped: \(error)")
             return rdImage
         }
         
-        var storageRef = Storage.storage().reference().child(objectPath)
+        var storageRef = FirebaseImageManager.storageRef.child(objectPath)
         storageRef = storageRef.child(objectId).child(rdImage.id)
         
         let metaData = StorageMetadata()
@@ -47,6 +65,8 @@ final class FirebaseImageManager: ImageManager {
         return updated
     }
     
+    
+    // MARK: uploadImages()
     func uploadImages(_ images: [RDImage], newImageType: RDImageTypeEnum) async throws -> [RDImage] {
         try await withThrowingTaskGroup(of: RDImage.self) { group in
             for image in images where image.imageType == .dirty {
@@ -65,20 +85,39 @@ final class FirebaseImageManager: ImageManager {
         }
     }
     
-    enum ImageUploadError: Error {
-        case notDirty, invalidType, noUIImage, cannotCompress, missingObjectId
+
+    // MARK: Delete Images
+    
+    enum ImageDeleteError: Error {
+        case getObjectPathError, missingObjectId
     }
 
-    private func validateRDImage(_ rdImage: RDImage, newImageType: RDImageTypeEnum) throws -> (uiImage: UIImage, objectPath: String, objectId: String) {
+    
+    private func validateDeleteRDImage(_ rdImage: RDImage) throws -> (objectId: String, objectPath: String) {
+        guard let objectId = rdImage.objectId else { throw ImageDeleteError.missingObjectId }
+        guard let objectPath = rdImage.imageType.objectPath else { throw ImageDeleteError.getObjectPathError }
         
-        guard rdImage.imageType == .dirty else { throw ImageUploadError.notDirty }
+        return (objectId, objectPath)
+    }
+    
+    func deleteImage(_ rdImage: RDImage) async throws {
+        // delete image from storage
+        let (objectId, objectPath): (String, String)
         
-        guard let objectPath = newImageType.objectPath else { throw ImageUploadError.invalidType }
+        do {
+            (objectId, objectPath) = try validateDeleteRDImage(rdImage)
+        } catch {
+            print("Delete skipped: \(error)")
+            throw error
+        }
         
-        guard let uiImage = rdImage.uiImage else { throw ImageUploadError.noUIImage }
-        
-        guard let objectId = rdImage.objectId else { throw ImageUploadError.missingObjectId }
-        
-        return (uiImage, objectPath, objectId)
+        var storageRef = FirebaseImageManager.storageRef.child(objectPath)
+            
+        do {
+            try await storageRef.delete()
+        } catch {
+            print("Error deleting imageID: \(error)")
+        }
+
     }
 }

@@ -87,27 +87,31 @@ struct ModelSecondaryImages: View {
                     showAlert = true
                     editIndex = index
                 } else {
-                    selectedRDImage?.uiImage = secondaryRDImages[index].uiImage
+                    if secondaryRDImages[index].imageURL != nil {
+                        selectedRDImage = secondaryRDImages[index]
+                    } else if let uiImage = secondaryRDImages[index].uiImage {
+                        selectedRDImage = RDImage(uiImage: uiImage)
+                    }
                     isImageFullScreen = true
                 }
                 
             } label: {
-                if let uiImage = secondaryRDImages[index].uiImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .aspectRatio(1, contentMode: .fit)
-                        .cornerRadius(12)
-                        .clipped()
-                } else if let imageUrl = secondaryRDImages[index].imageURL {
+                if let imageUrl = secondaryRDImages[index].imageURL {
                     CachedAsyncImage(url: imageUrl) { image in
                         image
                             .resizable()
-                            .aspectRatio(1, contentMode: .fill)
+                            .aspectRatio(1, contentMode: .fit)
                             .clipped()
                             .cornerRadius(12)
                     } placeholder: {
                         PlaceholderRectangle()
                     }
+                } else if let uiImage = secondaryRDImages[index].uiImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(1, contentMode: .fit)
+                        .cornerRadius(12)
+                        .clipped()
                 } else {
                     PlaceholderRectangle()
                 }
@@ -158,7 +162,7 @@ struct ModelSecondaryImages: View {
     private func PlaceholderRectangle() -> some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(Color.clear)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(1, contentMode: .fill)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(.gray, lineWidth: 1)

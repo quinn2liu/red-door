@@ -30,10 +30,8 @@ struct CreateModelView: View {
             VStack(spacing: 12) {
                 TopBar()
                             
-//                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
-                
-                ModelImages()
-                        
+                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                                        
                 ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
                 
                 Stepper("Item Count: \(viewModel.selectedModel.itemCount)", value: $viewModel.selectedModel.itemCount, in: 1...100, step: 1)
@@ -85,40 +83,6 @@ struct CreateModelView: View {
                 Spacer().frame(24)
             }
         )
-    }
-    
-    
-    // MARK: - Model Images
-    @ViewBuilder
-    private func ModelImages() -> some View {
-        Group {
-            if !viewModel.selectedModel.primaryImageExists {
-                HStack {
-                    Spacer()
-                    
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
-                                      selectedRDImage: $selectedRDImage,
-                                      isImageSelected: $isImageSelected,
-                                      isEditing: $isEditing)
-                        
-                    Spacer()
-                }
-            } else {
-                HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primaryImage,
-                                      selectedRDImage: $selectedRDImage,
-                                      isImageSelected: $isImageSelected,
-                                      isEditing: $isEditing)
-                    
-                    Spacer()
-
-                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondaryImages,
-                                         selectedRDImage: $selectedRDImage,
-                                         isImageFullScreen: $isImageSelected,
-                                         isEditing: $isEditing)
-                }
-            }
-        }
     }
         
     // MARK: Model Name Entry
