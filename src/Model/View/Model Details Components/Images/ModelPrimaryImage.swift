@@ -17,11 +17,8 @@ struct ModelPrimaryImage: View {
     @State private var activeSheet: ImageSourceEnum?
     
     @Binding var primaryRDImage: RDImage
-    
     @Binding var selectedRDImage: RDImage?
-    @Binding var selectedUIImage: UIImage?
-    
-    @Binding var isImageFullScreen: Bool
+    @Binding var isImageSelected: Bool
     @Binding var isEditing: Bool
     
     var body: some View {
@@ -29,20 +26,26 @@ struct ModelPrimaryImage: View {
             if isEditing {
                 showEditAlert = true
             } else {
-                if let uiImage = primaryRDImage.uiImage {
-                    selectedRDImage = RDImage(uiImage: uiImage)
-                } else if primaryRDImage.imageUrl != nil {
+                if primaryRDImage.imageURL != nil {
                     selectedRDImage = primaryRDImage
+                } else if let uiImage = primaryRDImage.uiImage {
+                    selectedRDImage = RDImage(uiImage: uiImage)
                 }
-                isImageFullScreen = true
+                isImageSelected = true
             }
         } label: {
-            if let uiImage = primaryRDImage.uiImage {
+            if let imageUrl = primaryRDImage.imageURL {
+                CachedAsyncImage(url: imageUrl) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    Rectangle()
+                        .foregroundStyle(.gray.opacity(0.3))
+                }
+            } else if let uiImage = primaryRDImage.uiImage {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFill()
-            } else if let imageUrl = primaryRDImage.imageUrl {
-                CachedAsyncImage(url: imageUrl)
                     .scaledToFill()
             } else { // no image selected
                 Rectangle()
@@ -50,7 +53,7 @@ struct ModelPrimaryImage: View {
             }
         }
         .alert(
-            primaryRDImage.imageUrl != URL(string: "") ? "Upload Method" : "Update Image",
+            primaryRDImage.imageURL != URL(string: "") ? "Upload Method" : "Update Image",
             isPresented: $showEditAlert
         ) {
             EditPhotoAlert()
@@ -58,17 +61,17 @@ struct ModelPrimaryImage: View {
         .sheet(item: $activeSheet) { item in
             switch item {
             case .library:
-                SingleLibraryPicker(primaryImage: $primaryRDImage.uiImage) {
+                SingleLibraryPicker(primaryRDImage: $primaryRDImage) {
                     activeSheet = nil
                 }
             case .camera:
-                SingleCameraPicker(primaryImage: $primaryRDImage.uiImage) {
+                SingleCameraPicker(primaryRDImage: $primaryRDImage) {
                     activeSheet = nil
                 }
             }
         }
-        .frame(maxWidth: Constants.screenWidthPadding / 2,
-               maxHeight: Constants.screenWidthPadding / 2)
+        .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
+        .contentShape(Rectangle())
         .cornerRadius(12)
     }
     

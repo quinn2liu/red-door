@@ -19,6 +19,10 @@ struct ModelSecondaryImages: View {
     @Binding var isImageFullScreen: Bool
     @Binding var isEditing: Bool
     
+    var visibleImages: [RDImage] {
+        secondaryRDImages.filter { $0.imageType != .delete }
+    }
+    
     var body: some View {
         Group {
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
@@ -28,6 +32,7 @@ struct ModelSecondaryImages: View {
                             let index = 2 * row + col
                             
                             SecondaryImageItem(index: index)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                     }
                 }
@@ -41,87 +46,109 @@ struct ModelSecondaryImages: View {
                 PickerSheet(item: activeSheet, editIndex: editIndex)
             }
         }
-        .frame(maxWidth: Constants.screenWidth / 2,
-               maxHeight: Constants.screenWidth / 2)
+        .frame(maxWidth: Constants.screenWidthPadding / 2,
+               maxHeight: Constants.screenWidthPadding / 2)
+
     }
     
     // MARK: Edit Image Alert
     @ViewBuilder
     private func EditImageAlert() -> some View {
-        Button(role: .none) {
-            activeSheet = .library
-        } label: {
-            Text("Library")
-        }
-
-        Button(role: .none) {
-            activeSheet = .camera
-        } label: {
-            Text("Camera")
-        }
-        
-        if isEditing {
-            Button(role: .destructive) {
-                DeleteSecondaryImage(index: editIndex)
+        if let index = editIndex {
+            Button(role: .none) {
+                activeSheet = .library
             } label: {
-                Text("Delete")
+                Text("Library")
+            }
+
+            Button(role: .none) {
+                activeSheet = .camera
+            } label: {
+                Text("Camera")
+            }
+            
+            if isEditing {
+                Button(role: .destructive) {
+                    DeleteSecondaryImage(index: index)
+                } label: {
+                    Text("Delete")
+                }
+            }
+
+            Button(role: .cancel) {
+
+            } label: {
+                Text("Cancel")
             }
         }
-
-        Button(role: .cancel) {
-
-        } label: {
-            Text("Cancel")
-        }
+        
     }
 
     // MARK: Secondary Image Item
     @ViewBuilder
     private func SecondaryImageItem(index: Int) -> some View {
-        if index < secondaryRDImages.count {
+     
+        if index < visibleImages.count {
             Button {
                 if isEditing {
                     showAlert = true
                     editIndex = index
                 } else {
-                    selectedRDImage?.uiImage = secondaryRDImages[index].uiImage
+                    if visibleImages[index].imageURL != nil {
+                        selectedRDImage = visibleImages[index]
+                    } else if let uiImage = visibleImages[index].uiImage {
+                        selectedRDImage = RDImage(uiImage: uiImage)
+                    }
                     isImageFullScreen = true
                 }
                 
             } label: {
-                if let uiImage = secondaryRDImages[index].uiImage {
+                if let imageUrl = visibleImages[index].imageURL {
+                    CachedAsyncImage(url: imageUrl) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(1, contentMode: .fill)
+                            .contentShape(Rectangle())
+                            .cornerRadius(12)
+                    } placeholder: {
+                        PlaceholderRectangle()
+                    }
+                } else if let uiImage = visibleImages[index].uiImage {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .aspectRatio(1, contentMode: .fit)
+                        .aspectRatio(1, contentMode: .fill)
+                        .contentShape(Rectangle())
                         .cornerRadius(12)
-                        .clipped()
-                } else if let imageUrl = secondaryRDImages[index].imageUrl {
-                    CachedAsyncImage(url: imageUrl)
                 } else {
                     PlaceholderRectangle()
                 }
             }
-        } else if index == secondaryRDImages.count {
+        } else if index == visibleImages.count {
             Button {
-                showAlert = true
-                editIndex = index
+                if isEditing {
+                    showAlert = true
+                    editIndex = index
+                }
             } label: {
                 ZStack (alignment: .center) {
                     PlaceholderRectangle()
                     
-                    Image(systemName: "plus")
+                    Image(systemName: isEditing ? "plus" : "photo")
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.secondary)
                 }
             }
+
         } else {
             PlaceholderRectangle()
         }
     }
     
-    private func DeleteSecondaryImage(index: Int?) {
-        // TODO: Delete the secondary image
+    private func DeleteSecondaryImage(index: Int) {
+        secondaryRDImages[index].imageType = .delete
+        secondaryRDImages[index].uiImage = nil
+        secondaryRDImages[index].imageURL = nil
     }
     
     @ViewBuilder
@@ -144,11 +171,12 @@ struct ModelSecondaryImages: View {
     private func PlaceholderRectangle() -> some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(Color.clear)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(1, contentMode: .fill)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(.gray, lineWidth: 1)
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

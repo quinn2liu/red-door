@@ -88,22 +88,29 @@ struct RoomView: View {
     }
     
     // MARK: RoomItemListItem()
-    @ViewBuilder private func RoomItemListItem(_ item: Item) -> some View {
+    @ViewBuilder
+    private func RoomItemListItem(_ item: Item) -> some View {
         HStack(spacing: 12) {
             if let model = viewModel.getModelForItem(item) {
-                if !model.image_ids.isEmpty, let imageURL = model.image_url_dict[model.image_ids[0]] {
-                    CachedAsyncImage(url: URL(string: imageURL)) { image in
-                        image.resizable()
+                if let uiImage = model.primaryImage.uiImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 40, height: 40)
+                        .cornerRadius(4)
+                } else if let imageUrl = model.primaryImage.imageURL {
+                    CachedAsyncImage(url: imageUrl) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 40, height: 40)
                     } placeholder: {
                         Color.gray
                     }
-                    .frame(width: 40, height: 40)
-                    .cornerRadius(4)
                 } else {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
+                    Image(systemName: "photo.badge.exclamationmark")
+                        .foregroundStyle(.gray)
                         .frame(width: 40, height: 40)
-                        .cornerRadius(4)
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
@@ -114,9 +121,9 @@ struct RoomView: View {
                     HStack {
                         Text(model.type)
                         Text("•")
-                        Text(model.primary_color)
+                        Text(model.primaryColor)
                         Text("•")
-                        Text(model.primary_material)
+                        Text(model.primaryMaterial)
                     }
                     .font(.caption)
                     .foregroundStyle(Color(.systemGray))

@@ -170,9 +170,9 @@ extension RDListViewModel {
             for modelId in modelIdSet {
                 let modelRef = db.collection("models").document(modelId)
                 let snapshot = try await modelRef.getDocument()
-                if let data = snapshot.data(), var availableItemIds = data["available_item_ids"] as? [String] {
+                if let data = snapshot.data(), var availableItemIds = data["availableItemIds"] as? [String] {
                     availableItemIds.removeAll(where: { itemIdSet.contains($0) })
-                    let update: [String: [String]] = ["available_item_ids": availableItemIds]
+                    let update: [String: [String]] = ["availableItemIds": availableItemIds]
                     try await modelRef.updateData(update)
                 }
             }

@@ -10,60 +10,68 @@ import PhotosUI
 
 struct CreateModelView: View {
     
-    @State private var viewModel: ModelViewModel = ModelViewModel()
+    // Environment variables
+    @State private var viewModel: ModelViewModel = ModelViewModel() // initializes new blank model
     @Environment(\.dismiss) var dismiss
-    
-    @State private var isImagePickerPresented = false
-    @State private var sourceType: UIImagePickerController.SourceType?
-    @State private var secondaryImages: [UIImage] = []
-    
-    @State private var selectedImage: UIImage?
-    @State private var isImageFullScreen: Bool = false
     @State private var isEditing: Bool = true
-    
-    @State private var selectedRDImage: RDImage?
-    
-    var body: some View {
-        VStack(spacing: 12) {
-                    
-            TopBar()
-                        
-            if viewModel.selectedModel.primary_image.imageUrl == nil && viewModel.selectedModel.primary_image.uiImage == nil {
-                HStack {
-                    Spacer()
-                    
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
-                        
-                    Spacer()
-                }
-            } else {
-                HStack(spacing: 0) {
-                    ModelPrimaryImage(primaryRDImage: $viewModel.selectedModel.primary_image, selectedRDImage: $selectedRDImage, selectedUIImage: $selectedImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
-                    
-                    Spacer()
 
-                    ModelSecondaryImages(secondaryRDImages: $viewModel.selectedModel.secondary_images, selectedRDImage: $selectedRDImage, isImageFullScreen: $isImageFullScreen, isEditing: $isEditing)
-                }
-            }
-                    
-            ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
-            
-            Stepper("Item Count: \(viewModel.selectedModel.count)", value: $viewModel.selectedModel.count, in: 1...100, step: 1)
-                
-            RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
-                createModel()
-            }
-        }
-        .toolbar(.hidden)
-        .frameTop()
-        .frameHorizontalPadding()
-        .ignoresSafeArea(.keyboard)
-        .overlay(
-            ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageFullScreen: $isImageFullScreen)
-                .animation(.easeInOut(duration: 0.3), value: isImageFullScreen)
-        )
+    // Image Overlay
+    @State private var selectedRDImage: RDImage? = nil
+    @State private var isImageSelected: Bool = false
+    
+    // Loading Variables
+    @State private var isLoading: Bool = false
+
+    init(viewModel: ModelViewModel = ModelViewModel()) {
+        self.viewModel = viewModel
     }
     
+    // MARK: - Body
+    var body: some View {
+        ZStack {
+            VStack(spacing: 12) {
+                TopBar()
+                            
+                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                                        
+                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                
+                Stepper("Item Count: \(viewModel.selectedModel.itemCount)", value: $viewModel.selectedModel.itemCount, in: 1...100, step: 1)
+                    
+                RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
+                    saveModel()
+                }
+            }
+            .toolbar(.hidden)
+            .frameTop()
+            .frameHorizontalPadding()
+            .ignoresSafeArea(.keyboard)
+            .overlay(
+                ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+                    .animation(.easeInOut(duration: 0.3), value: isImageSelected)
+            )
+            
+            if isLoading {
+                Color.black.opacity(0.3).ignoresSafeArea()
+                ProgressView("Saving Model...")
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                    .shadow(radius: 10)
+            }
+        }
+    }
+    
+    private func saveModel() {
+        isLoading = true
+        Task {
+            await viewModel.updateModel()
+            isLoading = false
+            dismiss()
+        }
+    }
+    
+    
+    // MARK: - Top Bar
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(
@@ -84,45 +92,10 @@ struct CreateModelView: View {
     private func ModelNameEntry() -> some View {
         TextField("Item Name", text: $viewModel.selectedModel.name)
             .padding(6)
-            .background(isImageFullScreen ? Color.clear : Color(.systemGray5))
+            .background(isImageSelected ? Color.clear : Color(.systemGray5))
             .cornerRadius(8)
             .multilineTextAlignment(.center)
     }
-    
-    @ViewBuilder
-    private func ImagePickerSheetView() -> some View {
-        if sourceType == .camera {
-            ModelImagesPickerWrapper(
-                images: $secondaryImages,
-                isPresented: $isImagePickerPresented,
-                sourceType: .camera
-            )
-            .background(Color.black)
-        } else {
-            ModelImagesPickerWrapper(
-                images: $secondaryImages,
-                isPresented: $isImagePickerPresented,
-                sourceType: .photoLibrary
-            )
-        }
-    }
-    
-    // TODO: move to model view model
-    private func createModel() {
-        Task {
-            await viewModel.updateModelUIImagesFirebase(images: secondaryImages)
-            await withCheckedContinuation { continuation in
-                viewModel.createModelItemsFirebase()
-                continuation.resume()
-            }
-            await withCheckedContinuation { continuation in
-                viewModel.updateModelDataFirebase()
-                continuation.resume()
-            }
-        }
-        dismiss()
-    }
-    
 }
 
 #Preview {

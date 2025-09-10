@@ -9,13 +9,7 @@ import SwiftUI
 import CachedAsyncImage
 
 struct ModelListItemView: View {
-    
     var model: Model
-    
-    // TODO: add primary image
-    var urlString: String {
-        return model.image_url_dict.values.first ?? ""
-    }
     
     var body: some View {
         HStack(spacing: 0) {
@@ -31,28 +25,28 @@ struct ModelListItemView: View {
             
             Spacer()
 
-            Text(model.primary_material)
+            Text(model.primaryMaterial)
             
             Spacer()
 
-            Text(model.primary_color)
+            Text(model.primaryColor)
             
             Spacer()
 
-            Text(String(model.count))
+            Text(String(model.itemCount))
         }
     }
     
     @ViewBuilder private func ModelImage() -> some View {
-        if urlString != "" {
-            CachedAsyncImage(url: URL(string: urlString)) { phase in
+        if let imageURL = model.primaryImage.imageURL {
+            CachedAsyncImage(url: imageURL) { phase in
                 switch phase {
                 case .empty:
                     ProgressView() // Placeholder while loading
                 case .success(let image):
                     image.resizable().frame(50)
                 case .failure:
-                    Image(systemName: "")
+                    Image(systemName: "photo.badge.plus")
                         .frame(50) // Fallback image
                 @unknown default:
                     EmptyView()

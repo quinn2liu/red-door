@@ -22,7 +22,7 @@ struct ItemListView: View {
             }
         } else {
             HStack {
-                Text("Item Count: \(viewModel.selectedModel.count)")
+                Text("Item Count: \(viewModel.selectedModel.itemCount)")
                 Spacer()
                 Image(systemName: listExpanded ? "minus" : "plus")
             }
@@ -35,13 +35,13 @@ struct ItemListView: View {
         }
         
         if !items.isEmpty && listExpanded {
-            List {
-                ForEach(items, id: \.self) { item in
-                    NavigationLink(value: item) {
-                        ItemListItemView(item: item, model: viewModel.selectedModel)
-                    }
+//            List {
+            ForEach(items, id: \.self) { item in
+                NavigationLink(value: item) {
+                    ItemListItemView(item: item, model: viewModel.selectedModel)
                 }
             }
+//            }
         }
     }
 }
