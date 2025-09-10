@@ -53,12 +53,8 @@
                                 "Confirm Delete",
                                 isPresented: $showDeleteAlert
                             ) {
-                                
                                 Button(role: .destructive) {
-                                    Task {
-                                        // TODO: DELETE MODEL CODE
-                                        dismiss()
-                                    }
+                                    deleteModel()
                                 } label: {
                                     Text("Delete")
                                 }
@@ -165,6 +161,16 @@
                 await viewModel.updateModel()
                 self.items = try await viewModel.getModelItems()
                 isLoading = false
+            }
+        }
+        
+        // MARK: - deleteModel()
+        private func deleteModel() {
+            isLoading = true
+            Task {
+                await viewModel.deleteModel()
+                isLoading = false
+                dismiss()
             }
         }
     }
