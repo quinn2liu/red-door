@@ -120,9 +120,6 @@ final class FirebaseImageManager {
     
     // MARK: Delete Image
     func deleteImage(_ rdImage: RDImage, deletedImageType: RDImageTypeEnum) async throws {
-        
-        print("deletedImageType: \(deletedImageType)")
-        
         // delete image from storage
         let (objectId, objectPath): (String, String)
         

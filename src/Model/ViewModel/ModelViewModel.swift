@@ -27,16 +27,6 @@ final class ModelViewModel {
         self.imageManager = imageManager
     }
     
-    // MARK: Update Model
-    func updateModelDataFirebase()  {
-        do {
-            selectedModel.nameLowercased = selectedModel.name.lowercased()
-            try db.collection("models").document(selectedModel.id).setData(from: selectedModel)
-        } catch {
-            print("Error adding document: \(error)")
-        }
-    }
-    
     // MARK: Create Model Items
     func createModelItemsFirebase() {
         let batch = db.batch()
@@ -94,128 +84,6 @@ final class ModelViewModel {
         return items
     }
     
-    // MARK: Load Images
-//    func loadImages() {
-//        let dispatchGroup = DispatchGroup()
-//        var loadedImages: [UIImage] = []
-//        
-//        for (_, urlString) in selectedModel.imageUrlDict {
-//            guard let url = URL(string: urlString) else { continue }
-//            //            print("Attempting to load imageURL: \(urlString)")
-//            dispatchGroup.enter()
-//            
-//            URLSession.shared.dataTask(with: url) { data, _, error in
-//                defer { dispatchGroup.leave() }
-//                
-//                if let data = data, let image = UIImage(data: data) {
-//                    loadedImages.append(image)
-//                } else {
-//                    print("Failed to load image from \(urlString): \(error?.localizedDescription ?? "Unknown error")")
-//                }
-//            }.resume()
-//        }
-//        
-//        dispatchGroup.notify(queue: .main) {
-//            self.images = loadedImages
-//        }
-//    }
-    
-    // MARK: Update Model Images
-//    func updateModelUIImagesFirebase(images: [UIImage]) async {
-//        
-//        if images.count > 0 {
-//            do {
-//                try await withThrowingTaskGroup(of: Void.self) { group in
-//                    
-//                    // delete og images
-//                    group.addTask {
-//                        await self.deleteModelImagesFirebase()
-//                    }
-//                    
-//                    group.addTask {
-//                        
-//                        self.selectedModel.imageUrlDict.removeAll()
-//                        self.selectedModel.imageIds.removeAll()
-//                        
-//                        // now update the images
-//                        for (index, image) in images.enumerated() {
-//                            let imageID = "\(self.selectedModel.id)-\(index)"
-//                            let imageRef = self.storageRef.child(imageID)
-//                            self.selectedModel.imageIds.append(imageID)
-//                            
-//                            // Compress the image to JPEG with a specified compression quality (0.0 to 1.0)
-//                            guard let imageData = image.jpegData(compressionQuality: 0.3) else {
-//                                print("Error converting UIImage to jpegData")
-//                                return
-//                            }
-//                            
-//                            let metaData = StorageMetadata()
-//                            metaData.contentType = "image/jpeg"
-//                            
-//                            do {
-//                                let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
-//                                let imageURL = try await imageRef.downloadURL().absoluteString
-//                                self.selectedModel.imageUrlDict.updateValue(imageURL, forKey: imageID)
-//                            } catch {
-//                                print("Error occurred when uploading image \(error.localizedDescription)")
-//                            }
-//                        }
-//                    }
-//                    try await group.waitForAll()
-//                    
-//                }
-//            } catch {
-//                print("Error updating images: \(error.localizedDescription)")
-//            }
-//        }
-//    }
-    
-    // MARK: Delete Model Images
-//    func deleteModelImagesFirebase() async {
-//        do {
-//            try await withThrowingTaskGroup(of: Void.self) { group in
-//                for imageID in selectedModel.imageIds {
-//                    group.addTask {
-//                        let deleteRef = self.storageRef.child(imageID)
-//                        do {
-//                            try await deleteRef.delete()
-//                        } catch {
-//                            print("Error deleting imageID \(imageID): \(error)")
-//                        }
-//                    }
-//                }
-//                
-//                try await group.waitForAll()
-//            }
-//        } catch {
-//            print("Error removing image: \(error)")
-//        }
-//    }
-    
-    // MARK: Delete Model
-//    func deleteModelFirebase() async {
-//        await withThrowingTaskGroup(of: Void.self) { group in
-//            
-//            group.addTask {
-//                await self.deleteModelImagesFirebase()
-//            }
-//            
-//            group.addTask {
-//                do {
-//                    try await self.db.collection("models").document(self.selectedModel.id).delete()
-//                    
-//                    for itemId in self.selectedModel.itemIds {
-//                        try await self.db.collection("items").document(itemId).delete()
-//                    }
-//                    //                    print("Document \(self.selectedModel.id) successfully removed!")
-//                } catch {
-//                    print("Error removing document: \(error)")
-//                }
-//            }
-//            
-//        }
-//    }
-    
     // MARK: Update Priamry Image
     func updatePrimaryImage(image: RDImage) async {
         if let uiImage = image.uiImage {
@@ -250,14 +118,14 @@ final class ModelViewModel {
     @MainActor
     func updateModel() async {
         do {
-            // upload primary image (runs background internally)
+            // update primary image
             selectedModel.primaryImage.objectId = selectedModel.id
             let newPrimaryImage = try await imageManager.updateImage(
                 selectedModel.primaryImage,
                 resultImageType: .model_primary
             )
 
-            // upload secondary images
+            // delete secondary images
             for index in selectedModel.secondaryImages.indices {
                 selectedModel.secondaryImages[index].objectId = selectedModel.id
             }
@@ -266,10 +134,12 @@ final class ModelViewModel {
                 resultImageType: .model_secondary
             )
 
-            // create model items
-            createModelItemsFirebase()
-
-            // update model data (safe on main actor now)
+            // delete model items
+            for itemId in self.selectedModel.itemIds {
+                try await self.db.collection("items").document(itemId).delete()
+            }
+            
+            // delete model data
             selectedModel.nameLowercased = selectedModel.name.lowercased()
             if let newPrimaryImage {
                 selectedModel.primaryImage = newPrimaryImage
@@ -281,6 +151,40 @@ final class ModelViewModel {
             // Firestore update
             let modelReference = db.collection("models").document(selectedModel.id)
             try modelReference.setData(from: selectedModel)
+        } catch {
+            print("Error updating model: \(error)")
+        }
+    }
+    
+    // MARK: New Update Model
+    func deleteModel() async {
+        do {
+            // delete primary image
+            selectedModel.primaryImage.objectId = selectedModel.id
+            selectedModel.primaryImage.imageType = .delete
+            let _ = try await imageManager.updateImage(
+                selectedModel.primaryImage,
+                resultImageType: .model_primary
+            )
+
+            // upload secondary images
+            for index in selectedModel.secondaryImages.indices {
+                selectedModel.secondaryImages[index].objectId = selectedModel.id
+                selectedModel.secondaryImages[index].imageType = .delete
+            }
+            let _ = try await imageManager.updateImages(
+                selectedModel.secondaryImages,
+                resultImageType: .model_secondary
+            )
+
+            // create model items
+            for itemId in self.selectedModel.itemIds {
+                try await self.db.collection("items").document(itemId).delete()
+            }
+            
+            // Firestore update
+            try await db.collection("models").document(self.selectedModel.id).delete()
+            
         } catch {
             print("Error updating model: \(error)")
         }
