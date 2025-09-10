@@ -17,11 +17,8 @@ struct Model: Identifiable, Codable, Hashable {
     var type: String
     var primaryColor: String
     var primaryMaterial: String
-    var imageIds: [String]
-    var imageUrlDict: [String: String]
     var itemCount: Int
     var id: String
-    
     var primaryImage: RDImage
     var secondaryImages: [RDImage]
     
@@ -47,8 +44,6 @@ struct Model: Identifiable, Codable, Hashable {
         self.type = type
         self.primaryColor = primaryColor
         self.primaryMaterial = primaryMaterial
-        self.imageIds = imageIds
-        self.imageUrlDict = imageUrlDict
         self.itemCount = count
         self.id = id
         
@@ -60,7 +55,7 @@ struct Model: Identifiable, Codable, Hashable {
 // MARK: primaryImageExists
 extension Model {
     var primaryImageExists: Bool {
-        !(primaryImage.imageURL == nil && primaryImage.uiImage == nil)
+        return !(primaryImage.imageURL == nil && primaryImage.uiImage == nil)
     }
 }
 

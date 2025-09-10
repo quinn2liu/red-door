@@ -9,13 +9,7 @@ import SwiftUI
 import CachedAsyncImage
 
 struct ModelListItemView: View {
-    
     var model: Model
-    
-    // TODO: add primary image
-    var urlString: String {
-        return model.imageUrlDict.values.first ?? ""
-    }
     
     var body: some View {
         HStack(spacing: 0) {
@@ -52,7 +46,7 @@ struct ModelListItemView: View {
                 case .success(let image):
                     image.resizable().frame(50)
                 case .failure:
-                    Image(systemName: "")
+                    Image(systemName: "photo.badge.plus")
                         .frame(50) // Fallback image
                 @unknown default:
                     EmptyView()

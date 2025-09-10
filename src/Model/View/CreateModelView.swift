@@ -10,19 +10,21 @@ import PhotosUI
 
 struct CreateModelView: View {
     
-    // MARK: Environment variables
+    // Environment variables
     @State private var viewModel: ModelViewModel = ModelViewModel() // initializes new blank model
     @Environment(\.dismiss) var dismiss
-    
-    @State private var selectedRDImage: RDImage?
-    @State private var isImageSelected: Bool = false
     @State private var isEditing: Bool = true
-    
-    @State private var errorMessage = ""
-    @State private var isLoading: Bool = false
-    @State private var showError = false
 
+    // Image Overlay
+    @State private var selectedRDImage: RDImage? = nil
+    @State private var isImageSelected: Bool = false
     
+    // Loading Variables
+    @State private var isLoading: Bool = false
+
+    init(viewModel: ModelViewModel = ModelViewModel()) {
+        self.viewModel = viewModel
+    }
     
     // MARK: - Body
     var body: some View {
@@ -37,7 +39,7 @@ struct CreateModelView: View {
                 Stepper("Item Count: \(viewModel.selectedModel.itemCount)", value: $viewModel.selectedModel.itemCount, in: 1...100, step: 1)
                     
                 RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
-                    saveTapped()
+                    saveModel()
                 }
             }
             .toolbar(.hidden)
@@ -59,7 +61,7 @@ struct CreateModelView: View {
         }
     }
     
-    private func saveTapped() {
+    private func saveModel() {
         isLoading = true
         Task {
             await viewModel.updateModel()

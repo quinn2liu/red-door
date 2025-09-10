@@ -65,16 +65,9 @@ struct RoomModelView: View {
         }
     }
     
-    
     private func getInitialData() {
-        modelViewModel.loadImages()
-        modelViewModel.getModelItems { result in
-            switch result {
-            case .success(let items):
-                self.items = items
-            case .failure(let error):
-                print("Error fetching items: \(error)")
-            }
+        Task {
+            self.items = try await modelViewModel.getModelItems()
         }
     }
 } // struct

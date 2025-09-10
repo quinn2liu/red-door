@@ -9,75 +9,89 @@
     import PhotosUI
 
     struct ModelView: View {
-        // MARK: Environment variables
+        // Environment variables
         @Environment(\.dismiss) private var dismiss
-        @State private var viewModel: ModelViewModel
-        
-        // MARK: State variables
         @State private var isEditing: Bool = false
+
+        // Data
+        @State private var viewModel: ModelViewModel
         @State private var items: [Item] = []
-        @State private var showingDeleteAlert = false
+        @State private var backupModel: Model?
         
-        // MARK: Image selected variables
+        // Presented variables
+        @State private var showDeleteAlert: Bool = false
+        @State private var isLoading: Bool = false
+        
+        // Image selected variables
         @State private var selectedRDImage: RDImage?
         @State private var isImageSelected: Bool = false
         
-        // MARK: Initializer
+        // Initializer
         init(model: Model, editable: Bool = true) {
             self.viewModel = ModelViewModel(selectedModel: model)
         }
         
         // MARK: - Body
         var body: some View {
-            VStack(spacing: 12) {
-                TopBar()
-                
-                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
-                                
-                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
-                
-                ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
-                
-                HStack {
-                    if isEditing {
-                        Button("Delete Model") {
-                            showingDeleteAlert = true
-                        }
-                        .foregroundColor(.red)
-                        .alert(
-                            "Confirm Delete",
-                            isPresented: $showingDeleteAlert
-                        ) {
-                            
-                            Button(role: .destructive) {
-                                Task {
-                                    await viewModel.deleteModelFirebase()
-                                    dismiss()
-                                }
-                            } label: {
-                                Text("Delete")
-                            }
-                            
-                            Button(role: .cancel) {
-                                viewModel.selectedModel.primaryImage.uiImage = nil
-                            } label: {
-                                Text("Cancel")
-                            }
-                        }
-                    } else {
-                        Button("Add Item to Pull List") { }
-                    }
+            ZStack {
+                VStack(spacing: 12) {
+                    TopBar()
                     
-                }.padding(.top)
-            }
-            .frameTop()
-            .frameHorizontalPadding()
-            .toolbar(.hidden)
-            .overlay(
-                ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
-            )
-            .onAppear {
-                getInitialData()
+                    ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                                    
+                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                    
+                    ItemListView(items: items, isEditing: isEditing, viewModel: viewModel)
+                    
+                    HStack {
+                        if isEditing {
+                            Button("Delete Model") {
+                                showDeleteAlert = true
+                            }
+                            .foregroundColor(.red)
+                            .alert(
+                                "Confirm Delete",
+                                isPresented: $showDeleteAlert
+                            ) {
+                                
+                                Button(role: .destructive) {
+                                    Task {
+                                        // TODO: DELETE MODEL CODE
+                                        dismiss()
+                                    }
+                                } label: {
+                                    Text("Delete")
+                                }
+                                
+                                Button(role: .cancel) {
+
+                                } label: {
+                                    Text("Cancel")
+                                }
+                            }
+                        } else {
+                            Button("Add Item to Pull List") { }
+                        }
+                        
+                    }.padding(.top)
+                }
+                .frameTop()
+                .frameHorizontalPadding()
+                .toolbar(.hidden)
+                .overlay(
+                    ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+                )
+                .onAppear {
+                    getInitialData()
+                }
+                
+                if isLoading {
+                    Color.black.opacity(0.3).ignoresSafeArea()
+                    ProgressView("Saving Model...")
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                        .shadow(radius: 10)
+                }
             }
         }
         
@@ -101,13 +115,8 @@
         }
         
         private func getInitialData() {
-            viewModel.getModelItems { result in
-                switch result {
-                case .success(let items):
-                    self.items = items
-                case .failure(let error):
-                    print("Error fetching items: \(error)")
-                }
+            Task {
+                self.items = try await viewModel.getModelItems()
             }
         }
         
@@ -118,6 +127,9 @@
                 leadingIcon: {
                     if isEditing {
                         Button {
+                            if let backup = backupModel {
+                                viewModel.selectedModel = backup
+                            }
                             isEditing = false
                         } label: {
                             Text("Cancel")
@@ -133,7 +145,9 @@
                     Button {
                         if isEditing {
                             saveModel()
+                            isEditing = false
                         } else {
+                            backupModel = viewModel.selectedModel
                             isEditing = true
                         }
                     } label: {
@@ -143,22 +157,14 @@
             )
         }
         
+        
         // MARK: - saveModel()
         private func saveModel() {
-            if isEditing {
-                isEditing = false
-                Task {
-                    await viewModel.updateModel()
-                    viewModel.getModelItems { result in
-                        switch result {
-                        case .success(let items):
-                            self.items = items
-                        case .failure(let error):
-                            print("Error fetching items: \(error)")
-                        }
-                    }
-                }
+            isLoading = true
+            Task {
+                await viewModel.updateModel()
+                self.items = try await viewModel.getModelItems()
+                isLoading = false
             }
         }
-        
     }

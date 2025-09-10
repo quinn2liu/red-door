@@ -9,8 +9,10 @@ import Foundation
 import PhotosUI
 import SwiftUI
 
+
+// MARK: RDImageTypeEnum
 enum RDImageTypeEnum: String, Codable {
-    case model_primary, model_secondary, item, rd_list, dirty, misc
+    case model_primary, model_secondary, item, rd_list, dirty, misc, delete
     
     var objectPath: String? {
         switch self {
@@ -22,12 +24,13 @@ enum RDImageTypeEnum: String, Codable {
             return "rd_lists"
         case .misc:
             return "misc"
-        case .dirty:
-            return nil // no valid path for dirty
+        case .dirty, .delete:
+            return nil // no path for dirty or delete
         }
     }
 }
 
+// MARK: RDImage
 struct RDImage: Identifiable, Codable, Hashable {
     var id: String = UUID().uuidString
     var imageType: RDImageTypeEnum = .dirty
@@ -37,5 +40,11 @@ struct RDImage: Identifiable, Codable, Hashable {
     
     enum CodingKeys: String, CodingKey {
         case id, objectId, imageURL, imageType
+    }
+}
+
+extension RDImage {
+    var imageExists: Bool {
+        return !(self.imageURL == nil && self.uiImage == nil)
     }
 }
