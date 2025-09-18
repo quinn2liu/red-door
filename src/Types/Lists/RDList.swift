@@ -54,7 +54,6 @@ struct RDList: Codable, Identifiable, Hashable {
         self.installed = installed
         self.listType = listType
     }
-    
 }
 
 extension RDList {

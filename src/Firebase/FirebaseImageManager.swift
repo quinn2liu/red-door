@@ -10,7 +10,6 @@ import Firebase
 import FirebaseStorage
 
 
-
 final class FirebaseImageManager {
     static let shared = FirebaseImageManager()
     static let storageRef = Storage.storage().reference()
@@ -19,6 +18,7 @@ final class FirebaseImageManager {
     
     
     // MARK: - Update Images
+    
     
     // MARK: updateImage()
     func updateImage(_ rdImage: RDImage, resultImageType: RDImageTypeEnum) async throws -> RDImage? {
