@@ -36,7 +36,7 @@ struct CreateModelView: View {
                                         
                 ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
                 
-                Stepper("Item Count: \(viewModel.selectedModel.itemCount)", value: $viewModel.selectedModel.itemCount, in: 1...100, step: 1)
+                Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1...100, step: 1)
                     
                 RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
                     saveModel()
