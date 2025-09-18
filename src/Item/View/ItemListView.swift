@@ -22,7 +22,7 @@ struct ItemListView: View {
             }
         } else {
             HStack {
-                Text("Item Count: \(viewModel.selectedModel.itemCount)")
+                Text("Item Count: \(viewModel.itemCount)")
                 Spacer()
                 Image(systemName: listExpanded ? "minus" : "plus")
             }

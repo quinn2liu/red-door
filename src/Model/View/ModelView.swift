@@ -28,7 +28,7 @@
         
         // Initializer
         init(model: Model, editable: Bool = true) {
-            self.viewModel = ModelViewModel(selectedModel: model)
+            self.viewModel = ModelViewModel(model: model)
         }
         
         // MARK: - Body

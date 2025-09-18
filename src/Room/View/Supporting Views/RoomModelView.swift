@@ -24,7 +24,7 @@ struct RoomModelView: View {
 
     // MARK: Initializer
     init(model: Model, roomViewModel: Binding<RoomViewModel>) {
-        self.modelViewModel = ModelViewModel(selectedModel: model)
+        self.modelViewModel = ModelViewModel(model: model)
         _roomViewModel = roomViewModel
     }
     
