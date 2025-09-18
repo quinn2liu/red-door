@@ -86,8 +86,39 @@ final class ModelViewModel {
         return items
     }
     
+<<<<<<< HEAD
     private func updateModelItems(_ items: [Item]) async throws -> [Item] {
         return []
+=======
+    // MARK: Update Priamry Image
+    func updatePrimaryImage(image: RDImage) async {
+        if let uiImage = image.uiImage {
+            
+            let imageRef = self.storageRef.child(image.id)
+            guard let imageData = uiImage.jpegData(compressionQuality: 0.3) else {
+                print("Error converting UIImage to jpegData")
+                return
+            }
+            
+            let metaData = StorageMetadata()
+            metaData.contentType = "image/jpeg"
+            
+            do {
+                let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
+                let imageURL = try await imageRef.downloadURL()
+                self.selectedModel.primaryImage.imageURL = imageURL
+                if self.selectedModel.primaryImage.imageType == .dirty {
+                    self.selectedModel.primaryImage.imageType = .model_primary
+                }
+                
+            } catch {
+                print("Error occurred when uploading image \(error.localizedDescription)")
+            }
+            
+        } else {
+            print("Error occurred when uploading image: no RDImage.uiImage = nil")
+        }
+>>>>>>> main
     }
     
     
@@ -102,7 +133,11 @@ final class ModelViewModel {
                 resultImageType: .model_primary
             )
 
+<<<<<<< HEAD
             // update secondary images
+=======
+            // delete secondary images
+>>>>>>> main
             for index in selectedModel.secondaryImages.indices {
                 selectedModel.secondaryImages[index].objectId = selectedModel.id
             }
@@ -111,6 +146,7 @@ final class ModelViewModel {
                 resultImageType: .model_secondary
             )
 
+<<<<<<< HEAD
             // updateItems
 //            if selectedModel.itemCount != selectedModel.itemIds.count {
 ////                self.items = try await updateModelItems()
@@ -118,6 +154,14 @@ final class ModelViewModel {
 //            }
 //            
             // update model data
+=======
+            // delete model items
+            for itemId in self.selectedModel.itemIds {
+                try await self.db.collection("items").document(itemId).delete()
+            }
+            
+            // delete model data
+>>>>>>> main
             selectedModel.nameLowercased = selectedModel.name.lowercased()
             if let newPrimaryImage {
                 selectedModel.primaryImage = newPrimaryImage
@@ -154,9 +198,14 @@ final class ModelViewModel {
                 selectedModel.secondaryImages,
                 resultImageType: .model_secondary
             )
+<<<<<<< HEAD
             
             // TODO: fix this
             // delete model items
+=======
+
+            // create model items
+>>>>>>> main
             for itemId in self.selectedModel.itemIds {
                 try await self.db.collection("items").document(itemId).delete()
             }
