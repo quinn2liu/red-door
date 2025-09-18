@@ -13,6 +13,9 @@ struct ModelInventoryView: View {
     @State private var isLoadingModels: Bool = false
     @State private var searchFocused: Bool = false
     @FocusState private var searchTextFocused: Bool
+
+    // MARK: Sheet Presentation
+    @State private var isPresentingCreateModelSheet: Bool = false
     
     // MARK: Body
     var body: some View {
@@ -60,6 +63,9 @@ struct ModelInventoryView: View {
                 }
             }
             .rootNavigationDestinations(path: $path)
+            .sheet(isPresented: $isPresentingCreateModelSheet) {
+                CreateModelView()
+            }
         }
     }
     
@@ -157,7 +163,9 @@ struct ModelInventoryView: View {
     // MARK: ToolBarMenu
     @ViewBuilder private func ToolBarMenu() -> some View {
         Menu {
-            NavigationLink(destination: CreateModelView()) {
+            Button {
+                isPresentingCreateModelSheet = true
+            } label: {
                 Label("Add Item", systemImage: "plus")
             }
             NavigationLink(destination: ScanItemView()) {

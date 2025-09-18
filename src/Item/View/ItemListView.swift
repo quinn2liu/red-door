@@ -18,7 +18,9 @@ struct ItemListView: View {
         
         if isEditing {
             TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "plus", text: "Add Item") {
-                viewModel.createSingleModelItem()
+                Task {
+                    try await viewModel.createSingleModelItem()
+                }
             }
         } else {
             HStack {

@@ -17,16 +17,21 @@ import FirebaseStorage
 final class ModelViewModel {
     var selectedModel: Model
     var itemCount: Int
+    var items: [Item] = []
     
     let db = Firestore.firestore()
+    let modelDocumentRef: DocumentReference
     let storageRef: StorageReference
     private let imageManager: FirebaseImageManager
     
     init(model: Model = Model(), imageManager: FirebaseImageManager = FirebaseImageManager.shared) {
         self.selectedModel = model
-        self.storageRef = Storage.storage().reference().child("model_images").child(model.id)
-        self.imageManager = imageManager
         self.itemCount = model.itemIds.count
+
+        self.modelDocumentRef = db.collection("models").document(model.id)
+        self.storageRef = Storage.storage().reference().child("model_images").child(model.id)
+        
+        self.imageManager = imageManager
     }
     
     // MARK: Create Model Items
@@ -54,18 +59,18 @@ final class ModelViewModel {
     }
     
     // MARK: Create Single Model Item
-    func createSingleModelItem() {
-        let itemId = "item-\(UUID().uuidString)"
-        let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
-        selectedModel.itemIds.append(itemId)
+    func createSingleModelItem() async throws {
+        let item = Item(modelId: selectedModel.id)
+        selectedModel.itemIds.append(item.id)
         selectedModel.availableItemCount += 1
-        let itemRef = db.collection("items").document(itemId)
-        let modelRef = db.collection("models").document(selectedModel.id)
-        do {
-            try itemRef.setData(from: item)
-        } catch {
-            print("Error adding item: \(itemId): \(error)")
-        }
+        
+        try await modelDocumentRef.updateData([
+            "availableItemCount": selectedModel.availableItemCount,
+            "itemIds": selectedModel.itemIds
+        ])
+        
+        let itemRef = db.collection("items").document(item.id)
+        try itemRef.setData(from: item)
     }
     
     // MARK: Get Model Items
@@ -83,9 +88,27 @@ final class ModelViewModel {
         return items
     }
     
-
-    private func updateModelItems(_ items: [Item]) async throws -> [Item] {
-        return []
+    
+    // MARK: Create Items
+    private func createModelItems() async throws {
+        let batch = db.batch()
+        let collectionRef = db.collection("items")
+        
+        for _ in (1...itemCount) {
+            let item = Item(modelId: selectedModel.id)
+            selectedModel.itemIds.append(item.id)
+            selectedModel.availableItemCount += 1
+            
+            let documentRef = collectionRef.document(item.id)
+            try batch.setData(from: item, forDocument: documentRef)
+        }
+        
+//        try await modelDocumentRef.updateData([
+//            "availableItemCount": selectedModel.availableItemCount,
+//            "itemIds": selectedModel.itemIds
+//        ])
+        
+        try await batch.commit()
     }
 
     // MARK: Update Priamry Image
@@ -104,9 +127,9 @@ final class ModelViewModel {
             do {
                 let _ = try await imageRef.putDataAsync(imageData, metadata: metaData)
                 let imageURL = try await imageRef.downloadURL()
-                self.selectedModel.primaryImage.imageURL = imageURL
-                if self.selectedModel.primaryImage.imageType == .dirty {
-                    self.selectedModel.primaryImage.imageType = .model_primary
+                selectedModel.primaryImage.imageURL = imageURL
+                if selectedModel.primaryImage.imageType == .dirty {
+                    selectedModel.primaryImage.imageType = .model_primary
                 }
                 
             } catch {
@@ -116,11 +139,10 @@ final class ModelViewModel {
         } else {
             print("Error occurred when uploading image: no RDImage.uiImage = nil")
         }
-
     }
     
     
-    // MARK: New Update Model
+    // MARK: Update Model
     @MainActor
     func updateModel() async {
         do {
@@ -141,12 +163,14 @@ final class ModelViewModel {
                 resultImageType: .model_secondary
             )
 
-            // updateItems
-//            if selectedModel.itemCount != selectedModel.itemIds.count {
-////                self.items = try await updateModelItems()
-//                selectedModel.itemIds = try await getModelItems().map(\.id)
-//            }
-//            
+            // create items
+            let itemIdCount = selectedModel.itemIds.count
+            if itemCount != itemIdCount && itemIdCount == 0 { // create items if none exist
+                try await createModelItems()
+            }
+            
+            selectedModel.itemIds = try await getModelItems().map(\.id)
+                        
             // update model data
 
             selectedModel.nameLowercased = selectedModel.name.lowercased()
@@ -158,14 +182,13 @@ final class ModelViewModel {
             selectedModel.secondaryImages = newSecondaryImages
 
             // Firestore update
-            let modelReference = db.collection("models").document(selectedModel.id)
-            try modelReference.setData(from: selectedModel)
+            try modelDocumentRef.setData(from: selectedModel)
         } catch {
             print("Error updating model: \(error)")
         }
     }
     
-    // MARK: New Update Model
+    // MARK: Delete Model
     func deleteModel() async {
         do {
             // delete primary image
@@ -176,7 +199,7 @@ final class ModelViewModel {
                 resultImageType: .model_primary
             )
 
-            // upload secondary images
+            // delete secondary images
             for index in selectedModel.secondaryImages.indices {
                 selectedModel.secondaryImages[index].objectId = selectedModel.id
                 selectedModel.secondaryImages[index].imageType = .delete
@@ -186,16 +209,16 @@ final class ModelViewModel {
                 resultImageType: .model_secondary
             )
 
-            // delete model items
+            // delete items
             for itemId in self.selectedModel.itemIds {
                 try await self.db.collection("items").document(itemId).delete()
             }
             
             // Firestore update
-            try await db.collection("models").document(self.selectedModel.id).delete()
+            try await modelDocumentRef.delete()
             
         } catch {
-            print("Error updating model: \(error)")
+            print("Error deleting model: \(error)")
         }
     }
 }
