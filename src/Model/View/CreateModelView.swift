@@ -80,7 +80,14 @@ struct CreateModelView: View {
     private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                BackButton()
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .fontWeight(.bold)
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(.red)
+                }
             },
             header: {
                 ModelNameEntry()

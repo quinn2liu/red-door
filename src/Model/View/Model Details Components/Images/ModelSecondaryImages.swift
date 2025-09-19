@@ -44,6 +44,9 @@ struct ModelSecondaryImages: View {
         .sheet(item: $activeSheet) { activeSheet in
             if let editIndex = editIndex {
                 PickerSheet(item: activeSheet, editIndex: editIndex)
+                    .onDisappear {
+                        self.editIndex = nil
+                    }
             }
         }
         .frame(maxWidth: Constants.screenWidthPadding / 2,

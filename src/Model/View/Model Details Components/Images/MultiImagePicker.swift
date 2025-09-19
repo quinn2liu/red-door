@@ -46,11 +46,11 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
                     parent.selectedRDImages.append(newRDImage)
                 }
             }
-            parent.dismiss()
+            picker.dismiss(animated: true)
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.dismiss()
+            picker.dismiss(animated: true)
         }
     }
 }
@@ -85,31 +85,21 @@ struct MultiLibraryPicker: UIViewControllerRepresentable {
 
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             picker.dismiss(animated: true)
-            let group = DispatchGroup()
-
             for result in results {
-                guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else { continue }
-
-                group.enter()
-                result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
-                    if let image = object as? UIImage {
-                        let newRDImage = RDImage(uiImage: image)
-                        DispatchQueue.main.async {
-                            if self.parent.editIndex >= 0 && self.parent.editIndex < self.parent.selectedRDImages.count {
-                                // Replace existing image
-                                self.parent.selectedRDImages[self.parent.editIndex] = newRDImage
-                            } else {
-                                // Append if index is invalid or beyond array bounds
-                                self.parent.selectedRDImages.append(newRDImage)
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
+                        if let image = object as? UIImage {
+                            let newRDImage = RDImage(uiImage: image)
+                            DispatchQueue.main.async {
+                                if self.parent.editIndex >= 0 && self.parent.editIndex < self.parent.selectedRDImages.count {
+                                    self.parent.selectedRDImages[self.parent.editIndex] = newRDImage
+                                } else {
+                                    self.parent.selectedRDImages.append(newRDImage)
+                                }
                             }
                         }
                     }
-                    group.leave()
                 }
-            }
-
-            group.notify(queue: .main) {
-                self.parent.dismiss()
             }
         }
     }

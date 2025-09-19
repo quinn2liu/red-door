@@ -103,10 +103,10 @@ final class ModelViewModel {
             try batch.setData(from: item, forDocument: documentRef)
         }
         
-//        try await modelDocumentRef.updateData([
-//            "availableItemCount": selectedModel.availableItemCount,
-//            "itemIds": selectedModel.itemIds
-//        ])
+        try await modelDocumentRef.updateData([
+            "availableItemCount": selectedModel.availableItemCount,
+            "itemIds": selectedModel.itemIds
+        ])
         
         try await batch.commit()
     }
