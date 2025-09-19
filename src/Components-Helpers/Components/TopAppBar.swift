@@ -38,13 +38,12 @@ struct BackButton: View {
                 print("path reset triggered")
                 self.path?.wrappedValue = NavigationPath()
             } else {
-                print("dismiss triggered")
                 dismiss()
             }
         } label: {
             Image(systemName: "chevron.left")
                 .fontWeight(.bold)
-                .frame(width: 24, height: 24)
+                .frame(24)
         }.tint(.red)
     }
 }

@@ -14,6 +14,8 @@ struct ModelInventoryView: View {
     @State private var searchFocused: Bool = false
     @FocusState private var searchTextFocused: Bool
     
+    @State private var showCreateModelCover: Bool = false
+    
     // MARK: Body
     var body: some View {
         NavigationStack(path: $path) {
@@ -60,11 +62,15 @@ struct ModelInventoryView: View {
                 }
             }
             .rootNavigationDestinations(path: $path)
+            .fullScreenCover(isPresented: $showCreateModelCover) {
+                CreateModelView()
+            }
         }
     }
     
     // MARK: Top Bar
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder
+    private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
                 Text("Inventory")
@@ -86,7 +92,18 @@ struct ModelInventoryView: View {
                         }
                     }
                     
-                    ToolBarMenu()
+                    NavigationLink(destination: ScanItemView()) {
+                        Image(systemName: "qrcode.viewfinder")
+                    }
+                    
+                    Button {
+                        showCreateModelCover = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+//                    NavigationLink(destination: CreateItemview()) {
+//                        Image(systemName: "plus")
+//                    }
                 }
             }
         ).tint(.red)
@@ -154,20 +171,6 @@ struct ModelInventoryView: View {
         }
     }
     
-    // MARK: ToolBarMenu
-    @ViewBuilder private func ToolBarMenu() -> some View {
-        Menu {
-            NavigationLink(destination: CreateModelView()) {
-                Label("Add Item", systemImage: "plus")
-            }
-            NavigationLink(destination: ScanItemView()) {
-                Label("Scan Item", systemImage: "qrcode.viewfinder")
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(.red)
-        }
-    }
     
     // MARK: Fetch Models (Using the Abstracted ViewModel)
     private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {

@@ -32,20 +32,22 @@ struct CreateModelView: View {
             VStack(spacing: 12) {
                 TopBar()
                             
-                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
-                                        
-                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
-                
-                Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1...100, step: 1)
+                ScrollView(.vertical) {
+                    ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                                            
+                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
                     
-                RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
-                    saveModel()
+                    Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1...100, step: 1)
+                        
+                    RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
+                        saveModel()
+                    }
                 }
             }
             .toolbar(.hidden)
             .frameTop()
+            .frameTopPadding()
             .frameHorizontalPadding()
-            .ignoresSafeArea(.keyboard)
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
                     .animation(.easeInOut(duration: 0.3), value: isImageSelected)
@@ -78,7 +80,14 @@ struct CreateModelView: View {
     private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                BackButton()
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .fontWeight(.bold)
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(.red)
+                }
             },
             header: {
                 ModelNameEntry()
