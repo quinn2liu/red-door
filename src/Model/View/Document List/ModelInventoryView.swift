@@ -101,9 +101,6 @@ struct ModelInventoryView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-//                    NavigationLink(destination: CreateItemview()) {
-//                        Image(systemName: "plus")
-//                    }
                 }
             }
         ).tint(.red)
@@ -167,6 +164,13 @@ struct ModelInventoryView: View {
                         .padding()
                 }
                 
+            }
+        }
+        .refreshable {
+            Task {
+                if !isLoadingModels {
+                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+                }
             }
         }
     }

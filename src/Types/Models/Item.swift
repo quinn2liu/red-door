@@ -14,12 +14,15 @@ struct Item: Identifiable, Codable, Hashable {
     var repair: Bool // whether the item needs to be repaired
     var isAvailable: Bool // whether item is available to be added to a list
     
-    init(modelId: String, id: String = UUID().uuidString, repair: Bool = false, listId: String = "warehouse-1", isAvailable: Bool = true) {
+    var image: RDImage
+    
+    init(modelId: String, id: String = UUID().uuidString, repair: Bool = false, listId: String = "warehouse-1", isAvailable: Bool = true, image: RDImage = RDImage()) {
         self.modelId = modelId
         self.id = id
         self.repair = repair
         self.listId = listId
         self.isAvailable = isAvailable
+        self.image = image
     }
 }
 
