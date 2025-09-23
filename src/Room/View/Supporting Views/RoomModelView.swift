@@ -15,7 +15,6 @@ struct RoomModelView: View {
     @Binding private var roomViewModel: RoomViewModel
     
     // MARK: State Variables
-    @State private var items: [Item] = []
     @State private var showingDeleteAlert = false
     
     // MARK: RD Image Refactor
@@ -38,7 +37,7 @@ struct RoomModelView: View {
                     ModelDetailsView(isEditing: false, viewModel: $modelViewModel)
                 }
                 Section("Items") {
-                    ItemListView(items: items, isEditing: false, viewModel: modelViewModel)
+                    ModelItemListView(viewModel: modelViewModel)
                 }
             }
             .toolbar {
@@ -48,8 +47,8 @@ struct RoomModelView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
         }
-        .onAppear {
-            getInitialData()
+        .task {
+            await loadItems()
         }
         .overlay(
             ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
@@ -65,14 +64,13 @@ struct RoomModelView: View {
         }
     }
     
-    private func getInitialData() {
-        Task {
-            self.items = try await modelViewModel.getModelItems()
+    // MARK: loadItems()
+    private func loadItems() async {
+        do {
+            modelViewModel.items = try await modelViewModel.getModelItems()
+        } catch {
+            print("Error loading model items: \(error.localizedDescription)")
         }
     }
-} // struct
-
-//#Preview {
-//    ItemView(path: Binding<NavigationPath>, model: Model(), isAdding: true, isEditing: true)
-//}
+}
 

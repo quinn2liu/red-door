@@ -34,30 +34,6 @@ final class ModelViewModel {
         self.imageManager = imageManager
     }
     
-    // MARK: Create Model Items
-    func createModelItemsFirebase() {
-//        let batch = db.batch()
-//        
-//        for _ in (1...selectedModel.itemCount) {
-//            let itemId = "item-\(UUID().uuidString)"
-//            let item: Item = Item(modelId: selectedModel.id, id: itemId, repair: false)
-//            selectedModel.itemIds.append(itemId)
-//            selectedModel.availableItemIds.append(itemId)
-//            let documentRef = db.collection("items").document(itemId)
-//            do {
-//                try batch.setData(from: item, forDocument: documentRef)
-//            } catch {
-//                print("Error adding item: \(itemId): \(error)")
-//            }
-//        }
-//        
-//        batch.commit { err in
-//            if let err {
-//                print("Error writing batch: \(err)")
-//            }
-//        }
-    }
-    
     // MARK: Create Single Model Item
     func createSingleModelItem() async throws {
         let item = Item(modelId: selectedModel.id)
@@ -102,11 +78,6 @@ final class ModelViewModel {
             let documentRef = collectionRef.document(item.id)
             try batch.setData(from: item, forDocument: documentRef)
         }
-        
-        try await modelDocumentRef.updateData([
-            "availableItemCount": selectedModel.availableItemCount,
-            "itemIds": selectedModel.itemIds
-        ])
         
         try await batch.commit()
     }
@@ -169,10 +140,11 @@ final class ModelViewModel {
                 try await createModelItems()
             }
             
-            selectedModel.itemIds = try await getModelItems().map(\.id)
+            // fetch updated models
+            items = try await getModelItems()
+            selectedModel.itemIds = items.map(\.id)
                         
             // update model data
-
             selectedModel.nameLowercased = selectedModel.name.lowercased()
             if let newPrimaryImage {
                 selectedModel.primaryImage = newPrimaryImage

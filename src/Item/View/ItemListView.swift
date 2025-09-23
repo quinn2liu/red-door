@@ -1,53 +1,55 @@
 //
-//  ItemListView.swift
+//  ModelItemListView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/9/25.
 //
 
 import SwiftUI
+import CachedAsyncImage
 
-struct ItemListView: View {
+struct ModelItemListView: View {
     
-    var items: [Item]
-    var isEditing: Bool
     @State var viewModel: ModelViewModel
     @State var listExpanded: Bool = false
     
     var body: some View {
-        
-        if isEditing {
-            TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "plus", text: "Add Item") {
-                Task {
-                    try await viewModel.createSingleModelItem()
-                }
-            }
-        } else {
-            HStack {
-                Text("Item Count: \(viewModel.itemCount)")
-                Spacer()
-                Image(systemName: listExpanded ? "minus" : "plus")
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                listExpanded.toggle()
-            }
-          
+        HStack {
+            Text("Item Count: \(viewModel.itemCount)")
+            Spacer()
+            Image(systemName: listExpanded ? "minus" : "plus")
+        }
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            listExpanded.toggle()
         }
         
-        if !items.isEmpty && listExpanded {
-//            List {
-            ForEach(items, id: \.self) { item in
-                NavigationLink(value: item) {
-                    ItemListItemView(item: item, model: viewModel.selectedModel)
+        if !viewModel.items.isEmpty && listExpanded {
+            NavigationLink(destination: ModelItemListDetailView(modelViewModel: $viewModel)) {
+                VStack(spacing: 0) {
+                    ForEach(viewModel.items, id: \.self) { item in
+                        ModelItemListItem(item)
+                    }
                 }
             }
-//            }
         }
     }
+    
+    @ViewBuilder
+    private func ModelItemListItem(_ item: Item) -> some View {
+        let model = viewModel.selectedModel
+        
+        HStack {
+            if item.image.imageExists {
+                CachedAsyncImage(url: item.image.imageURL)
+            } else {
+                Image(systemName: "photo.badge.plus")
+            }
+            Text(item.id)
+            Text(model.type)
+            Text(item.repair.description)
+        }
+       
+    }
 }
-
-//#Preview {
-//    ItemListView()
-//}
