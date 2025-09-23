@@ -11,49 +11,47 @@ import CachedAsyncImage
 struct ModelItemListDetailView: View {
     @Binding var modelViewModel: ModelViewModel
     
-    // Image selected variables
     @State private var selectedRDImage: RDImage?
     @State private var isImageSelected: Bool = false
+    
+    private var model: Model {
+        modelViewModel.selectedModel
+    }
     
     var body: some View {
         VStack(spacing: 12) {
             TopBar()
             
-            ModelPrimaryImage(primaryRDImage: Binding.constant(modelViewModel.selectedModel.primaryImage), selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: Binding.constant(false))
+            ModelInformation()
             
             ForEach(modelViewModel.items, id: \.self) { item in
-                // TODO: update this with the Route enum
                 NavigationLink(destination: ItemDetailView(item: item)) {
                     ItemListItem(item)
                 }
             }
-            
         }
         .frameTop()
         .frameHorizontalPadding()
         .toolbar(.hidden)
         .overlay(
-            ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+            ModelRDImageOverlay(selectedRDImage: selectedRDImage,
+                                isImageSelected: $isImageSelected)
         )
     }
-        
     
+    // MARK: Top Bar
     @ViewBuilder
     private func TopBar() -> some View {
-        TopAppBar(leadingIcon: {
-            BackButton()
-        }, header: {
-            Text(modelViewModel.selectedModel.name)
-        }, trailingIcon: {
-            Spacer().frame(24)
-        })
+        TopAppBar(
+            leadingIcon: { BackButton() },
+            header: { Text(model.name) },
+            trailingIcon: { Spacer().frame(24) }
+        )
     }
     
     // MARK: Item List Item
     @ViewBuilder
     private func ItemListItem(_ item: Item) -> some View {
-        let model = modelViewModel.selectedModel
-        
         HStack {
             if item.image.imageExists {
                 CachedAsyncImage(url: item.image.imageURL)
@@ -63,6 +61,27 @@ struct ModelItemListDetailView: View {
             Text(item.id)
             Text(model.type)
             Text(item.repair.description)
+        }
+    }
+    
+    // MARK: Model Information
+    @ViewBuilder
+    private func ModelInformation() -> some View {
+        HStack(spacing: 0) {
+            ModelPrimaryImage(
+                primaryRDImage: Binding.constant(model.primaryImage),
+                selectedRDImage: $selectedRDImage,
+                isImageSelected: $isImageSelected,
+                isEditing: Binding.constant(false)
+            )
+            
+            Spacer()
+            
+            VStack(spacing: 0) {
+                Text("Type: \(model.type)")
+                Text("Primary Color: \(model.primaryColor)")
+                Text("Primary Material: \(model.primaryMaterial)")
+            }
         }
     }
 }

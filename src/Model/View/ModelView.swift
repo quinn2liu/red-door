@@ -12,8 +12,7 @@ import CachedAsyncImage
 struct ModelView: View {
     // Environment variables
     @Environment(\.dismiss) private var dismiss
-    @State private var isEditing: Bool = false
-
+    
     // Data
     @State private var viewModel: ModelViewModel
     @State private var backupModel: Model?
@@ -21,7 +20,8 @@ struct ModelView: View {
     // Presented variables
     @State private var showDeleteAlert: Bool = false
     @State private var isLoading: Bool = false
-    @State private var showItemList: Bool = false
+    @State private var isEditingModel: Bool = false
+    @State private var showEditingItems: Bool = false
     
     // Image selected variables
     @State private var selectedRDImage: RDImage?
@@ -38,14 +38,14 @@ struct ModelView: View {
             VStack(spacing: 12) {
                 TopBar()
                 
-                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditingModel)
                                 
-                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                ModelDetailsView(isEditing: isEditingModel, viewModel: $viewModel)
                 
                 ItemListView()
                 
                 HStack {
-                    if isEditing {
+                    if isEditingModel {
                         Button("Delete Model") {
                             showDeleteAlert = true
                         }
@@ -69,12 +69,14 @@ struct ModelView: View {
                     } else {
                         Button("Add Item to Pull List") { }
                     }
-                    
                 }
             }
             .frameTop()
             .frameHorizontalPadding()
             .toolbar(.hidden)
+            .sheet(isPresented: $showEditingItems) {
+                EditItemsSheet()
+            }
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
             )
@@ -96,7 +98,7 @@ struct ModelView: View {
     // MARK: Model Name
     @ViewBuilder
     private func ModelNameView() -> some View {
-        if isEditing {
+        if isEditingModel {
             HStack {
                 TextField("", text: $viewModel.selectedModel.name)
                     .padding(6)
@@ -118,12 +120,12 @@ struct ModelView: View {
     private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                if isEditing {
+                if isEditingModel {
                     Button {
                         if let backup = backupModel {
                             viewModel.selectedModel = backup
                         }
-                        isEditing = false
+                        isEditingModel = false
                     } label: {
                         Text("Cancel")
                     }
@@ -136,20 +138,20 @@ struct ModelView: View {
             },
             trailingIcon: {
                 Button {
-                    if isEditing {
+                    if isEditingModel {
                         saveModel()
-                        isEditing = false
+                        isEditingModel = false
                     } else {
                         backupModel = viewModel.selectedModel
-                        isEditing = true
+                        isEditingModel = true
                     }
                 } label: {
-                    Text(isEditing ? "Done" : "Edit")
+                    Text(isEditingModel ? "Save" : "Edit")
                 }
             }
         )
     }
-    
+
     
     // MARK: - Item List View
     @ViewBuilder
@@ -157,19 +159,20 @@ struct ModelView: View {
         VStack(spacing: 12) {
             HStack {
                 Text("Item Count: \(viewModel.itemCount)")
+                
                 Spacer()
-                Image(systemName: showItemList ? "minus" : "plus")
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                showItemList.toggle()
+                
+                Button {
+                    showEditingItems = true
+                } label: {
+                    Text("Edit")
+                }
             }
             
-            if !viewModel.items.isEmpty && showItemList {
-                NavigationLink(destination: ModelItemListDetailView(modelViewModel: $viewModel)) {
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.items, id: \.self) { item in
+            if !viewModel.items.isEmpty {
+                VStack(spacing: 0) {
+                    ForEach(viewModel.items, id: \.self) { item in
+                        NavigationLink(value: item) {
                             ItemListItem(item)
                         }
                     }
@@ -195,8 +198,16 @@ struct ModelView: View {
         }
     }
     
-    // MARK: - Helper Functions
+    // MARK: EditItemsSheet
+    // TODO: maybe put this in separate file...?
+    @ViewBuilder
+    private func EditItemsSheet() -> some View {
+        ForEach(viewModel.items, id: \.self) { item in
+            ItemListItem(item)
+        }
+    }
     
+    // MARK: - Helper Functions
     private func saveModel() {
         isLoading = true
         Task {
