@@ -8,12 +8,11 @@
 import Foundation
 import Firebase
 
-@MainActor
 @Observable
 class RoomViewModel {
     var selectedRoom: Room
     var items: [Item] = [] // for display
-    var models: [String: Model] = [:] // mapping modelId to model, for display
+    var modelsById: [String: Model] = [:] // mapping modelId to model, for display
     
     let db = Firestore.firestore()
     
@@ -50,23 +49,15 @@ extension RoomViewModel {
     
     // MARK: addItemToRoomDraft()
     func addItemToRoomDraft(item: Item) -> Bool {
+        let roomRef = db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(selectedRoom.id)
         
-        var itemIdsSet = Set(selectedRoom.itemIds)
+        var itemIdsSet = Set(selectedRoom.itemModelMap.keys)
         let (inserted, _) = itemIdsSet.insert(item.id)
-        if inserted { // the itemId doesn't already exist in the room's items
-            selectedRoom.itemIds = Array(itemIdsSet)
-            
-            let pullListRef = db.collection("pull_lists").document(selectedRoom.listId)
-            let roomRef = pullListRef.collection("rooms").document(selectedRoom.id)
-
+        if inserted { // the itemId doesn't already exist in the room's items and was added
+            selectedRoom.itemModelMap.updateValue(item.modelId, forKey: item.id) // insert into map
+        
             // update the room with the new item
-            roomRef.updateData([
-                "itemIds": FieldValue.arrayUnion([item.id])
-            ]) { error in
-                if let error = error {
-                    print("Error adding item to room: \(error)")
-                }
-            }
+            roomRef.setData(["itemModelMap": selectedRoom.itemModelMap])
             return true
         } else { // itemId already exists for the room
             return false
@@ -76,18 +67,20 @@ extension RoomViewModel {
     
     // MARK: Load Items and Models
     func loadItemsAndModels() async {
-        if !selectedRoom.itemIds.isEmpty {
+        if !selectedRoom.itemModelMap.isEmpty {
             await loadItems()
             await loadModelsForItems()
         }
     }
 
     // MARK: Load Items
+    @MainActor
     private func loadItems() async {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
+            let itemIds = Array(selectedRoom.itemModelMap.keys)
             let itemsRef = db.collection("items")
-                .whereField("id", in: selectedRoom.itemIds)
+                .whereField("id", in: itemIds)
             
             let snapshot = try await itemsRef.getDocuments()
             
@@ -96,16 +89,14 @@ extension RoomViewModel {
                 try? Firestore.Decoder().decode(Item.self, from: document.data())
             }
             
-            // Update the items on the main thread
-            await MainActor.run {
-                self.items = fetchedItems
-            }
+            self.items = fetchedItems
         } catch {
             print("Error loading items for room \(selectedRoom.id): \(error)")
         }
     }
 
     // MARK: Load Models for Items
+    @MainActor
     private func loadModelsForItems() async {
         // Only proceed if we have items
         guard !items.isEmpty else { return }
@@ -131,10 +122,7 @@ extension RoomViewModel {
             // Create the dictionary from the array of tuples
             let modelDict = Dictionary(uniqueKeysWithValues: fetchedModels)
             
-            // Update the models dictionary on the main thread
-            await MainActor.run {
-                self.models = modelDict
-            }
+            self.modelsById = modelDict
         } catch {
             print("Error loading models for items: \(error)")
         }
@@ -143,6 +131,6 @@ extension RoomViewModel {
     // MARK: Get Model for Item
     // Helper function to easily get a model for a given item
     func getModelForItem(_ item: Item) -> Model? {
-        return models[item.modelId]
+        return modelsById[item.modelId]
     }
 }

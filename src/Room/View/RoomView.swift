@@ -31,7 +31,7 @@ struct RoomView: View {
                 Spacer()
                 
                 if !isEditing {
-                    Text("Items \(viewModel.selectedRoom.itemIds.count)")
+                    Text("Items \(viewModel.selectedRoom.itemModelMap.count)")
                 }
                 
                 Button {
@@ -64,7 +64,7 @@ struct RoomView: View {
                 await viewModel.loadItemsAndModels()
             }
         }
-        .onChange(of: viewModel.selectedRoom.itemIds) {
+        .onChange(of: viewModel.selectedRoom.itemModelMap) { // TODO: not auto-reload?
             Task {
                 await viewModel.loadItemsAndModels()
             }

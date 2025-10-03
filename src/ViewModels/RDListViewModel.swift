@@ -144,7 +144,7 @@ extension RDListViewModel {
                 var modelItemCounts: [String:Int] = [:]
                 
                 for room in self.rooms {
-                    for itemId in room.itemIds {
+                    for itemId in room.itemModelMap.keys {
                         let itemRef = self.db.collection("items").document(itemId)
                         guard let itemSnap = try? transaction.getDocument(itemRef),
                         let item = try? itemSnap.data(as: Item.self) else { continue }
