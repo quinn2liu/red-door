@@ -50,6 +50,5 @@ struct ModelItemListView: View {
             Text(model.type)
             Text(item.repair.description)
         }
-       
     }
 }

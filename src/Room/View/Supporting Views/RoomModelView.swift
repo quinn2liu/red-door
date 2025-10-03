@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct RoomModelView: View {
     
@@ -30,23 +31,19 @@ struct RoomModelView: View {
     // MARK: Body
     var body: some View {
         VStack(spacing: 0) {
-            Form {
-                ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
-                
-                Section("Details") {
-                    ModelDetailsView(isEditing: false, viewModel: $modelViewModel)
-                }
-                Section("Items") {
-                    ModelItemListView(viewModel: modelViewModel)
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ModelNameView()
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
+            ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
+            
+            ModelDetailsView(isEditing: false, viewModel: $modelViewModel)
+        
+            // TODO: rename this
+            ModelItemList()
         }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                ModelNameView()
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadItems()
         }
@@ -61,6 +58,45 @@ struct RoomModelView: View {
             Text("Name:")
                 .font(.headline)
             Text(modelViewModel.selectedModel.name)
+        }
+    }
+    
+    @ViewBuilder
+    private func ModelItemList() -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Item Count: \(modelViewModel.itemCount)")
+                Spacer()
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            
+            if !modelViewModel.items.isEmpty {
+                VStack(spacing: 0) {
+                    ForEach(modelViewModel.items, id: \.self) { item in
+                        NavigationLink(destination: RoomItemView(item: item, roomViewModel: $roomViewModel)) {
+                            ModelItemListItem(item)
+                        }
+                    }
+                }
+            }
+        }
+    }
+        
+        
+    @ViewBuilder
+    private func ModelItemListItem(_ item: Item) -> some View {
+        let model = modelViewModel.selectedModel
+        
+        HStack {
+            if item.image.imageExists {
+                CachedAsyncImage(url: item.image.imageURL)
+            } else {
+                Image(systemName: "photo.badge.plus")
+            }
+            Text(item.id)
+            Text(model.type)
+            Text(item.repair.description)
         }
     }
     

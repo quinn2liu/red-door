@@ -49,7 +49,8 @@ struct PullListDetailsView: View {
     }
     
     // MARK: TopBar()
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder
+    private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             if isEditing {
                 Button {
@@ -92,7 +93,8 @@ struct PullListDetailsView: View {
     }
     
     // MARK: PullListDetails()
-    @ViewBuilder private func PullListDetails() -> some View {
+    @ViewBuilder
+    private func PullListDetails() -> some View {
         
         VStack(spacing: 12) {
             if isEditing {
@@ -117,7 +119,8 @@ struct PullListDetailsView: View {
     }
     
     // MARK: RoomList()
-    @ViewBuilder private func RoomList() -> some View {
+    @ViewBuilder
+    private func RoomList() -> some View {
         VStack(spacing: 12) {
             ScrollView {
                 LazyVStack {
@@ -140,7 +143,8 @@ struct PullListDetailsView: View {
         }
     }
     
-    @ViewBuilder private func Footer() -> some View {
+    @ViewBuilder
+    private func Footer() -> some View {
         if isEditing {
             HStack {
                 Button("Delete Pull List") {

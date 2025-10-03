@@ -181,7 +181,7 @@ struct ModelInventoryView: View {
         var filters: [String: Any] = [:]
         
         if let modelType {
-            filters.updateValue(modelType, forKey: "type")
+            filters.updateValue(modelType.rawValue, forKey: "type")
         }
         
         if let searchText {

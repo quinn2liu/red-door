@@ -160,7 +160,7 @@ struct InstalledListDetailView: View {
                 RedDoorButton(type: .green, text: "Create Installed List") {
                     Task {
                         let installedList = await viewModel.createInstalledFromPull()
-                        path.append(installedList)
+//                        path.append(installedList)
                     }
                 }
             }

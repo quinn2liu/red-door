@@ -12,18 +12,24 @@ import PhotosUI
 import SwiftUI
 import FirebaseStorage
 
-@MainActor
 @Observable
 class RDListViewModel {
     
+    // current data
     var selectedList: RDList
     var rooms: [Room]
     
+    // firebase
     let db = Firestore.firestore()
+    let listDocumentRef: DocumentReference
+    let roomsDocumentRef: CollectionReference
     
     init(selectedList: RDList = RDList(), rooms: [Room] = []) {
         self.selectedList = selectedList
         self.rooms = rooms
+        
+        self.listDocumentRef = db.collection("\(selectedList.listType.collectionString)").document("\(selectedList.id)")
+        self.roomsDocumentRef = listDocumentRef.collection("rooms")
     }
     
     var selectedListReference: DocumentReference {
@@ -58,7 +64,9 @@ extension RDListViewModel {
         }
     }
     
+    
     // MARK: Refresh PL
+    @MainActor
     func refreshPullList() async {
         do {
             let document = try await selectedListReference.getDocument()
@@ -68,10 +76,10 @@ extension RDListViewModel {
                 let updatedPullList = try JSONDecoder().decode(RDList.self, from: jsonData)
                 
                 // Update selectedInstalledList on the main thread
-                if self.selectedList != updatedPullList {
-                    DispatchQueue.main.async {
-                        self.selectedList = updatedPullList
-                    }
+                if selectedList != updatedPullList {
+//                    DispatchQueue.main.async {
+                        selectedList = updatedPullList
+//                    }
                 }
                 
                 // Refresh rooms
@@ -105,86 +113,68 @@ extension RDListViewModel {
 // MARK: - Installed List
 extension RDListViewModel {
     
-    // MARK: Create IL
-    func createInstalledFromPull() async -> RDList {
-        // creating installed list
-        let installedList: RDList = RDList(pullList: selectedList)
-        let installedListReference: DocumentReference = db.collection("installed_lists").document(installedList.id)
+    // MARK: Create Installed List from Pull List
+    func createInstalledFromPull() async -> RDList? {
+        let installedList = RDList(pullList: selectedList, listType: .installed_list)
+        let installedListRef = db.collection("installed_lists").document(installedList.id)
+        let roomsRef = installedListRef.collection("rooms")
         
         do {
-            try installedListReference.setData(from: installedList)
-        } catch {
-            print("Error adding installed list: \(installedList.id): \(error)")
-        }
-        
-        // creating the rooms
-        do {
-            let installedListRoomReference = installedListReference.collection("rooms")
-            
-            if !rooms.isEmpty {
-                let roomsBatch = db.batch()
+            let result = try await db.runTransaction { transaction, errorPointer in
+                // 1. Create installed list
+                do {
+                    try transaction.setData(from: installedList, forDocument: installedListRef)
+                } catch {
+                    print("Error creating installedList document: (\(error.localizedDescription))")
+                    return nil
+                }
                 
-                rooms.forEach { room in
-                    let roomRef = installedListRoomReference.document(room.id)
-                    
+                // 2. Copy rooms
+                for room in self.rooms {
+                    let roomRef = roomsRef.document(room.id)
                     do {
-                        try roomsBatch.setData(from: room, forDocument: roomRef)
+                        try transaction.setData(from: room, forDocument: roomRef)
                     } catch {
-                        print("Error adding item: \(room.id): \(error)")
+                        print("Error creating installedList rooms documents: (\(error.localizedDescription))")
+                        return nil
                     }
                 }
                 
-                // committing batch
-                try await roomsBatch.commit()
-            }
-        } catch {
-            print("Error creating installed list rooms: \(error.localizedDescription)")
-        }
-        
-        // update listID of each of the items and the items
-        let itemsBatch = db.batch()
-        var modelIdSet: Set<String> = []
-        var itemIdSet: Set<String> = []
-        do {
-            for room in rooms {
-                for itemId in room.itemIds {
-                    let docRef = db.collection("items").document(itemId)
-                    itemsBatch.updateData(["listId": installedList.id], forDocument: docRef)
-                    
-                    itemIdSet.insert(itemId)
-                    
-                    let snapshot = try await docRef.getDocument()
-                    if let itemData = snapshot.data(), let modelId = itemData["modelId"] as? String {
-                        modelIdSet.insert(modelId)
+                // 3. Update items + collect model counts
+                var modelItemCounts: [String:Int] = [:]
+                
+                for room in self.rooms {
+                    for itemId in room.itemIds {
+                        let itemRef = self.db.collection("items").document(itemId)
+                        guard let itemSnap = try? transaction.getDocument(itemRef),
+                        let item = try? itemSnap.data(as: Item.self) else { continue }
+                        transaction.updateData([
+                            "listId": installedList.id,
+                            "isAvailable": false
+                        ], forDocument: itemRef)
+
+                        modelItemCounts[item.modelId, default: 0] += 1
                     }
                 }
-            }
-
-            try await itemsBatch.commit()
-        } catch {
-            print("Batch items listId update failed: \(error.localizedDescription)")
-        }
-        
-        // update models' availableItemIds by removing updated itemIds
-        do {
-            for modelId in modelIdSet {
-                let modelRef = db.collection("models").document(modelId)
-                let snapshot = try await modelRef.getDocument()
-                if let data = snapshot.data(), var availableItemIds = data["availableItemIds"] as? [String] {
-                    availableItemIds.removeAll(where: { itemIdSet.contains($0) })
-                    let update: [String: [String]] = ["availableItemIds": availableItemIds]
-                    try await modelRef.updateData(update)
+                
+                // 4. Update models with increments
+                for (modelId, installedItemCount) in modelItemCounts {
+                    let modelRef = self.db.collection("models").document(modelId)
+                    
+                    transaction.updateData([
+                        "availableItemCount": FieldValue.increment(Int64(-installedItemCount))
+                    ], forDocument: modelRef)
                 }
+                
+                return installedList
             }
+            
+            return result as? RDList
         } catch {
-            print("Error updating Models' availableItemIds: \(error.localizedDescription)")
+            print("Transaction failed: \(error.localizedDescription)")
+            return installedList
         }
-        
-        // DELETE PULL LIST (not implemented for now)
-        
-        return installedList
     }
-    
 }
 
 // MARK: - Room
@@ -217,6 +207,7 @@ extension RDListViewModel {
     }
     
     // MARK: Load Rooms
+    @MainActor
     func loadRooms() async {
         let roomRef = selectedListReference.collection("rooms")
         

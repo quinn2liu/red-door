@@ -9,17 +9,20 @@ import Foundation
 
 struct Room: Codable, Identifiable, Hashable {
     
+    // TODO: don't love coupling meaning into the ID
     var id: String // listId + roomName(spaces replaced by -, lowercased), separated by ";" ex: (adslkfasdflkjasdkl;living-room)
     
     var roomName: String
     var listId: String // Id of parent list (pull list or installed list)
     var itemIds: [String] = [String]() // itemIDs in the room
+    var itemToModelIds: [String: String] = [:]
 
     init(roomName: String, contents: [String] = [], listId: String) {
         self.id = listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
         self.roomName = roomName
         self.listId = listId
         self.itemIds = contents
+        self.itemToModelIds
     }
 }
 

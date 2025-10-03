@@ -195,32 +195,29 @@ struct RoomAddItemsSheet: View {
     }
     
     // MARK: Fetch Models (Using the Abstracted ViewModel)
+    @MainActor
     private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {
+        isLoadingModels = true
+        
         var filters: [String: Any] = [:]
+        filters["itemsAvailable"] = true
         
         if let modelType {
-            filters.updateValue(modelType, forKey: "type")
+            filters["type"] = modelType.rawValue
         }
         
         if let searchText {
-            filters.updateValue(searchText.lowercased(), forKey: "nameLowercased")
+            filters["nameLowercased"] = searchText.lowercased()
         }
         
-        DispatchQueue.main.async {
-            isLoadingModels = true
-        }
-
         if isInitial {
             await inventoryViewModel.fetchInitialDocuments(filters: filters)
         } else {
             await inventoryViewModel.fetchMoreDocuments(filters: filters)
         }
-
-        DispatchQueue.main.async {
-            isLoadingModels = false
-        }
+        
+        isLoadingModels = false
     }
-    
 }
 
 //#Preview {
