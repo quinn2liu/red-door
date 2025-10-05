@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: make the edit view a sheet (should only be editing the metadata of the pull list)
 struct PullListDetailsView: View {
     
     @Environment(\.dismiss) private var dismiss
@@ -125,7 +126,7 @@ struct PullListDetailsView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomView(room: room)
+                        RoomListItemView(room: room)
                     }
                 }
             }

@@ -16,6 +16,8 @@ class RoomViewModel {
     
     let db = Firestore.firestore()
     
+    var modelsLoaded = false
+    
     // MARK: init/deinit
     init(room: Room) {
         self.selectedRoom = room
@@ -68,14 +70,14 @@ extension RoomViewModel {
     // MARK: Load Items and Models
     func loadItemsAndModels() async {
         if !selectedRoom.itemModelMap.isEmpty {
-            await loadItems()
-            await loadModelsForItems()
+            await getRoomItems()
+            await getRoomModels()
         }
     }
 
     // MARK: Load Items
     @MainActor
-    private func loadItems() async {
+    func getRoomItems() async {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
             let itemIds = Array(selectedRoom.itemModelMap.keys)
@@ -97,34 +99,31 @@ extension RoomViewModel {
 
     // MARK: Load Models for Items
     @MainActor
-    private func loadModelsForItems() async {
-        // Only proceed if we have items
-        guard !items.isEmpty else { return }
-        
-        // Get unique modelIds from the items
-        let modelIds = Set(items.map { $0.modelId })
-        
-        do {
-            // Fetch models with those IDs
-            let modelsRef = db.collection("models")
-                .whereField("id", in: Array(modelIds))
+    func getRoomModels(reloadModels: Bool = false) async {
+        if !modelsLoaded || reloadModels {
+            let modelIds = Set(selectedRoom.itemModelMap.values)
             
-            let snapshot = try await modelsRef.getDocuments()
-            
-            // Create dictionary mapping modelId to Model - do this outside of concurrent context
-            let fetchedModels = snapshot.documents.compactMap { document -> (String, Model)? in
-                guard let model = try? Firestore.Decoder().decode(Model.self, from: document.data()) else {
-                    return nil
+            do {
+                // Fetch models with those IDs
+                let modelsRef = db.collection("models")
+                    .whereField("id", in: Array(modelIds))
+                
+                let snapshot = try await modelsRef.getDocuments()
+                
+                // Create dictionary mapping modelId to Model - do this outside of concurrent context
+                let fetchedModelTuples = try snapshot.documents.map { document -> (String, Model) in
+                    let model = try Firestore.Decoder().decode(Model.self, from: document.data())
+                    return (model.id, model)
                 }
-                return (model.id, model)
+                
+                // Create the dictionary from the array of tuples
+                let modelDict = Dictionary(fetchedModelTuples, uniquingKeysWith: { (first, _) in first })
+                
+                modelsById = modelDict
+                modelsLoaded = true
+            } catch {
+                print("Error loading models for items: \(error)")
             }
-            
-            // Create the dictionary from the array of tuples
-            let modelDict = Dictionary(uniqueKeysWithValues: fetchedModels)
-            
-            self.modelsById = modelDict
-        } catch {
-            print("Error loading models for items: \(error)")
         }
     }
     
