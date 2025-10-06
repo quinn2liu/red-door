@@ -75,14 +75,10 @@ extension RDListViewModel {
                 let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
                 let updatedPullList = try JSONDecoder().decode(RDList.self, from: jsonData)
                 
-                // Update selectedInstalledList on the main thread
                 if selectedList != updatedPullList {
-//                    DispatchQueue.main.async {
-                        selectedList = updatedPullList
-//                    }
+                    selectedList = updatedPullList
                 }
                 
-                // Refresh rooms
                 await loadRooms()
             }
         } catch {
@@ -108,72 +104,114 @@ extension RDListViewModel {
         }
         selectedListReference.delete()
     }
+    
+    // MARK: Validate PL
+    func validatePullList() async throws { // throws PullListValidationError
+        var modelItemCounts: [String : Int] = [:] // modelId -> number of those Items that exist in PL
+        
+        // validate item availability
+        for room in rooms {
+            for (itemId, modelId) in room.itemModelMap {
+                modelItemCounts[modelId, default: 0] += 1
+                
+                let itemRef = db.collection("items").document(itemId)
+                let itemSnap = try await itemRef.getDocument() // only throws network, permission, or serialization errors
+                
+                guard itemSnap.exists else {
+                    throw PullListValidationError.itemDoesNotExist(id: itemId)
+                }
+                
+                if let isAvailable = itemSnap["isAvailable"] as? Bool {
+                    guard isAvailable else {
+                        throw PullListValidationError.itemNotAvailable(id: itemId)
+                    }
+                }
+                
+                // TODO: add code to validate location = warehouse when Location type is implemented
+            }
+        }
+        
+        // validate model availability
+        for (modelId, listItemCount) in modelItemCounts {
+            let modelRef = db.collection("models").document(modelId)
+            let modelSnap = try await modelRef.getDocument()
+            
+            guard modelSnap.exists else {
+                throw PullListValidationError.modelDoesNotExist(id: modelId)
+            }
+            
+            if let availableItemCount = modelSnap["availableItemCount"] as? Int {
+                if availableItemCount - listItemCount < 0 {
+                    throw PullListValidationError.modelAvailableCountInvalid(id: modelId)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Installed List
 extension RDListViewModel {
     
     // MARK: Create Installed List from Pull List
-    func createInstalledFromPull() async -> RDList? {
+    func createInstalledFromPull() async throws -> RDList {
         let installedList = RDList(pullList: selectedList, listType: .installed_list)
         let installedListRef = db.collection("installed_lists").document(installedList.id)
         let roomsRef = installedListRef.collection("rooms")
         
-        do {
-            let result = try await db.runTransaction { transaction, errorPointer in
-                // 1. Create installed list
-                do {
-                    try transaction.setData(from: installedList, forDocument: installedListRef)
-                } catch {
-                    print("Error creating installedList document: (\(error.localizedDescription))")
-                    return nil
-                }
-                
-                // 2. Copy rooms
-                for room in self.rooms {
-                    let roomRef = roomsRef.document(room.id)
-                    do {
-                        try transaction.setData(from: room, forDocument: roomRef)
-                    } catch {
-                        print("Error creating installedList rooms documents: (\(error.localizedDescription))")
-                        return nil
-                    }
-                }
-                
-                // 3. Update items + collect model counts
-                var modelItemCounts: [String:Int] = [:]
-                
-                for room in self.rooms {
-                    for itemId in room.itemModelMap.keys {
-                        let itemRef = self.db.collection("items").document(itemId)
-                        guard let itemSnap = try? transaction.getDocument(itemRef),
-                        let item = try? itemSnap.data(as: Item.self) else { continue }
-                        transaction.updateData([
-                            "listId": installedList.id,
-                            "isAvailable": false
-                        ], forDocument: itemRef)
-
-                        modelItemCounts[item.modelId, default: 0] += 1
-                    }
-                }
-                
-                // 4. Update models with increments
-                for (modelId, installedItemCount) in modelItemCounts {
-                    let modelRef = self.db.collection("models").document(modelId)
-                    
-                    transaction.updateData([
-                        "availableItemCount": FieldValue.increment(Int64(-installedItemCount))
-                    ], forDocument: modelRef)
-                }
-                
-                return installedList
+        try await validatePullList() // will throw PullListValidationErrors
+        
+        let result = try await db.runTransaction { transaction, errorPointer in
+            // 1. Create installed list
+            do {
+                try transaction.setData(from: installedList, forDocument: installedListRef)
+            } catch {
+                print("Error creating installedList document: (\(error.localizedDescription))")
+                return nil
             }
             
-            return result as? RDList
-        } catch {
-            print("Transaction failed: \(error.localizedDescription)")
+            // 2. Copy rooms
+            for room in self.rooms {
+                let roomRef = roomsRef.document(room.id)
+                do {
+                    try transaction.setData(from: room, forDocument: roomRef)
+                } catch {
+                    print("Error creating installedList rooms documents: (\(error.localizedDescription))")
+                    return nil
+                }
+            }
+            
+            // 3. Update items + collect model counts
+            var modelItemCounts: [String:Int] = [:]
+            
+            for room in self.rooms {
+                for (itemId, modelId) in room.itemModelMap {
+                    let itemRef = self.db.collection("items").document(itemId)
+                    transaction.updateData([
+                        "listId": installedList.id,
+                        "isAvailable": false
+                    ], forDocument: itemRef)
+
+                    modelItemCounts[modelId, default: 0] += 1
+                }
+            }
+            
+            // 4. Update models with increments
+            for (modelId, installedItemCount) in modelItemCounts {
+                let modelRef = self.db.collection("models").document(modelId)
+                
+                transaction.updateData([
+                    "availableItemCount": FieldValue.increment(Int64(-installedItemCount))
+                ], forDocument: modelRef)
+            }
+            
             return installedList
         }
+        
+        guard let installedList = result as? RDList else {
+            throw InstalledFromPullError.creationFailed
+        }
+        
+        return installedList
     }
 }
 

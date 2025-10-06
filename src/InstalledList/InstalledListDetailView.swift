@@ -154,16 +154,16 @@ struct InstalledListDetailView: View {
                 }
             }
         } else {
-            Button {
-                // turn into installed list
-            } label: {
-                RedDoorButton(type: .green, text: "Create Installed List") {
-                    Task {
-                        let installedList = await viewModel.createInstalledFromPull()
-//                        path.append(installedList)
-                    }
-                }
-            }
+//            Button {
+//                // turn into installed list
+//            } label: {
+//                RedDoorButton(type: .green, text: "Create Installed List") {
+//                    Task {
+//                        let installedList = await viewModel.createInstalledFromPull()
+////                        path.append(installedList)
+//                    }
+//                }
+//            }
         }
     }
 }

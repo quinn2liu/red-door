@@ -10,22 +10,26 @@ import SwiftUI
 // TODO: make the edit view a sheet (should only be editing the metadata of the pull list)
 struct PullListDetailsView: View {
     
+    // MARK: Navigation
     @Environment(\.dismiss) private var dismiss
-    @State private var viewModel: RDListViewModel
     @Binding var path: NavigationPath
+    
+    // MARK: View State
+    @FocusState private var keyboardFocused: Bool
+    @State private var isEditing: Bool = false
+    @State private var showSheet: Bool = false
+    @State private var showCreateRoom: Bool = false
+    @State private var errorMessage: String?
+    
+    // MARK: PullListData
+    @State private var addressQuery: String = ""
+    @State private var date: Date = Date()
+    @State private var viewModel: RDListViewModel
     
     init(pullList: RDList, path: Binding<NavigationPath>) {
         self.viewModel = RDListViewModel(selectedList: pullList)
         self._path = path
     }
-    
-    @FocusState private var keyboardFocused: Bool
-    @State private var isEditing: Bool = false
-    @State private var showSheet: Bool = false
-    @State private var showCreateRoom: Bool = false
-    
-    @State private var addressQuery: String = ""
-    @State private var date: Date = Date()
     
     var body: some View {
         VStack(spacing: 16) {
@@ -47,6 +51,16 @@ struct PullListDetailsView: View {
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
         .frameHorizontalPadding()
+        .alert("Pull List Not Valid",
+                       isPresented: .constant(errorMessage != nil),
+                       actions: {
+                           Button("Close") { errorMessage = nil }
+                       },
+                       message: {
+                           if let errorMessage = errorMessage {
+                               Text(errorMessage)
+                           }
+                       })
     }
     
     // MARK: TopBar()
@@ -144,6 +158,7 @@ struct PullListDetailsView: View {
         }
     }
     
+    // MARK: Footer()
     @ViewBuilder
     private func Footer() -> some View {
         if isEditing {
@@ -159,16 +174,36 @@ struct PullListDetailsView: View {
                 }
             }
         } else {
-            RedDoorButton(type: .green, text: "Create Installed List") {
-                Task {
-                    let installedList = await viewModel.createInstalledFromPull()
-                    path.append(installedList)
+            HStack(spacing: 12) {
+                Button {
+                    Task { // TODO: consider wrapping this in some error-handling function
+                        do {
+                            let installedlist = try await viewModel.createInstalledFromPull()
+                        } catch PullListValidationError.itemDoesNotExist(let id) {
+                            errorMessage = "Item \(id) does not exist."
+                        } catch PullListValidationError.itemNotAvailable(let id) {
+                            errorMessage = "Item \(id) is not available."
+                        } catch PullListValidationError.modelDoesNotExist(let id) {
+                            errorMessage = "Model \(id) does not exist."
+                        } catch PullListValidationError.modelAvailableCountInvalid(let id) {
+                            errorMessage = "Model \(id) has insufficient available items."
+                        } catch InstalledFromPullError.creationFailed {
+                            errorMessage = "Unable to create Installed list."
+                        } catch {
+                            errorMessage = "Unexpected error: \(error.localizedDescription)"
+                        }
+                        
+                    }
+                } label: {
+                    Text("Create Installed List")
+                }
+                
+                RedDoorButton(type: .blue, text: "Refresh Contents") {
+                    Task {
+                        await viewModel.refreshPullList()
+                    }
                 }
             }
         }
     }
 }
-// MARK: CREATE MOCK DATA
-//#Preview {
-//    PullListDetailsView()
-//}

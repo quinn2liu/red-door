@@ -27,10 +27,8 @@ struct RoomDetailsView: View {
         .sheet(isPresented: $showSheet) {
             RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showSheet)
         }
-        .onAppear {
-            Task {
-                await viewModel.loadItemsAndModels()
-            }
+        .task {
+            await viewModel.loadItemsAndModels()
         }
         .onChange(of: viewModel.selectedRoom.itemModelMap) { // TODO: not auto-reload?
             Task {
@@ -128,12 +126,13 @@ struct RoomDetailsView: View {
     }
     
     // MARK: EditRoomMenu()
-    @ViewBuilder private func EditRoomMenu() -> some View {
+    @ViewBuilder
+    private func EditRoomMenu() -> some View {
         Group {
             Button {
                 
             } label: {
-                HStack(spacing: 0) {
+                HStack(spacing: 0) { // TODO: replace with label item
                     Text("Delete Room")
                     
                     Spacer()
