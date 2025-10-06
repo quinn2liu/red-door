@@ -92,9 +92,8 @@ struct ModelInventoryView: View {
                         }
                     }
                     
-                    NavigationLink(destination: ScanItemView()) {
-                        Image(systemName: "qrcode.viewfinder")
-                    }
+                    // TODO: add scan button here
+                    Image(systemName: "qrcode.viewfinder")
                     
                     Button {
                         showCreateModelCover = true

@@ -10,11 +10,11 @@ import Firebase
 
 @Observable
 class RoomViewModel {
+    static let db = Firestore.firestore()
+    
     var selectedRoom: Room
     var items: [Item] = [] // for display
     var modelsById: [String: Model] = [:] // mapping modelId to model, for display
-    
-    let db = Firestore.firestore()
     
     var modelsLoaded = false
     
@@ -29,7 +29,7 @@ class RoomViewModel {
     
     // MARK: updateRoom
     func updateRoom() {
-        let roomRef = db.collection("pull_lists")
+        let roomRef = Self.db.collection("pull_lists")
             .document(selectedRoom.listId)
             .collection("rooms")
             .document(selectedRoom.id)
@@ -51,7 +51,7 @@ extension RoomViewModel {
     
     // MARK: addItemToRoomDraft()
     func addItemToRoomDraft(item: Item) -> Bool {
-        let roomRef = db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(selectedRoom.id)
+        let roomRef = Self.db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(selectedRoom.id)
         
         var itemIdsSet = Set(selectedRoom.itemModelMap.keys)
         let (inserted, _) = itemIdsSet.insert(item.id)
@@ -81,7 +81,7 @@ extension RoomViewModel {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
             let itemIds = Array(selectedRoom.itemModelMap.keys)
-            let itemsRef = db.collection("items")
+            let itemsRef = Self.db.collection("items")
                 .whereField("id", in: itemIds)
             
             let snapshot = try await itemsRef.getDocuments()
@@ -91,7 +91,7 @@ extension RoomViewModel {
                 try? Firestore.Decoder().decode(Item.self, from: document.data())
             }
             
-            self.items = fetchedItems
+            items = fetchedItems
         } catch {
             print("Error loading items for room \(selectedRoom.id): \(error)")
         }
@@ -105,7 +105,7 @@ extension RoomViewModel {
             
             do {
                 // Fetch models with those IDs
-                let modelsRef = db.collection("models")
+                let modelsRef = Self.db.collection("models")
                     .whereField("id", in: Array(modelIds))
                 
                 let snapshot = try await modelsRef.getDocuments()
@@ -131,5 +131,27 @@ extension RoomViewModel {
     // Helper function to easily get a model for a given item
     func getModelForItem(_ item: Item) -> Model? {
         return modelsById[item.modelId]
+    }
+    
+    // MARK: Group Items by Room
+    static func getItemsByRoom(_ room: Room) async -> [Item]? {
+        do {
+            // Query items where listId matches the room's listId and is in the room's itemIds array
+            let itemIds = Array(room.itemModelMap.keys)
+            let itemsRef = db.collection("items")
+                .whereField("id", in: itemIds)
+            
+            let snapshot = try await itemsRef.getDocuments()
+            
+            // Parse the items
+            let fetchedItems = snapshot.documents.compactMap { document -> Item? in
+                try? Firestore.Decoder().decode(Item.self, from: document.data())
+            }
+            
+            return fetchedItems
+        } catch {
+            print("Error loading items for room \(room.id): \(error)")
+            return nil
+        }
     }
 }
