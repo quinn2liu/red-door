@@ -8,14 +8,15 @@
 import Foundation
 import Firebase
 
-@MainActor
 @Observable
 class RoomViewModel {
     var selectedRoom: Room
     var items: [Item] = [] // for display
-    var models: [String: Model] = [:] // mapping modelId to model, for display
+    var modelsById: [String: Model] = [:] // mapping modelId to model, for display
     
     let db = Firestore.firestore()
+    
+    var modelsLoaded = false
     
     // MARK: init/deinit
     init(room: Room) {
@@ -50,23 +51,15 @@ extension RoomViewModel {
     
     // MARK: addItemToRoomDraft()
     func addItemToRoomDraft(item: Item) -> Bool {
+        let roomRef = db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(selectedRoom.id)
         
-        var itemIdsSet = Set(selectedRoom.itemIds)
+        var itemIdsSet = Set(selectedRoom.itemModelMap.keys)
         let (inserted, _) = itemIdsSet.insert(item.id)
-        if inserted { // the itemId doesn't already exist in the room's items
-            selectedRoom.itemIds = Array(itemIdsSet)
-            
-            let pullListRef = db.collection("pull_lists").document(selectedRoom.listId)
-            let roomRef = pullListRef.collection("rooms").document(selectedRoom.id)
-
+        if inserted { // the itemId doesn't already exist in the room's items and was added
+            selectedRoom.itemModelMap.updateValue(item.modelId, forKey: item.id) // insert into map
+        
             // update the room with the new item
-            roomRef.updateData([
-                "itemIds": FieldValue.arrayUnion([item.id])
-            ]) { error in
-                if let error = error {
-                    print("Error adding item to room: \(error)")
-                }
-            }
+            roomRef.setData(["itemModelMap": selectedRoom.itemModelMap])
             return true
         } else { // itemId already exists for the room
             return false
@@ -76,18 +69,20 @@ extension RoomViewModel {
     
     // MARK: Load Items and Models
     func loadItemsAndModels() async {
-        if !selectedRoom.itemIds.isEmpty {
-            await loadItems()
-            await loadModelsForItems()
+        if !selectedRoom.itemModelMap.isEmpty {
+            await getRoomItems()
+            await getRoomModels()
         }
     }
 
     // MARK: Load Items
-    private func loadItems() async {
+    @MainActor
+    func getRoomItems() async {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
+            let itemIds = Array(selectedRoom.itemModelMap.keys)
             let itemsRef = db.collection("items")
-                .whereField("id", in: selectedRoom.itemIds)
+                .whereField("id", in: itemIds)
             
             let snapshot = try await itemsRef.getDocuments()
             
@@ -96,53 +91,45 @@ extension RoomViewModel {
                 try? Firestore.Decoder().decode(Item.self, from: document.data())
             }
             
-            // Update the items on the main thread
-            await MainActor.run {
-                self.items = fetchedItems
-            }
+            self.items = fetchedItems
         } catch {
             print("Error loading items for room \(selectedRoom.id): \(error)")
         }
     }
 
     // MARK: Load Models for Items
-    private func loadModelsForItems() async {
-        // Only proceed if we have items
-        guard !items.isEmpty else { return }
-        
-        // Get unique modelIds from the items
-        let modelIds = Set(items.map { $0.modelId })
-        
-        do {
-            // Fetch models with those IDs
-            let modelsRef = db.collection("models")
-                .whereField("id", in: Array(modelIds))
+    @MainActor
+    func getRoomModels(reloadModels: Bool = false) async {
+        if !modelsLoaded || reloadModels {
+            let modelIds = Set(selectedRoom.itemModelMap.values)
             
-            let snapshot = try await modelsRef.getDocuments()
-            
-            // Create dictionary mapping modelId to Model - do this outside of concurrent context
-            let fetchedModels = snapshot.documents.compactMap { document -> (String, Model)? in
-                guard let model = try? Firestore.Decoder().decode(Model.self, from: document.data()) else {
-                    return nil
+            do {
+                // Fetch models with those IDs
+                let modelsRef = db.collection("models")
+                    .whereField("id", in: Array(modelIds))
+                
+                let snapshot = try await modelsRef.getDocuments()
+                
+                // Create dictionary mapping modelId to Model - do this outside of concurrent context
+                let fetchedModelTuples = try snapshot.documents.map { document -> (String, Model) in
+                    let model = try Firestore.Decoder().decode(Model.self, from: document.data())
+                    return (model.id, model)
                 }
-                return (model.id, model)
+                
+                // Create the dictionary from the array of tuples
+                let modelDict = Dictionary(fetchedModelTuples, uniquingKeysWith: { (first, _) in first })
+                
+                modelsById = modelDict
+                modelsLoaded = true
+            } catch {
+                print("Error loading models for items: \(error)")
             }
-            
-            // Create the dictionary from the array of tuples
-            let modelDict = Dictionary(uniqueKeysWithValues: fetchedModels)
-            
-            // Update the models dictionary on the main thread
-            await MainActor.run {
-                self.models = modelDict
-            }
-        } catch {
-            print("Error loading models for items: \(error)")
         }
     }
     
     // MARK: Get Model for Item
     // Helper function to easily get a model for a given item
     func getModelForItem(_ item: Item) -> Model? {
-        return models[item.modelId]
+        return modelsById[item.modelId]
     }
 }

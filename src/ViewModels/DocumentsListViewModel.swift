@@ -9,7 +9,6 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 
-//  MARK: Could be abstracted for all lists
 @Observable
 class DocumentsListViewModel {
     
@@ -116,6 +115,9 @@ class DocumentsListViewModel {
                 updatedQuery = updatedQuery
                     .whereField("nameLowercased", isGreaterThanOrEqualTo: searchText)
                     .whereField("nameLowercased", isLessThan: searchText + "\u{f8ff}")
+            } else if key == "itemsAvailable" {
+                updatedQuery = updatedQuery
+                    .whereField("availableItemCount", isNotEqualTo: "0")
             } else {
                 updatedQuery = updatedQuery.whereField(key, isEqualTo: value)
             }

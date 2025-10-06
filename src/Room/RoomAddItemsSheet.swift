@@ -1,20 +1,37 @@
+//
+//  RoomAddItemsSheet.swift
+//  RedDoor
+//
+//  Created by Quinn Liu on 2/13/25.
+//
+
 import SwiftUI
 
-struct ModelInventoryView: View {
+
+struct RoomAddItemsSheet: View {
+    // MARK: Environment Variables
+    @Environment(\.dismiss) private var dismiss
     
-    @State private var viewModel = DocumentsListViewModel(.model)
-    @State private var path: NavigationPath = NavigationPath()
+    // MARK: View Parameters
+    @State private var inventoryViewModel: DocumentsListViewModel = DocumentsListViewModel(.model)
+    @Binding var roomViewModel: RoomViewModel
+    @Binding var showSheet: Bool
+    
+    // MARK: init()
+    init(roomViewModel: Binding<RoomViewModel>, showSheet: Binding<Bool>) {
+        self._roomViewModel = roomViewModel
+        self._showSheet = showSheet
+    }
     
     // MARK: Filter Variables
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
     
-    // MARK: View Modifier Variables
-    @State private var isLoadingModels: Bool = false
+    // MARK: State Variables
+    @State var path: NavigationPath = NavigationPath()
     @State private var searchFocused: Bool = false
-    @FocusState private var searchTextFocused: Bool
-    
-    @State private var showCreateModelCover: Bool = false
+    @FocusState var searchTextFocused: Bool
+    @State private var isLoadingModels: Bool = false
     
     // MARK: Body
     var body: some View {
@@ -35,6 +52,7 @@ struct ModelInventoryView: View {
                 Spacer()
             }
             .frameTop()
+            .frameTopPadding()
             .frameHorizontalPadding()
             .onAppear {
                 Task {
@@ -61,16 +79,17 @@ struct ModelInventoryView: View {
                     }
                 }
             }
-            .rootNavigationDestinations(path: $path)
-            .fullScreenCover(isPresented: $showCreateModelCover) {
-                CreateModelView()
+            .navigationDestination(for: Model.self) { model in
+                RoomModelView(model: model, roomViewModel: $roomViewModel)
+            }
+            .navigationDestination(for: Item.self) { item in
+                RoomItemView(item: item, roomViewModel: $roomViewModel)
             }
         }
     }
     
     // MARK: Top Bar
-    @ViewBuilder
-    private func TopBar() -> some View {
+    @ViewBuilder private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
                 Text("Inventory")
@@ -85,22 +104,14 @@ struct ModelInventoryView: View {
                 HStack(spacing: 12) {
                     if !searchFocused {
                         Button {
-                            searchFocused = true
                             searchTextFocused = true
+                            searchFocused = true
                         } label: {
                             Image(systemName: "magnifyingglass")
                         }
                     }
                     
-                    NavigationLink(destination: ScanItemView()) {
-                        Image(systemName: "qrcode.viewfinder")
-                    }
-                    
-                    Button {
-                        showCreateModelCover = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
+                    ToolBarMenu()
                 }
             }
         ).tint(.red)
@@ -140,17 +151,32 @@ struct ModelInventoryView: View {
         .animation(.bouncy(duration: 0.5), value: searchTextFocused)
     }
     
+    // MARK: ToolBarMenu
+    @ViewBuilder private func ToolBarMenu() -> some View {
+        Menu {
+            NavigationLink(destination: CreateModelView()) {
+                Label("Add Item", systemImage: "plus")
+            }
+            NavigationLink(destination: ScanItemView()) {
+                Label("Scan Item", systemImage: "qrcode.viewfinder")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(.red)
+        }
+    }
+    
     // MARK: InventoryList
     @ViewBuilder private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(viewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
+                ForEach(inventoryViewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
                     NavigationLink(value: model) {
                         ModelListItemView(model: model)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .onAppear {
-                        if model == viewModel.documentsArray.last as? Model {
+                        if model == inventoryViewModel.documentsArray.last as? Model {
                             Task {
                                 await fetchModels(initial: false, searchText: searchText.isEmpty ? nil : searchText, modelType: selectedType)
                             }
@@ -166,44 +192,34 @@ struct ModelInventoryView: View {
                 
             }
         }
-        .refreshable {
-            Task {
-                if !isLoadingModels {
-                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                }
-            }
-        }
     }
     
-    
     // MARK: Fetch Models (Using the Abstracted ViewModel)
+    @MainActor
     private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {
+        isLoadingModels = true
+        
         var filters: [String: Any] = [:]
+        filters["itemsAvailable"] = true
         
         if let modelType {
-            filters.updateValue(modelType, forKey: "type")
+            filters["type"] = modelType.rawValue
         }
         
         if let searchText {
-            filters.updateValue(searchText.lowercased(), forKey: "nameLowercased")
+            filters["nameLowercased"] = searchText.lowercased()
         }
         
-        DispatchQueue.main.async {
-            isLoadingModels = true
-        }
-
         if isInitial {
-            await viewModel.fetchInitialDocuments(filters: filters)
+            await inventoryViewModel.fetchInitialDocuments(filters: filters)
         } else {
-            await viewModel.fetchMoreDocuments(filters: filters)
+            await inventoryViewModel.fetchMoreDocuments(filters: filters)
         }
-
-        DispatchQueue.main.async {
-            isLoadingModels = false
-        }
+        
+        isLoadingModels = false
     }
 }
 
-#Preview {
-    ModelInventoryView()
-}
+//#Preview {
+//    RoomAddItemsSheet(room: Room.MOCK_DATA[0], showSheet: .constant(true))
+//}

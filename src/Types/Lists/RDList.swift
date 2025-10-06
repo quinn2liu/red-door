@@ -29,22 +29,22 @@ struct RDList: Codable, Identifiable, Hashable {
     }
     
     // init from list
-    init(pullList: RDList) {
+    init(pullList: RDList, listType: DocumentType) {
         self.id = pullList.id
         self.roomNames = pullList.roomNames
         self.client = pullList.client
         self.installDate = pullList.installDate
         self.installed = pullList.installed
-        self.listType = pullList.listType
+        self.listType = listType
     }
     
     // init from blank
     init(
-        id: String = "",
+        id: String = UUID().uuidString,
         roomNames: [String] = [],
         installDate: String = "",
         client: String = "",
-        installed: Bool? = nil,
+        installed: Bool = false,
         listType: DocumentType = .pull_list
     ) {
         self.id = id
