@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import WebKit
 import PDFKit
 
 // MARK: - Sample SwiftUI View
@@ -15,11 +14,9 @@ struct PullListPDFView: View {
     
     // MARK: view variables
     @Environment(\.dismiss) private var dismiss
-    @State private var htmlContent: String = ""
-    @State private var generatingHTML: Bool = false
-    @State private var pdfData: Data? = nil
+    @State private var pdfDocument: PDFDocument? = nil
     @State private var isGeneratingPDF: Bool = false
-    @State private var displayWebView: WKWebView?
+    @State private var pdfData: Data? = nil
     
     // MARK: Init variables
     var pullList: RDList
@@ -35,7 +32,7 @@ struct PullListPDFView: View {
             }
             
             VStack(alignment: .center, spacing: 0) {
-                if htmlContent.isEmpty {
+                if pdfDocument == nil {
                     Spacer()
                     
                     VStack(spacing: 12) {
@@ -45,39 +42,42 @@ struct PullListPDFView: View {
                     
                     Spacer()
                 } else {
-                    HTMLPreview(htmlContent: htmlContent, webViewReference: $displayWebView)
+                    PDFKitView(document: pdfDocument!)
                         .border(.gray)
                         .cornerRadius(6)
 
-                    Button("Export as PDF") {
-                        exportPDF()
-                    }
-                    .padding()
-                    .disabled(isGeneratingPDF || displayWebView == nil)
-                    
                     if isGeneratingPDF {
-                        ProgressView("Generating PDF...")
+                        ProgressView("Preparing PDF for export...")
                             .padding()
                     }
                     
                     // iOS 17+ ShareLink
                     if #available(iOS 17, *), let pdfData {
                         ShareLink(
-                            item: PDFFile(data: pdfData, filename: "\(pullList.id).pdf"),
+                            item: PDFFile(data: pdfData),
                             preview: SharePreview(
-                                "\(pullList.id).pdf",
+                                "PullList.pdf",
                                 image: Image(systemName: "doc.fill")
                             )
                         ) {
                             Label("Share / Export PDF", systemImage: "square.and.arrow.up")
                         }
+                        .padding()
                     }
+
+//                    // iOS <17: UIKit share sheet
+//                    if #unavailable(iOS 17), let pdfData {
+//                        Button("Share / Export PDF") {
+//                            presentActivityController(for: pdfData)
+//                        }
+//                        .padding()
+//                    }
                 }
             }
         }
-        .onAppear {
+        .onAppear() {
             Task {
-                htmlContent = await generateHTML()
+                await generatePDF()
             }
         }
         .frameTopPadding()
@@ -85,160 +85,201 @@ struct PullListPDFView: View {
         .frameTop()
     }
 
-    // MARK: HTML Generator
-    private func generateHTML() async -> String {
-        generatingHTML = true
+    // MARK: PDF Generator
+    private func generatePDF() async {
+        isGeneratingPDF = true
         
-        var html = """
-        <html>
-        <head>
-        <style>
-            body { font-family: -apple-system; padding: 20px; }
-            h1 { font-size: 24px; margin-bottom: 10px; }
-            h2 { font-size: 20px; margin-top: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            img { max-width: 50px; max-height: 50px; }
-        </style>
-        </head>
-        <body>
-        """
-
-        // Pull list info
-        html += """
-        <h1>Pull List: \(pullList.id)</h1>
-        <p>Client: \(pullList.client)</p>
-        <p>Install Date: \(pullList.installDate)</p>
-        <p>Type: \(pullList.listType)</p>
-        """
-
-        // Rooms and items
+        // Fetch all data first before rendering
+        var roomsData: [(room: Room, items: [Item], images: [String: UIImage])] = []
+        
         for room in rooms {
             let roomViewModel = RoomViewModel(room: room)
-            html += "<h2>Room: \(room.roomName)</h2>"
-            html += "<table><tr><th>Image</th><th>ItemID</th><th>Location</th></tr>"
             await roomViewModel.getRoomItems()
-            if !roomViewModel.items.isEmpty {
-                for item in roomViewModel.items {
-                    var imageUrl: URL? = nil
-                    if let itemImage = item.image.imageURL {
-                        imageUrl = itemImage
-                    } else {
-                        await roomViewModel.getRoomModels()
-                        if let model = roomViewModel.getModelForItem(item) {
-                            if let modelImageUrl = model.primaryImage.imageURL {
-                                imageUrl = modelImageUrl
-                            }
+            await roomViewModel.getRoomModels()
+            
+            var images: [String: UIImage] = [:]
+            
+            for item in roomViewModel.items {
+                var imageUrl: URL? = nil
+                if let itemImage = item.image.imageURL {
+                    imageUrl = itemImage
+                } else {
+                    if let model = roomViewModel.getModelForItem(item) {
+                        if let modelImageUrl = model.primaryImage.imageURL {
+                            imageUrl = modelImageUrl
                         }
                     }
-                    html += """
-                    <tr>
-                        <td><img src="\(imageUrl?.absoluteString ?? "")" /></td>
-                        <td>\(item.modelId)</td>
-                        <td>\(item.listId)</td>
-                    </tr>
-                    """
                 }
-            } else {
-                html += "<tr><td colspan='3'>No items found</td></tr>"
+                
+                if let imageUrl = imageUrl,
+                   let imageData = try? await URLSession.shared.data(from: imageUrl).0,
+                   let image = UIImage(data: imageData) {
+                    images[item.id] = image
+                }
             }
-            html += "</table>"
-        }
-
-        html += "</body></html>"
-        generatingHTML = false
-        return html
-    }
-
-    // MARK: PDF Export
-    private func exportPDF() {
-        guard let webView = displayWebView else {
-            print("🔴 No WebView available")
-            return
+            
+            roomsData.append((room: room, items: roomViewModel.items, images: images))
         }
         
-        isGeneratingPDF = true
-        print("🔵 Starting PDF generation")
-
-        // Wait for all images and content to finish rendering
-        webView.evaluateJavaScript("""
-            new Promise((resolve) => {
-                const images = Array.from(document.images);
-                if (images.length === 0) { resolve(true); return; }
-                let loaded = 0;
-                images.forEach(img => {
-                    if (img.complete) loaded++;
-                    else img.onload = img.onerror = () => { loaded++; if (loaded === images.length) resolve(true); };
-                });
-                if (loaded === images.length) resolve(true);
-            });
-        """) { _, _ in
-            webView.createPDF { data in
-                print("🟢 PDF generation completed, data size: \(data?.count ?? 0) bytes")
-                self.pdfData = data
-                self.isGeneratingPDF = false
+        // Create PDF document
+        let pdfMetaData = [
+            kCGPDFContextCreator: "RedDoor",
+            kCGPDFContextAuthor: "RedDoor App",
+            kCGPDFContextTitle: "Pull List - \(pullList.client)"
+        ]
+        let format = UIGraphicsPDFRendererFormat()
+        format.documentInfo = pdfMetaData as [String: Any]
+        
+        // Page size (US Letter: 612 x 792 points)
+        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
+        let renderer = UIGraphicsPDFRenderer(bounds: pageRect, format: format)
+        
+        let data = renderer.pdfData { context in
+            var yPosition: CGFloat = 40
+            let leftMargin: CGFloat = 40
+            let rightMargin: CGFloat = 572
+            let pageHeight: CGFloat = 752
+            
+            context.beginPage()
+            
+            // Title
+            let titleAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: 24)
+            ]
+            let title = "Pull List: \(pullList.id)"
+            title.draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: titleAttributes)
+            yPosition += 35
+            
+            // Pull list info
+            let infoAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 14)
+            ]
+            
+            let info = """
+            Client: \(pullList.client)
+            Install Date: \(pullList.installDate)
+            Type: \(pullList.listType)
+            """
+            
+            info.draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: infoAttributes)
+            yPosition += 70
+            
+            // Rooms and items
+            for roomData in roomsData {
+                // Check if we need a new page
+                if yPosition > pageHeight - 100 {
+                    context.beginPage()
+                    yPosition = 40
+                }
+                
+                // Room header
+                let roomHeaderAttributes: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.boldSystemFont(ofSize: 18)
+                ]
+                "Room: \(roomData.room.roomName)".draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: roomHeaderAttributes)
+                yPosition += 30
+                
+                if !roomData.items.isEmpty {
+                    // Table header
+                    let tableHeaderAttributes: [NSAttributedString.Key: Any] = [
+                        .font: UIFont.boldSystemFont(ofSize: 12)
+                    ]
+                    
+                    // Draw table header background
+                    let headerRect = CGRect(x: leftMargin, y: yPosition, width: rightMargin - leftMargin, height: 25)
+                    UIColor.systemGray5.setFill()
+                    context.fill(headerRect)
+                    
+                    "Image".draw(at: CGPoint(x: leftMargin + 5, y: yPosition + 5), withAttributes: tableHeaderAttributes)
+                    "Item ID".draw(at: CGPoint(x: leftMargin + 70, y: yPosition + 5), withAttributes: tableHeaderAttributes)
+                    "Location".draw(at: CGPoint(x: leftMargin + 200, y: yPosition + 5), withAttributes: tableHeaderAttributes)
+                    yPosition += 25
+                    
+                    // Draw table border
+                    UIColor.systemGray3.setStroke()
+                    context.stroke(headerRect)
+                    
+                    // Table rows
+                    let cellAttributes: [NSAttributedString.Key: Any] = [
+                        .font: UIFont.systemFont(ofSize: 11)
+                    ]
+                    
+                    for item in roomData.items {
+                        // Check if we need a new page
+                        if yPosition > pageHeight - 80 {
+                            context.beginPage()
+                            yPosition = 40
+                        }
+                        
+                        let rowRect = CGRect(x: leftMargin, y: yPosition, width: rightMargin - leftMargin, height: 50)
+                        
+                        // Draw row border
+                        UIColor.systemGray4.setStroke()
+                        context.stroke(rowRect)
+                        
+                        // Draw image if available
+                        if let image = roomData.images[item.id] {
+                            let imageRect = CGRect(x: leftMargin + 5, y: yPosition + 5, width: 40, height: 40)
+                            image.draw(in: imageRect)
+                        }
+                        
+                        // Draw text
+                        item.modelId.draw(at: CGPoint(x: leftMargin + 70, y: yPosition + 15), withAttributes: cellAttributes)
+                        item.listId.draw(at: CGPoint(x: leftMargin + 200, y: yPosition + 15), withAttributes: cellAttributes)
+                        
+                        yPosition += 50
+                    }
+                } else {
+                    "No items found".draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: infoAttributes)
+                    yPosition += 30
+                }
+                
+                yPosition += 20
             }
         }
+        
+        // Create PDFDocument from data
+        pdfDocument = PDFDocument(data: data)
+        pdfData = data
+        isGeneratingPDF = false
     }
+
+//    // MARK: UIKit share sheet for iOS <17
+//    private func presentActivityController(for data: Data) {
+//       let activityVC = UIActivityViewController(activityItems: [data], applicationActivities: nil)
+//       if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+//          let root = scene.windows.first?.rootViewController {
+//           root.present(activityVC, animated: true)
+//       }
+//    }
 }
 
-// MARK: - HTML WebView Wrapper
-struct HTMLPreview: UIViewRepresentable {
-    let htmlContent: String
-    @Binding var webViewReference: WKWebView?
+// MARK: - PDFKit View Wrapper
+struct PDFKitView: UIViewRepresentable {
+    let document: PDFDocument
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(parent: self)
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        pdfView.document = document
+        pdfView.autoScales = true
+        pdfView.displayMode = .singlePageContinuous
+        pdfView.displayDirection = .vertical
+        return pdfView
     }
 
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        webView.navigationDelegate = context.coordinator
-        webView.loadHTMLString(htmlContent, baseURL: nil)
-        return webView
-    }
-
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        uiView.loadHTMLString(htmlContent, baseURL: nil)
-    }
-
-    class Coordinator: NSObject, WKNavigationDelegate {
-        var parent: HTMLPreview
-        init(parent: HTMLPreview) { self.parent = parent }
-
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            DispatchQueue.main.async {
-                self.parent.webViewReference = webView
-            }
-        }
+    func updateUIView(_ uiView: PDFView, context: Context) {
+        uiView.document = document
     }
 }
 
 // MARK: - PDF File Wrapper for ShareLink
+@available(iOS 17, *)
 struct PDFFile: Transferable {
     let data: Data
-    let filename: String
-
+    
     static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(exportedContentType: .pdf, exporting: { pdf in pdf.data })
-            .suggestedFileName { pdf in pdf.filename }
-    }
-}
-
-// MARK: - PDF Generation from WebView
-extension WKWebView {
-    func createPDF(completion: @escaping (Data?) -> Void) {
-        let config = WKPDFConfiguration()
-        config.rect = .zero // capture full content
-
-        self.createPDF(configuration: config) { result in
-            switch result {
-            case .success(let data):
-                completion(data)
-            case .failure(let error):
-                print("PDF generation failed:", error)
-                completion(nil)
-            }
+        DataRepresentation(exportedContentType: .pdf) { pdf in
+            pdf.data
         }
     }
 }
