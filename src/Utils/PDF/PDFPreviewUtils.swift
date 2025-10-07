@@ -17,6 +17,7 @@ struct PullListPDFView: View {
     @State private var pdfDocument: PDFDocument? = nil
     @State private var isGeneratingPDF: Bool = false
     @State private var pdfData: Data? = nil
+    @State private var roomsData: [RoomData] = []
     
     // MARK: Init variables
     var pullList: RDList
@@ -64,14 +65,6 @@ struct PullListPDFView: View {
                         }
                         .padding()
                     }
-
-//                    // iOS <17: UIKit share sheet
-//                    if #unavailable(iOS 17), let pdfData {
-//                        Button("Share / Export PDF") {
-//                            presentActivityController(for: pdfData)
-//                        }
-//                        .padding()
-//                    }
                 }
             }
         }
@@ -86,21 +79,24 @@ struct PullListPDFView: View {
     }
 
     // MARK: PDF Generator
+    @MainActor
     private func generatePDF() async {
         isGeneratingPDF = true
         
-        // Fetch all data first before rendering
-        var roomsData: [(room: Room, items: [Item], images: [String: UIImage])] = []
+        // Fetch all data first
+        var fetchedRoomsData: [RoomData] = []
         
         for room in rooms {
             let roomViewModel = RoomViewModel(room: room)
             await roomViewModel.getRoomItems()
             await roomViewModel.getRoomModels()
             
-            var images: [String: UIImage] = [:]
+            var itemsData: [ItemData] = []
             
             for item in roomViewModel.items {
+                var image: Image? = nil
                 var imageUrl: URL? = nil
+                
                 if let itemImage = item.image.imageURL {
                     imageUrl = itemImage
                 } else {
@@ -113,145 +109,191 @@ struct PullListPDFView: View {
                 
                 if let imageUrl = imageUrl,
                    let imageData = try? await URLSession.shared.data(from: imageUrl).0,
-                   let image = UIImage(data: imageData) {
-                    images[item.id] = image
+                   let uiImage = UIImage(data: imageData) {
+                    image = Image(uiImage: uiImage)
                 }
+                
+                itemsData.append(ItemData(
+                    id: item.id,
+                    modelId: item.modelId,
+                    listId: item.listId,
+                    image: image
+                ))
             }
             
-            roomsData.append((room: room, items: roomViewModel.items, images: images))
+            fetchedRoomsData.append(RoomData(
+                roomName: room.roomName,
+                items: itemsData
+            ))
         }
         
-        // Create PDF document
-        let pdfMetaData = [
-            kCGPDFContextCreator: "RedDoor",
-            kCGPDFContextAuthor: "RedDoor App",
-            kCGPDFContextTitle: "Pull List - \(pullList.client)"
-        ]
-        let format = UIGraphicsPDFRendererFormat()
-        format.documentInfo = pdfMetaData as [String: Any]
+        roomsData = fetchedRoomsData
         
-        // Page size (US Letter: 612 x 792 points)
-        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
-        let renderer = UIGraphicsPDFRenderer(bounds: pageRect, format: format)
+        // Create PDF using ImageRenderer
+        let pdfView = PLGeneratedPDFView(
+            pullList: pullList,
+            roomsData: roomsData
+        )
         
-        let data = renderer.pdfData { context in
-            var yPosition: CGFloat = 40
-            let leftMargin: CGFloat = 40
-            let rightMargin: CGFloat = 572
-            let pageHeight: CGFloat = 752
+        let renderer = ImageRenderer(content: pdfView)
+        renderer.proposedSize = .init(width: 612, height: 792) // US Letter size
+        
+        // Create temporary file URL
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".pdf")
+        
+        // Render to PDF
+        renderer.render { size, context in
+            var box = CGRect(origin: .zero, size: size)
             
-            context.beginPage()
+            guard let pdf = CGContext(tempURL as CFURL, mediaBox: &box, nil) else { return }
             
-            // Title
-            let titleAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.boldSystemFont(ofSize: 24)
-            ]
-            let title = "Pull List: \(pullList.id)"
-            title.draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: titleAttributes)
-            yPosition += 35
-            
-            // Pull list info
-            let infoAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 14)
-            ]
-            
-            let info = """
-            Client: \(pullList.client)
-            Install Date: \(pullList.installDate)
-            Type: \(pullList.listType)
-            """
-            
-            info.draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: infoAttributes)
-            yPosition += 70
-            
-            // Rooms and items
-            for roomData in roomsData {
-                // Check if we need a new page
-                if yPosition > pageHeight - 100 {
-                    context.beginPage()
-                    yPosition = 40
-                }
-                
-                // Room header
-                let roomHeaderAttributes: [NSAttributedString.Key: Any] = [
-                    .font: UIFont.boldSystemFont(ofSize: 18)
-                ]
-                "Room: \(roomData.room.roomName)".draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: roomHeaderAttributes)
-                yPosition += 30
-                
-                if !roomData.items.isEmpty {
-                    // Table header
-                    let tableHeaderAttributes: [NSAttributedString.Key: Any] = [
-                        .font: UIFont.boldSystemFont(ofSize: 12)
-                    ]
-                    
-                    // Draw table header background
-                    let headerRect = CGRect(x: leftMargin, y: yPosition, width: rightMargin - leftMargin, height: 25)
-                    UIColor.systemGray5.setFill()
-                    context.fill(headerRect)
-                    
-                    "Image".draw(at: CGPoint(x: leftMargin + 5, y: yPosition + 5), withAttributes: tableHeaderAttributes)
-                    "Item ID".draw(at: CGPoint(x: leftMargin + 70, y: yPosition + 5), withAttributes: tableHeaderAttributes)
-                    "Location".draw(at: CGPoint(x: leftMargin + 200, y: yPosition + 5), withAttributes: tableHeaderAttributes)
-                    yPosition += 25
-                    
-                    // Draw table border
-                    UIColor.systemGray3.setStroke()
-                    context.stroke(headerRect)
-                    
-                    // Table rows
-                    let cellAttributes: [NSAttributedString.Key: Any] = [
-                        .font: UIFont.systemFont(ofSize: 11)
-                    ]
-                    
-                    for item in roomData.items {
-                        // Check if we need a new page
-                        if yPosition > pageHeight - 80 {
-                            context.beginPage()
-                            yPosition = 40
-                        }
-                        
-                        let rowRect = CGRect(x: leftMargin, y: yPosition, width: rightMargin - leftMargin, height: 50)
-                        
-                        // Draw row border
-                        UIColor.systemGray4.setStroke()
-                        context.stroke(rowRect)
-                        
-                        // Draw image if available
-                        if let image = roomData.images[item.id] {
-                            let imageRect = CGRect(x: leftMargin + 5, y: yPosition + 5, width: 40, height: 40)
-                            image.draw(in: imageRect)
-                        }
-                        
-                        // Draw text
-                        item.modelId.draw(at: CGPoint(x: leftMargin + 70, y: yPosition + 15), withAttributes: cellAttributes)
-                        item.listId.draw(at: CGPoint(x: leftMargin + 200, y: yPosition + 15), withAttributes: cellAttributes)
-                        
-                        yPosition += 50
-                    }
-                } else {
-                    "No items found".draw(at: CGPoint(x: leftMargin, y: yPosition), withAttributes: infoAttributes)
-                    yPosition += 30
-                }
-                
-                yPosition += 20
-            }
+            pdf.beginPDFPage(nil)
+            context(pdf)
+            pdf.endPDFPage()
+            pdf.closePDF()
         }
         
-        // Create PDFDocument from data
-        pdfDocument = PDFDocument(data: data)
-        pdfData = data
+        // Load PDF
+        if let data = try? Data(contentsOf: tempURL) {
+            pdfData = data
+            pdfDocument = PDFDocument(data: data)
+        }
+        
+        // Clean up temp file
+        try? FileManager.default.removeItem(at: tempURL)
+        
         isGeneratingPDF = false
     }
+}
 
-//    // MARK: UIKit share sheet for iOS <17
-//    private func presentActivityController(for data: Data) {
-//       let activityVC = UIActivityViewController(activityItems: [data], applicationActivities: nil)
-//       if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-//          let root = scene.windows.first?.rootViewController {
-//           root.present(activityVC, animated: true)
-//       }
-//    }
+// MARK: - Data Models
+struct RoomData: Identifiable {
+    let id = UUID()
+    let roomName: String
+    let items: [ItemData]
+}
+
+struct ItemData: Identifiable {
+    let id: String
+    let modelId: String
+    let listId: String
+    let image: Image?
+}
+
+// MARK: - PDF Document View
+struct PLGeneratedPDFView: View {
+    let pullList: RDList
+    let roomsData: [RoomData]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header Section
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Pull List: \(pullList.id)")
+                    .font(.system(size: 24, weight: .bold))
+                    .padding(.bottom, 6)
+                
+                Text("Client: \(pullList.client)")
+                    .font(.system(size: 14))
+                Text("Install Date: \(pullList.installDate)")
+                    .font(.system(size: 14))
+                Text("Type: \(pullList.listType)")
+                    .font(.system(size: 14))
+            }
+            .padding(.top, 40)
+            .padding(.horizontal, 40)
+            .padding(.bottom, 20)
+            
+            // Rooms Section
+            VStack(alignment: .leading, spacing: 20) {
+                ForEach(roomsData) { roomData in
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Room: \(roomData.roomName)")
+                            .font(.system(size: 18, weight: .bold))
+                            .padding(.horizontal, 40)
+                        
+                        if !roomData.items.isEmpty {
+                            // Table with proper borders
+                            VStack(spacing: 0) {
+                                // Table Header
+                                HStack(spacing: 0) {
+                                    Text("Image")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .frame(width: 60, alignment: .leading)
+                                        .padding(.leading, 8)
+                                    
+                                    Text("Item ID")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .frame(width: 180, alignment: .leading)
+                                        .padding(.leading, 8)
+                                    
+                                    Text("Location")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.leading, 8)
+                                }
+                                .frame(height: 25)
+                                .background(Color(white: 0.9))
+                                .overlay(
+                                    Rectangle()
+                                        .stroke(Color(white: 0.7), lineWidth: 1)
+                                )
+                                
+                                // Table Rows
+                                ForEach(roomData.items) { item in
+                                    HStack(spacing: 0) {
+                                        // Image cell
+                                        Group {
+                                            if let image = item.image {
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(width: 40, height: 40)
+                                            } else {
+                                                Rectangle()
+                                                    .fill(Color.gray.opacity(0.2))
+                                                    .frame(width: 40, height: 40)
+                                            }
+                                        }
+                                        .frame(width: 60, alignment: .center)
+                                        .padding(.leading, 10)
+                                        
+                                        // Model ID cell
+                                        Text(item.modelId)
+                                            .font(.system(size: 11))
+                                            .frame(width: 180, alignment: .leading)
+                                            .padding(.leading, 8)
+                                        
+                                        // Location cell
+                                        Text(item.listId)
+                                            .font(.system(size: 11))
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, 8)
+                                    }
+                                    .frame(height: 50)
+                                    .background(Color.white)
+                                    .overlay(
+                                        Rectangle()
+                                            .stroke(Color(white: 0.8), lineWidth: 1)
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 40)
+                        } else {
+                            Text("No items found")
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 40)
+                        }
+                    }
+                }
+            }
+            
+            Spacer()
+        }
+        .frame(width: 612, height: 792)
+        .background(Color.white)
+    }
 }
 
 // MARK: - PDFKit View Wrapper
