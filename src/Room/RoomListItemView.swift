@@ -43,6 +43,7 @@ struct RoomListItemView: View {
         .onTapGesture {
             showRoomPreview.toggle()
         }
+        .padding()
         .background(Color(.systemGray5))
         .cornerRadius(6)
     }

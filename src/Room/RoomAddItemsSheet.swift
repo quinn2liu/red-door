@@ -157,9 +157,8 @@ struct RoomAddItemsSheet: View {
             NavigationLink(destination: CreateModelView()) {
                 Label("Add Item", systemImage: "plus")
             }
-            NavigationLink(destination: ScanItemView()) {
-                Label("Scan Item", systemImage: "qrcode.viewfinder")
-            }
+                
+            Label("Scan Item", systemImage: "qrcode.viewfinder")
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.red)

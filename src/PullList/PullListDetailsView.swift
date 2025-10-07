@@ -20,6 +20,7 @@ struct PullListDetailsView: View {
     @State private var showSheet: Bool = false
     @State private var showCreateRoom: Bool = false
     @State private var errorMessage: String?
+    @State private var showPDF: Bool = false
     
     // MARK: PullListData
     @State private var addressQuery: String = ""
@@ -51,6 +52,9 @@ struct PullListDetailsView: View {
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
         .frameHorizontalPadding()
+        .fullScreenCover(isPresented: $showPDF) {
+            PullListPDFView(pullList: viewModel.selectedList, rooms: viewModel.rooms)
+        }
         .alert("Pull List Not Valid",
                        isPresented: .constant(errorMessage != nil),
                        actions: {
@@ -162,7 +166,7 @@ struct PullListDetailsView: View {
     @ViewBuilder
     private func Footer() -> some View {
         if isEditing {
-            HStack {
+            HStack(spacing: 12) {
                 Button("Delete Pull List") {
                     viewModel.deletePullList()
                     dismiss()
@@ -175,6 +179,10 @@ struct PullListDetailsView: View {
             }
         } else {
             HStack(spacing: 12) {
+                Button("Show PDF") {
+                    showPDF = true
+                }
+                
                 Button {
                     Task { // TODO: consider wrapping this in some error-handling function
                         do {
