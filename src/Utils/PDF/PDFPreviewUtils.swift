@@ -17,11 +17,12 @@ struct PullListPDFView: View {
     @State private var pdfDocument: PDFDocument? = nil
     @State private var isGeneratingPDF: Bool = false
     @State private var pdfData: Data? = nil
+
     
     // MARK: Init variables
     var pullList: RDList
     var rooms: [Room]
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
@@ -45,7 +46,7 @@ struct PullListPDFView: View {
                     PDFKitView(document: pdfDocument!)
                         .border(.gray)
                         .cornerRadius(6)
-                    
+
                     if isGeneratingPDF {
                         ProgressView("Preparing PDF for export...")
                             .padding()
@@ -76,7 +77,7 @@ struct PullListPDFView: View {
         .frameHorizontalPadding()
         .frameTop()
     }
-    
+
     // MARK: PDF Generator
     @MainActor
     private func generatePDF() async {
@@ -93,6 +94,7 @@ struct PullListPDFView: View {
         }
         
         let preloadedImages: [String: UIImage] = await preloadImages(for: roomViewModels)
+
         
         // Create PDF using ImageRenderer
         let pdfView = PLGeneratedPDFView(
@@ -110,18 +112,21 @@ struct PullListPDFView: View {
         renderer.render { size, context in
             var box = CGRect(origin: .zero, size: size)
             guard let pdf = CGContext(tempURL as CFURL, mediaBox: &box, nil) else { return }
+
             pdf.beginPDFPage(nil)
             context(pdf)
             pdf.endPDFPage()
             pdf.closePDF()
         }
         
+
         if let data = try? Data(contentsOf: tempURL) {
             pdfData = data
             pdfDocument = PDFDocument(data: data)
         }
         
         try? FileManager.default.removeItem(at: tempURL)
+
         isGeneratingPDF = false
     }
 }
@@ -148,6 +153,7 @@ func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
     }
     return result
 }
+
 
 
 // MARK: - PDFKit View Wrapper
