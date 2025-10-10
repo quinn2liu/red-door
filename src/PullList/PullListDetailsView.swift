@@ -168,8 +168,10 @@ struct PullListDetailsView: View {
         if isEditing {
             HStack(spacing: 12) {
                 Button("Delete Pull List") {
-                    viewModel.deletePullList()
-                    dismiss()
+                    Task {
+                        await viewModel.deletePullList()
+                        dismiss()
+                    }
                 }
                 
                 Button("Save Pull List") {
