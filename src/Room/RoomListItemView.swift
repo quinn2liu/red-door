@@ -64,7 +64,9 @@ struct RoomListItemView: View {
             .padding()
         }
         .task {
-            await viewModel.getRoomModels()
+            if !viewModel.selectedRoom.itemModelMap.isEmpty {
+                await viewModel.getRoomModels()
+            }
         }
     }
     
