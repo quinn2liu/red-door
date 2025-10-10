@@ -117,7 +117,7 @@ class DocumentsListViewModel {
                     .whereField("nameLowercased", isLessThan: searchText + "\u{f8ff}")
             } else if key == "itemsAvailable" {
                 updatedQuery = updatedQuery
-                    .whereField("availableItemCount", isNotEqualTo: "0")
+                    .whereField("availableItemCount", isNotEqualTo: 0)
             } else {
                 updatedQuery = updatedQuery.whereField(key, isEqualTo: value)
             }

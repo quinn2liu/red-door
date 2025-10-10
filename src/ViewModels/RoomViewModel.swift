@@ -59,7 +59,7 @@ extension RoomViewModel {
             selectedRoom.itemModelMap.updateValue(item.modelId, forKey: item.id) // insert into map
         
             // update the room with the new item
-            roomRef.setData(["itemModelMap": selectedRoom.itemModelMap])
+            roomRef.updateData(["itemModelMap": selectedRoom.itemModelMap])
             return true
         } else { // itemId already exists for the room
             return false

@@ -92,7 +92,7 @@ struct RoomAddItemsSheet: View {
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                Text("Inventory")
+                Text("Available Inventory")
                     .font(.system(.title2, design: .default))
                     .bold()
                     .foregroundStyle(.red)
