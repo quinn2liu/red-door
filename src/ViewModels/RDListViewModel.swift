@@ -47,7 +47,7 @@ extension RDListViewModel {
             
             // creating empty rooms
             let batch = db.batch()
-            selectedList.roomNames.forEach { roomName in
+            selectedList.roomIds.forEach { roomName in
                 let room = Room(roomName: roomName, listId: selectedList.id)
                 let roomRef = selectedListReference.collection("rooms").document(room.id)
                 
@@ -97,12 +97,23 @@ extension RDListViewModel {
     
     
     // MARK: Delete PL
-    func deletePullList() {
-        for roomId in selectedList.roomNames {
-            let roomsRef = selectedListReference.collection("rooms").document(roomId) // TODO: confirm if this works
-            roomsRef.delete()
+    func deletePullList() async {
+        do {
+            let roomsSnapshot = try await selectedListReference.collection("rooms").getDocuments()
+            
+            let batch = db.batch()
+            
+            for document in roomsSnapshot.documents {
+                batch.deleteDocument(document.reference)
+            }
+            
+            batch.deleteDocument(selectedListReference)
+            
+            try await batch.commit()
+            
+        } catch {
+            print("Error deleting PL: \(error.localizedDescription)")
         }
-        selectedListReference.delete()
     }
     
     // MARK: Validate PL
@@ -219,10 +230,10 @@ extension RDListViewModel {
 extension RDListViewModel {
     // MARK: Create Empty Room
     func createEmptyRoom(_ roomName: String) -> Bool {
-        if roomExists(newRoomName: roomName, roomNames: self.selectedList.roomNames) {
+        if roomExists(newRoomName: roomName, roomNames: self.selectedList.roomIds) {
             return false // room not added
         } else {
-            self.selectedList.roomNames.append(roomName)
+            self.selectedList.roomIds.append(Room.roomNameToId(listId: selectedList.id, roomName: roomName))
             return true // room successfully added
         }
     }

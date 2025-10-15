@@ -40,7 +40,7 @@ struct CreatePullListView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
-                        ForEach(viewModel.selectedList.roomNames, id: \.self) { roomId in
+                        ForEach(viewModel.selectedList.roomIds, id: \.self) { roomId in
                             EmptyRoomListItem(roomId)
                         }
                     }
