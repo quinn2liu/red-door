@@ -42,60 +42,22 @@ class ItemViewModel {
         }
     }
     
-    
-//    TODO: this code should only run from turning a pull list into an installed list
-    
-//    func addItemToRoom(room: Room) {
-//        // 1. add the item id to the room
-//        let roomRef = db.collection("pull_lists").document(room.listId).collection("rooms").document(room.id)
-//        
-//        roomRef.updateData([
-//            "contents": FieldValue.arrayUnion([selectedItem.id])
-//        ]) { error in
-//            if let error = error {
-//                print("Error adding item to room: \(error)")
-//            }
-//        }
-//        
-//        // 2. update the item locations to the designated pull list
-//        
-//        
-//        
-//        // 3. update the roommetadata
-//
-//    }
-//    
-//    
-//    func updateItemLocation(room: Room) {
-//        let itemRef = db.collection("items").document(selectedItem.id)
-//        itemRef.updateData([
-//            "listId": room.listId
-//        ]) { error in
-//            if let error = error {
-//                print("Error updating item (\(self.selectedItem.id)) to list (\(room.listId)): \(error)")
-//            }
-//        }
-//    }
-    
     func deleteItem() async {
-        // delete from "items" collection
-        do {
-            try await db.collection("items").document(selectedItem.id).delete()
-//            print("Item successfully removed from Firestore")
-        } catch {
-            print("Error removing item \(selectedItem.id): \(error)")
-        }
+        let batch = db.batch()
         
-        // delete from "models" collection
+        let itemRef = db.collection("items").document(selectedItem.id)
         let modelRef = db.collection("models").document(selectedItem.modelId)
+        
+        batch.deleteDocument(itemRef)
+        batch.updateData([
+            "itemIds": FieldValue.arrayRemove([selectedItem.id]),
+            "availableItemCount": FieldValue.increment(Int64(-1))
+        ], forDocument: modelRef)
+        
         do {
-            try await modelRef.updateData([
-                "item_ids": FieldValue.arrayRemove([selectedItem.id]),
-                "count": FieldValue.increment(Int64(-1))
-            ])
-//            print("item successfully removed from Item")
+            try await batch.commit()
         } catch {
-            print("Error removing item \(selectedItem.id) from it's model: \(error)")
+            print("Error committing batch delete for item \(selectedItem.id): \(error)")
         }
     }
     
