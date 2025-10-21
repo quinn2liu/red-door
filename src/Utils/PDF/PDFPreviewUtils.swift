@@ -135,7 +135,6 @@ struct PullListPDFView: View {
 // MARK: - Preload Images
 func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
     var result: [String: UIImage] = [:]
-    let group = DispatchGroup()
     
     for room in rooms {
         for item in room.items {
@@ -175,7 +174,6 @@ struct PDFKitView: UIViewRepresentable {
 }
 
 // MARK: - PDF File Wrapper for ShareLink
-@available(iOS 17, *)
 struct PDFFile: Transferable {
     let data: Data
     

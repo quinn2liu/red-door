@@ -23,7 +23,7 @@ struct PullListDetailsView: View {
     @State private var showPDF: Bool = false
     
     // MARK: PullListData
-    @State private var addressQuery: String = ""
+    @State private var address: String = ""
     @State private var date: Date = Date()
     @State private var viewModel: RDListViewModel
     
@@ -82,15 +82,13 @@ struct PullListDetailsView: View {
                 BackButton()
             }
         }, header: {
-            if isEditing {
-                TextField(viewModel.selectedList.id, text: $addressQuery)
-                    .onChange(of: addressQuery) { _, newValue in
-                        // do the address searching stuff (use a sheet?)
-                        let address = Address(fullAddress: newValue)
-                        viewModel.selectedList.id = address.toUniqueID()
+            if isEditing { // TODO: address searching should be a sheet
+                TextField(viewModel.selectedList.address.formattedAddress, text: $address)
+                    .onChange(of: address) { _, newValue in
+                        viewModel.selectedList.id = address
                     }
             } else {
-                Text(viewModel.selectedList.id)
+                Text(viewModel.selectedList.address.formattedAddress)
             }
             
         }, trailingIcon: {

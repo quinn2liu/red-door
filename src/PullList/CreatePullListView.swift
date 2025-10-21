@@ -12,7 +12,7 @@ struct CreatePullListView: View {
     
     @State private var viewModel: RDListViewModel = RDListViewModel()
     
-    @State private var addressQuery: String = ""
+    @State private var address: String = ""
     @State private var date: Date = Date()
     
     @State private var showCreateRoom: Bool = false
@@ -70,11 +70,10 @@ struct CreatePullListView: View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            TextField("Type Address", text: $addressQuery)
-                .onChange(of: addressQuery) { _, newValue in
+            TextField("Type Address", text: $address)
+                .onChange(of: address) { _, newValue in
                     // do the address searching stuff (use a sheet?)
-                    let address = Address(fullAddress: newValue)
-                    viewModel.selectedList.id = address.toUniqueID()
+                    viewModel.selectedList.id = address
                 }
                 .padding(6)
                 .background(Color(.systemGray5))

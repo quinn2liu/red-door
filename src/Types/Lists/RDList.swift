@@ -8,60 +8,91 @@
 import Foundation
 import MapKit
 
+import Foundation
+import MapKit
 
 struct RDList: Codable, Identifiable, Hashable {
     var id: String
-    
-    var roomIds: [String]
-    var installDate: String
-    var client: String
-    var installed: Bool?
     var listType: DocumentType
 
-    // init from address
-    init(address: Address = Address(warehouseNumber: "1"), roomNames: [String] = [], installDate: String = "", client: String = "", installed: Bool? = nil, listType: DocumentType) {
-        self.id = address.toUniqueID()
-        self.roomIds = roomNames
-        self.installDate = installDate
-        self.client = client
-        self.installed = installed
-        self.listType = listType
-    }
-    
-    // init from list
-    init(pullList: RDList, listType: DocumentType) {
-        self.id = pullList.id
-        self.roomIds = pullList.roomIds
-        self.client = pullList.client
-        self.installDate = pullList.installDate
-        self.installed = pullList.installed
-        self.listType = listType
-    }
-    
-    // init from blank
+    var address: Address
+    var addressKey: String
+    var cityLowercased: String
+    var streetLowercased: String
+    var stateLowercased: String
+
+    var createdDate: String
+    var installDate: String
+    var installed: Bool
+    var client: String
+
+    var roomIds: [String]
+
+    // MARK: - Init from Address
     init(
-        id: String = UUID().uuidString,
-        roomNames: [String] = [],
+        address: Address = Address.warehouse("1"),
         installDate: String = "",
         client: String = "",
         installed: Bool = false,
+        roomNames: [String] = [],
+        listType: DocumentType
+    ) {
+        self.id = UUID().uuidString
+        self.listType = listType
+
+        self.address = address
+        self.addressKey = address.toUniqueID()
+        self.cityLowercased = address.city.lowercased()
+        self.streetLowercased = address.street.lowercased().replacingOccurrences(of: " ", with: "")
+        self.stateLowercased = address.state.lowercased()
+
+        self.createdDate = ISO8601DateFormatter().string(from: Date())
+        self.installDate = installDate
+        self.installed = installed
+        self.client = client
+        self.roomIds = roomNames
+    }
+
+    // MARK: - Init from Existing List
+    init(
+        pullList: RDList,
+        listType: DocumentType
+    ) {
+        self.id = pullList.id
+        self.listType = listType
+
+        self.address = pullList.address
+        self.addressKey = pullList.addressKey
+        self.cityLowercased = pullList.cityLowercased
+        self.streetLowercased = pullList.streetLowercased
+        self.stateLowercased = pullList.stateLowercased
+
+        self.createdDate = pullList.createdDate
+        self.installDate = pullList.installDate
+        self.installed = pullList.installed
+        self.client = pullList.client
+        self.roomIds = pullList.roomIds
+    }
+    
+    // MARK: - Init from blank
+    init(
         listType: DocumentType = .pull_list
     ) {
-        self.id = id
-        self.roomIds = roomNames
-        self.installDate = installDate
-        self.client = client
-        self.installed = installed
+        self.id = UUID().uuidString
         self.listType = listType
+
+        self.address = Address.warehouse("1")
+        self.addressKey = address.toUniqueID()
+        self.cityLowercased = address.city.lowercased()
+        self.streetLowercased = address.street.lowercased().replacingOccurrences(of: " ", with: "")
+        self.stateLowercased = address.state.lowercased()
+
+        self.createdDate = ISO8601DateFormatter().string(from: Date())
+        self.installDate = ""
+        self.installed = false
+        self.client = ""
+        self.roomIds = []
     }
 }
 
-extension RDList {
-    static var MOCK_DATA: [RDList] = [
-        .init(address: Address(warehouseNumber: "1"), installDate: "2025-04-01", client: "Client A", listType: .pull_list),
-        .init(address: Address(warehouseNumber: "2"), installDate: "2025-04-05", client: "Client B", listType: .pull_list),
-        .init(address: Address(warehouseNumber: "3"), installDate: "2025-04-10", client: "Client C", listType: .pull_list),
-        .init(address: Address(warehouseNumber: "4"), installDate: "2025-04-15", client: "Client D", listType: .pull_list),
-        .init(address: Address(warehouseNumber: "5"), installDate: "2025-04-20", client: "Client E", listType: .pull_list)
-    ]
-}
+
