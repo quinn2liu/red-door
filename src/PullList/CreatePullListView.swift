@@ -12,6 +12,7 @@ struct CreatePullListView: View {
     
     @State private var viewModel: RDListViewModel = RDListViewModel()
     
+    @State private var showAddressSheet: Bool = false
     @State private var address: String = ""
     @State private var date: Date = Date()
     
@@ -63,6 +64,9 @@ struct CreatePullListView: View {
                     keyboardFocused = true
                 }
         }
+        .sheet(isPresented: $showAddressSheet) {
+            AddressSelectorSheet()
+        }
     }
     
     // MARK: TopBar
@@ -70,15 +74,12 @@ struct CreatePullListView: View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            TextField("Type Address", text: $address)
-                .onChange(of: address) { _, newValue in
-                    // do the address searching stuff (use a sheet?)
-                    viewModel.selectedList.id = address
-                }
-                .padding(6)
-                .background(Color(.systemGray5))
-                .cornerRadius(8)
-                .multilineTextAlignment(.center)
+            Button {
+                showAddressSheet = true
+            } label: {
+                Text("Enter Address")
+            }
+        
         }, trailingIcon: {
             Button {
                 viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())

@@ -28,9 +28,9 @@ struct RDList: Codable, Identifiable, Hashable {
 
     var roomIds: [String]
 
-    // MARK: - Init from Address
+    // MARK: - Init from Address (might not be needed)
     init(
-        address: Address = Address.warehouse("1"),
+        address: Address,
         installDate: String = "",
         client: String = "",
         installed: Bool = false,
@@ -81,7 +81,7 @@ struct RDList: Codable, Identifiable, Hashable {
         self.id = UUID().uuidString
         self.listType = listType
 
-        self.address = Address.warehouse("1")
+        self.address = Warehouse.warehouse1.address
         self.addressKey = address.toUniqueID()
         self.cityLowercased = address.city.lowercased()
         self.streetLowercased = address.street.lowercased().replacingOccurrences(of: " ", with: "")
