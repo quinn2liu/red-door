@@ -59,25 +59,3 @@ struct Address: Codable, Hashable {
     }
 }
 
-extension Address {
-    static let warehouseAddresses: [String: Address] = [
-        "1": Address(
-            street: "123 Apple St",
-            city: "Cupertino",
-            state: "CA",
-            zipCode: "95014",
-            warehouseNumber: "1"
-        ),
-        "2": Address(
-            street: "456 Orange Ave",
-            city: "San Jose",
-            state: "CA",
-            zipCode: "95110",
-            warehouseNumber: "2"
-        ),
-    ]
-    
-    static func warehouse(_ warehouseNumber: String) -> Address {
-        return warehouseAddresses[warehouseNumber] ?? warehouseAddresses["1"]!
-    }
-}

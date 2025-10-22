@@ -10,13 +10,13 @@ import Foundation
 struct Item: Identifiable, Codable, Hashable {
     var modelId: String // comes from the "parent" model
     var id: String // the item's id (a variation of the modelId
-    var listId: String // "effective location"
+    var listId: String // listId -> RDList ID the item is currently at (1 or 2 signify corresponding warehouse)
     var repair: Bool // whether the item needs to be repaired
-    var isAvailable: Bool // whether item is available to be added to a list
+    var isAvailable: Bool // whether item is available to be added to a list (in storage)
     
     var image: RDImage
     
-    init(modelId: String, id: String = UUID().uuidString, repair: Bool = false, listId: String = "warehouse-1", isAvailable: Bool = true, image: RDImage = RDImage()) {
+    init(modelId: String, id: String = UUID().uuidString, repair: Bool = false, listId: String = Warehouse.warehouse1.name, isAvailable: Bool = true, image: RDImage = RDImage()) {
         self.modelId = modelId
         self.id = id
         self.repair = repair
@@ -25,33 +25,3 @@ struct Item: Identifiable, Codable, Hashable {
         self.image = image
     }
 }
-
-// MARK: - Mock Data
-//extension Item {
-//    static var MOCK_DATA: [Item] = [
-//        // Items for mock_Chair
-//        .init(modelId: "mock_Chair_id", id: "mock_Chair_id_item_1", repair: false, listId: "warehouse-1"),
-//        .init(modelId: "mock_Chair_id", id: "mock_Chair_id_item_2", repair: true, listId: "warehouse-1"),
-//        .init(modelId: "mock_Chair_id", id: "mock_Chair_id_item_3", repair: false, listId: "warehouse-1"),
-//
-//        // Items for mock_Desk
-//        .init(modelId: "mock_Desk_id", id: "mock_Desk_id_item_1", repair: true, listId: "warehouse-1"),
-//        .init(modelId: "mock_Desk_id", id: "mock_Desk_id_item_2", repair: false, listId: "warehouse-1"),
-//        .init(modelId: "mock_Desk_id", id: "mock_Desk_id_item_3", repair: false, listId: "warehouse-1"),
-//
-//        // Items for mock_Table
-//        .init(modelId: "mock_Table_id", id: "mock_Table_id_item_1", repair: false, listId: "warehouse-1"),
-//        .init(modelId: "mock_Table_id", id: "mock_Table_id_item_2", repair: true, listId: "warehouse-1"),
-//        .init(modelId: "mock_Table_id", id: "mock_Table_id_item_3", repair: false, listId: "warehouse-1"),
-//
-//        // Items for mock_Couch
-//        .init(modelId: "mock_Couch_id", id: "mock_Couch_id_item_1", repair: false, listId: "warehouse-1"),
-//        .init(modelId: "mock_Couch_id", id: "mock_Couch_id_item_2", repair: false, listId: "warehouse-1"),
-//        .init(modelId: "mock_Couch_id", id: "mock_Couch_id_item_3", repair: true, listId: "warehouse-1"),
-//
-//        // Items for mock_Lamp
-//        .init(modelId: "mock_Lamp_id", id: "mock_Lamp_id_item_1", repair: true, listId: "warehouse-1"),
-//        .init(modelId: "mock_Lamp_id", id: "mock_Lamp_id_item_2", repair: false, listId: "warehouse-1"),
-//        .init(modelId: "mock_Lamp_id", id: "mock_Lamp_id_item_3", repair: false, listId: "warehouse-1")
-//    ]
-//}
