@@ -13,6 +13,8 @@ struct CreatePullListView: View {
     @State private var viewModel: RDListViewModel = RDListViewModel()
     
     @State private var showAddressSheet: Bool = false
+    @State private var selectedAddressMode: String = "Search"
+    let addressOptions = ["Search", "Entry"]
     @State private var address: String = ""
     @State private var date: Date = Date()
     
@@ -65,7 +67,7 @@ struct CreatePullListView: View {
                 }
         }
         .sheet(isPresented: $showAddressSheet) {
-            AddressSelectorSheet()
+            AddressSheet()
         }
     }
     
@@ -79,7 +81,7 @@ struct CreatePullListView: View {
             } label: {
                 Text("Enter Address")
             }
-        
+            
         }, trailingIcon: {
             Button {
                 viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
@@ -90,6 +92,35 @@ struct CreatePullListView: View {
                     .fontWeight(.bold)
             }
         })
+    }
+    
+    @ViewBuilder
+    private func AddressSheet() -> some View {
+    
+        VStack(alignment: .center, spacing: 12) {
+            Capsule()
+                .fill(Color(.systemGray3))
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+            
+            Picker("Address Mode", selection: $selectedAddressMode) {
+                ForEach(addressOptions, id: \.self) { mode in
+                    Text(mode).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            
+            Group {
+                if selectedAddressMode == "Search" {
+                    AddressSearchView()
+                } else {
+                    AddressEntryView()
+                }
+            }
+        }
+        .frameTop()
+        .frameTopPadding()
+        .frameHorizontalPadding()
     }
     
     // MARK: Create Empty Room Sheet ()

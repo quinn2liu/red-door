@@ -1,5 +1,5 @@
 //
-//  AddressSelectorSheet.swift
+//  AddressSearchView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 10/21/25.
@@ -8,15 +8,21 @@
 import SwiftUI
 import MapKit
 
-struct AddressSelectorSheet: View {
+struct AddressSearchView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
     @State private var searchResults: [MKMapItem] = []
     @State private var selectedItem: MKMapItem?
     @State private var cameraPosition: MapCameraPosition = .automatic
     
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
             TextField("Search address", text: $searchText)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color(.systemGray6), lineWidth: 2)
+                )
                 .onSubmit {
                     searchAddress()
                 }
@@ -27,29 +33,56 @@ struct AddressSelectorSheet: View {
                         .tag(item)
                 }
             }
+            .cornerRadius(8)
+            .layoutPriority(searchResults.isEmpty ? 1 : 0)
             
-            List(searchResults, id: \.self) { item in
-                Button(action: {
-                    selectedItem = item
-                    cameraPosition = .region(MKCoordinateRegion(
-                        center: item.placemark.coordinate,
-                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                    ))
-                }) {
-                    VStack(alignment: .leading) {
-                        Text(item.name ?? "Unknown")
-                        Text(formatPlacemark(item.placemark))
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(searchResults, id: \.self) { result in
+                        SearchListItem(result)
                     }
                 }
+                .padding(2)
             }
             
             if let item = selectedItem {
                 Button("Use This Address") {
                     let address = convertToAddress(item.placemark)
-                    print("Selected address: \(address.formattedAddress)")
+                    dismiss()
                 }
             }
         }
+    }
+    
+    // MARK: Search List Item
+    @ViewBuilder
+    private func SearchListItem(_ result: MKMapItem) -> some View {
+        let isSelected = result == selectedItem
+        Button {
+            selectedItem = result
+            cameraPosition = .region(MKCoordinateRegion(
+                center: result.placemark.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            ))
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(result.name ?? "Unknown")
+                    .foregroundStyle(.primary)
+                Text(formatPlacemark(result.placemark))
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? Color.blue.opacity(0.6) : Color(.systemBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isSelected ? Color.blue.opacity(0.6) : Color(.systemGray6), lineWidth: 2)
+            )
+        }
+        .buttonStyle(.plain)
     }
     
     private func searchAddress() {
@@ -63,8 +96,8 @@ struct AddressSelectorSheet: View {
                 return
             }
             searchResults = response.mapItems
+            selectedItem = nil
             if let first = searchResults.first {
-                selectedItem = first
                 cameraPosition = .region(MKCoordinateRegion(
                     center: first.placemark.coordinate,
                     span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -96,5 +129,5 @@ struct AddressSelectorSheet: View {
 }
 
 #Preview {
-    AddressSelectorSheet()
+    AddressSearchView()
 }
