@@ -76,12 +76,15 @@ struct CreatePullListView: View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            Button {
-                showAddressSheet = true
-            } label: {
-                Text("Enter Address")
+            if viewModel.selectedList.address.isInitialized() {
+                Text(viewModel.selectedList.address.formattedAddress)
+            } else {
+                Button {
+                    showAddressSheet = true
+                } label: {
+                    Text("Enter Address")
+                }
             }
-            
         }, trailingIcon: {
             Button {
                 viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
@@ -96,7 +99,6 @@ struct CreatePullListView: View {
     
     @ViewBuilder
     private func AddressSheet() -> some View {
-    
         VStack(alignment: .center, spacing: 12) {
             Capsule()
                 .fill(Color(.systemGray3))
@@ -112,9 +114,9 @@ struct CreatePullListView: View {
             
             Group {
                 if selectedAddressMode == "Search" {
-                    AddressSearchView()
+                    AddressSearchView($viewModel.selectedList.address)
                 } else {
-                    AddressEntryView()
+                    AddressEntryView($viewModel.selectedList.address)
                 }
             }
         }

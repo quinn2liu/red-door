@@ -10,10 +10,20 @@ import MapKit
 
 struct AddressSearchView: View {
     @Environment(\.dismiss) private var dismiss
+    @Binding var selectedAddress: Address
+    
     @State private var searchText = ""
     @State private var searchResults: [MKMapItem] = []
     @State private var selectedItem: MKMapItem?
     @State private var cameraPosition: MapCameraPosition = .automatic
+    
+    init(_ selectedAddress: Binding<Address>) {
+        self._selectedAddress = selectedAddress
+        self.searchText = ""
+        self.searchResults = []
+        self.selectedItem = nil
+        self.cameraPosition = .automatic
+    }
     
     var body: some View {
         VStack(spacing: 12) {
@@ -47,8 +57,15 @@ struct AddressSearchView: View {
             
             if let item = selectedItem {
                 Button("Use This Address") {
-                    let address = convertToAddress(item.placemark)
-                    dismiss()
+                    if #available(iOS 26.0, *) {
+                        print("Item.address.description: \(item.address?.description)")
+                        print("Item.address.fullAddress: \(item.address?.fullAddress)")
+                        print("Item.address.shortAddress: \(item.address?.shortAddress)")
+                        print("Item.addressRepresentations.fullAddress: \(item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: true))")
+                    } else {
+//                        selectedAddress = convertToAddress(item)
+                        dismiss()
+                    }
                 }
             }
         }
@@ -68,7 +85,7 @@ struct AddressSearchView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(result.name ?? "Unknown")
                     .foregroundStyle(.primary)
-                Text(formatPlacemark(result.placemark))
+                Text(formatPlacemark(result))
                     .foregroundStyle(.secondary)
             }
             .padding()
@@ -106,28 +123,39 @@ struct AddressSearchView: View {
         }
     }
     
-    private func formatPlacemark(_ placemark: MKPlacemark) -> String {
-        [
-            placemark.thoroughfare,
-            placemark.locality,
-            placemark.administrativeArea,
-            placemark.postalCode
-        ]
-        .compactMap { $0 }
-        .joined(separator: ", ")
-    }
     
-    private func convertToAddress(_ placemark: MKPlacemark) -> Address {
-        Address(
-            street: placemark.thoroughfare ?? "",
-            city: placemark.locality ?? "",
-            state: placemark.administrativeArea ?? "",
-            zipCode: placemark.postalCode ?? "",
-            unit: placemark.subThoroughfare
-        )
-    }
-}
+    // MARK: - Placemark Implementation
+    @available(iOS, introduced: 16.0, deprecated: 26.0)
+    private func formatPlacemark(_ mapItem: MKMapItem) -> String {
+           let placemark = mapItem.placemark
+           
+           return [
+               placemark.thoroughfare,
+               placemark.locality,
+               placemark.administrativeArea,
+               placemark.postalCode
+           ]
+           .compactMap { $0 }
+           .joined(separator: ", ")
+       }
 
-#Preview {
-    AddressSearchView()
+//    @available(iOS, introduced: 16.0, deprecated: 26.0)
+//    private func convertToAddress(_ mapItem: MKMapItem) -> Address? {
+//        if #available(iOS 27, *) {
+//            if let address = mapItem.address {
+//                
+//            }
+//        } else {
+//            let placemark = mapItem.placemark
+//            
+//            return Address(
+//                street: placemark.thoroughfare ?? "",
+//                city: placemark.locality ?? "",
+//                state: placemark.administrativeArea ?? "",
+//                zipCode: placemark.postalCode ?? "",
+//                unit: placemark.subThoroughfare
+//            )
+//        }
+//        
+//    }
 }
