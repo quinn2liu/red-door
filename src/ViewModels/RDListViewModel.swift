@@ -19,7 +19,7 @@ class RDListViewModel {
     var rooms: [Room]
 
     // firebase
-    let db = Firestore.firestore()
+    let db: Firestore = Firestore.firestore()
     let listDocumentRef: DocumentReference
     let roomsDocumentRef: CollectionReference
 

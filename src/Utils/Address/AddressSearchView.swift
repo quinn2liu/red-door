@@ -37,9 +37,7 @@ struct AddressSearchView: View {
                         .stroke(Color(.systemGray6), lineWidth: 2)
                 )
                 .onSubmit {
-                    searchAddress(searchText) { results in
-                        searchResults = results
-                    }
+                    searchAddress(searchText)
                 }
 
             Map(position: $cameraPosition, selection: $selectedItem) {
@@ -60,7 +58,7 @@ struct AddressSearchView: View {
                 .padding(2)
             }
 
-            if let item = selectedItem {
+            if selectedItem != nil {
                 Footer()
             }
         }
@@ -122,7 +120,7 @@ struct AddressSearchView: View {
 
     // MARK: Search Address Function
 
-    private func searchAddress(_ searchText: String, completion: @escaping ([MKMapItem]) -> Void) {
+    private func searchAddress(_ searchText: String) {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
 
@@ -130,17 +128,17 @@ struct AddressSearchView: View {
         search.start { response, error in
             guard let response = response else {
                 print("Search error: \(error?.localizedDescription ?? "Unknown")")
-                completion([])
+                searchResults = []
                 return
             }
+            searchResults = response.mapItems
             selectedItem = nil
-            if let first = searchResults.first {
+            if let first = response.mapItems.first {
                 cameraPosition = .region(MKCoordinateRegion(
                     center: first.placemark.coordinate,
                     span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 ))
             }
-            completion(searchResults)
         }
     }
 
