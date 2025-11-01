@@ -12,10 +12,13 @@ struct AddressSearchView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedAddress: Address
     
+    @State private var unit: String = ""
+    
     @State private var searchText = ""
     @State private var searchResults: [MKMapItem] = []
-    @State private var selectedItem: MKMapItem?
     @State private var cameraPosition: MapCameraPosition = .automatic
+
+    @State private var selectedItem: MKMapItem?
     
     init(_ selectedAddress: Binding<Address>) {
         self._selectedAddress = selectedAddress
@@ -34,7 +37,9 @@ struct AddressSearchView: View {
                         .stroke(Color(.systemGray6), lineWidth: 2)
                 )
                 .onSubmit {
-                    searchAddress()
+                    searchAddress(searchText) { results in
+                        searchResults = results
+                    }
                 }
             
             Map(position: $cameraPosition, selection: $selectedItem) {
@@ -56,16 +61,27 @@ struct AddressSearchView: View {
             }
             
             if let item = selectedItem {
-                Button("Use This Address") {
-                    if #available(iOS 26.0, *) {
-                        print("Item.address.description: \(item.address?.description)")
-                        print("Item.address.fullAddress: \(item.address?.fullAddress)")
-                        print("Item.address.shortAddress: \(item.address?.shortAddress)")
-                        print("Item.addressRepresentations.fullAddress: \(item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: true))")
-                    } else {
-//                        selectedAddress = convertToAddress(item)
-                        dismiss()
+                Footer()
+            }
+        }
+    }
+    
+    // MARK: Footer
+    @ViewBuilder
+    private func Footer() -> some View {
+        HStack(spacing: 0) {
+            if let item = selectedItem {
+                TextField("Specify Unit", text: $unit)
+                
+                Spacer()
+                
+                Button {
+                    if let address = convertToAddress(item) {
+                        selectedAddress = address
                     }
+                    dismiss()
+                } label: {
+                    Text("Use This Address")
                 }
             }
         }
@@ -73,19 +89,19 @@ struct AddressSearchView: View {
     
     // MARK: Search List Item
     @ViewBuilder
-    private func SearchListItem(_ result: MKMapItem) -> some View {
-        let isSelected = result == selectedItem
+    private func SearchListItem(_ mapItem: MKMapItem) -> some View {
+        let isSelected = mapItem == selectedItem
         Button {
-            selectedItem = result
+            selectedItem = mapItem
             cameraPosition = .region(MKCoordinateRegion(
-                center: result.placemark.coordinate,
+                center: mapItem.placemark.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             ))
         } label: {
             VStack(alignment: .leading, spacing: 6) {
-                Text(result.name ?? "Unknown")
+                Text(mapItem.name ?? "Unknown Name")
                     .foregroundStyle(.primary)
-                Text(formatPlacemark(result))
+                Text(formatAddress(mapItem) ?? "Unknown Address")
                     .foregroundStyle(.secondary)
             }
             .padding()
@@ -102,7 +118,8 @@ struct AddressSearchView: View {
         .buttonStyle(.plain)
     }
     
-    private func searchAddress() {
+    // MARK: Search Address Function
+    private func searchAddress(_ searchText: String, completion: @escaping([MKMapItem]) -> Void) {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
         
@@ -110,9 +127,9 @@ struct AddressSearchView: View {
         search.start { response, error in
             guard let response = response else {
                 print("Search error: \(error?.localizedDescription ?? "Unknown")")
+                completion([])
                 return
             }
-            searchResults = response.mapItems
             selectedItem = nil
             if let first = searchResults.first {
                 cameraPosition = .region(MKCoordinateRegion(
@@ -120,42 +137,43 @@ struct AddressSearchView: View {
                     span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 ))
             }
+            completion(searchResults)
         }
     }
     
     
     // MARK: - Placemark Implementation
-    @available(iOS, introduced: 16.0, deprecated: 26.0)
-    private func formatPlacemark(_ mapItem: MKMapItem) -> String {
-           let placemark = mapItem.placemark
-           
-           return [
-               placemark.thoroughfare,
-               placemark.locality,
-               placemark.administrativeArea,
-               placemark.postalCode
-           ]
-           .compactMap { $0 }
-           .joined(separator: ", ")
-       }
+    private func formatAddress(_ mapItem: MKMapItem) -> String? {
+        if #available(iOS 27, *) {
+            if let address = mapItem.address {
+                return address.fullAddress
+            } else {
+                return nil
+            }
+        } else {
+            let placemark = mapItem.placemark
+            
+            return [
+                placemark.thoroughfare,
+                placemark.locality,
+                placemark.administrativeArea,
+                placemark.postalCode
+            ]
+            .compactMap { $0 }
+            .joined(separator: ", ")
+        }
+   }
 
-//    @available(iOS, introduced: 16.0, deprecated: 26.0)
-//    private func convertToAddress(_ mapItem: MKMapItem) -> Address? {
-//        if #available(iOS 27, *) {
-//            if let address = mapItem.address {
-//                
-//            }
-//        } else {
-//            let placemark = mapItem.placemark
-//            
-//            return Address(
-//                street: placemark.thoroughfare ?? "",
-//                city: placemark.locality ?? "",
-//                state: placemark.administrativeArea ?? "",
-//                zipCode: placemark.postalCode ?? "",
-//                unit: placemark.subThoroughfare
-//            )
-//        }
-//        
-//    }
+    private func convertToAddress(_ mapItem: MKMapItem) -> Address? {
+        if #available(iOS 27, *) {
+            if let address = mapItem.address {
+                return Address(address: address, unit: unit)
+            } else {
+                return nil
+            }
+        } else {
+            let placemark = mapItem.placemark
+            return Address(placemark: placemark)
+        }
+    }
 }

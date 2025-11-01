@@ -16,10 +16,7 @@ struct RDList: Codable, Identifiable, Hashable {
     var listType: DocumentType
 
     var address: Address
-    var addressKey: String
-    var cityLowercased: String
-    var streetLowercased: String
-    var stateLowercased: String
+    var addressId: String
 
     var createdDate: String
     var installDate: String
@@ -41,10 +38,7 @@ struct RDList: Codable, Identifiable, Hashable {
         self.listType = listType
 
         self.address = address
-        self.addressKey = address.toUniqueID()
-        self.cityLowercased = address.city.lowercased()
-        self.streetLowercased = address.street.lowercased().replacingOccurrences(of: " ", with: "")
-        self.stateLowercased = address.state.lowercased()
+        self.addressId = address.id
 
         self.createdDate = ISO8601DateFormatter().string(from: Date())
         self.installDate = installDate
@@ -62,10 +56,7 @@ struct RDList: Codable, Identifiable, Hashable {
         self.listType = listType
 
         self.address = pullList.address
-        self.addressKey = pullList.addressKey
-        self.cityLowercased = pullList.cityLowercased
-        self.streetLowercased = pullList.streetLowercased
-        self.stateLowercased = pullList.stateLowercased
+        self.addressId = pullList.address.id
 
         self.createdDate = pullList.createdDate
         self.installDate = pullList.installDate
@@ -82,10 +73,7 @@ struct RDList: Codable, Identifiable, Hashable {
         self.listType = listType
 
         self.address = Warehouse.warehouse1.address
-        self.addressKey = address.toUniqueID()
-        self.cityLowercased = address.city.lowercased()
-        self.streetLowercased = address.street.lowercased().replacingOccurrences(of: " ", with: "")
-        self.stateLowercased = address.state.lowercased()
+        self.addressId = address.id
 
         self.createdDate = ISO8601DateFormatter().string(from: Date())
         self.installDate = ""

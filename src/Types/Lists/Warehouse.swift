@@ -25,7 +25,8 @@ enum Warehouse: String, Codable, CaseIterable {
                 street: "123 Distribution Way",
                 city: "Boston",
                 state: "MA",
-                zipCode: "02118",
+                zipcode: "02118",
+                country: "USA",
                 warehouseNumber: "1"
             )
         case .warehouse2:
@@ -33,7 +34,8 @@ enum Warehouse: String, Codable, CaseIterable {
                 street: "42 Storage Blvd",
                 city: "Cambridge",
                 state: "MA",
-                zipCode: "02139",
+                zipcode: "02139",
+                country: "USA",
                 warehouseNumber: "2"
             )
         }

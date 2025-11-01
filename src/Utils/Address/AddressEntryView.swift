@@ -41,7 +41,7 @@ struct AddressEntryView: View {
             TextField("Zipcode", text: $zipcode)
             
             TextField("Unit", text: $unit)
-
+            
             Button {
                 updateSelectedAddress()
                 dismiss()
@@ -52,13 +52,13 @@ struct AddressEntryView: View {
     }
     
     private func updateSelectedAddress() {
-        selectedAddress.street = street
-        selectedAddress.city = town
-        selectedAddress.state = state
-        selectedAddress.zipcode = zipcode
-        if !unit.isEmpty {
-            selectedAddress.unit = unit
-        }
+//        selectedAddress.street = street
+//        selectedAddress.city = town
+//        selectedAddress.state = state
+//        selectedAddress.zipcode = zipcode
+//        if !unit.isEmpty {
+//            selectedAddress.unit = unit
+//        }
     }
     
     let states: [String] = [

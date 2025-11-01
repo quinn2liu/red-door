@@ -7,62 +7,94 @@
 
 import Foundation
 import CoreLocation
+import MapKit
 
 struct Address: Codable, Hashable {
-    var street: String
-    var city: String
-    var state: String
-    var zipcode: String
+    var id: String // lowercased, trimmed, not punctuation
     var unit: String?
     var warehouseNumber: String?
-    var formattedAddress: String {
-        [
-            unit,
-            street,
-            city,
-            state,
-        ]
-        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-        .filter { !$0.isEmpty }
-        .joined(separator: ", ")
-    }
+    let formattedAddress: String
 //    var coordinates: GeoPoint?
     
     init(
         street: String,
         city: String,
         state: String,
-        zipCode: String,
+        zipcode: String,
+        country: String,
         unit: String? = nil,
         warehouseNumber: String? = nil
-//        coordinates: GeoPoint? = nil
+        //        coordinates: GeoPoint? = nil
     ) {
-        self.street = street
-        self.city = city
-        self.state = state
-        self.zipcode = zipCode
-        self.unit = unit
+        // ID: concatenated, lowercased, trimmed, no punctuation or spaces
+        self.id = Address.normalize([street, city, state, zipcode, country].joined())
+        
+        // Formatted address: standard comma-separated form
+        self.formattedAddress = [
+            street,
+            city,
+            state,
+            zipcode,
+            country,
+            unit
+        ]
+        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+        .joined(separator: ", ")
+        
         self.warehouseNumber = warehouseNumber
-//        self.coordinates = coordinates
     }
     
-    func toUniqueID() -> String {
-        let normalized = [
-            street.lowercased().replacingOccurrences(of: " ", with: ""),
-            city.lowercased(),
-            state.lowercased(),
-            zipcode
+    @available(iOS 26.0, *)
+    init(address: MKAddress, unit: String? = nil, warehouseNumber: String? = nil) {
+        self.id = Address.normalize(address.fullAddress)
+        self.formattedAddress = address.fullAddress
+        self.unit = unit
+        self.warehouseNumber = warehouseNumber
+    }
+    
+
+    init(placemark: MKPlacemark, unit: String? = nil, warehouseNumber: String? = nil) {
+        let street = [
+            placemark.subThoroughfare,
+            placemark.thoroughfare
         ]
-        .joined(separator: "_")
-        return normalized
+        .compactMap { $0 }
+        .joined(separator: " ")
+
+        let city = placemark.locality ?? ""
+        let state = placemark.administrativeArea ?? ""
+        let zipcode = placemark.postalCode ?? ""
+        let country = placemark.country ?? ""
+
+        self.id = Address.normalize([street, city, state, zipcode, country].joined())
+
+        self.formattedAddress = [
+            street,
+            city,
+            state,
+            zipcode,
+            country,
+            unit
+        ]
+        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+        .joined(separator: ", ")
+
+        self.unit = unit
+        self.warehouseNumber = warehouseNumber
     }
     
     func isInitialized() -> Bool {
-        if !street.isEmpty && !city.isEmpty && !state.isEmpty && !zipcode.isEmpty && warehouseNumber == nil {
-            return true
-        } else {
-            return false
-        }
+        warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
+    }
+    
+    static func normalize(_ input: String) -> String {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let lowercase = trimmed.lowercased()
+        let noPunctuation = lowercase.components(separatedBy: CharacterSet.punctuationCharacters).joined()
+        let noSpaces = noPunctuation.replacingOccurrences(of: " ", with: "")
+        return noSpaces
     }
 }
 
