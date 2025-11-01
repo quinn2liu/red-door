@@ -1,5 +1,5 @@
 //
-//  List.swift
+//  RDList.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/26/24.
@@ -26,6 +26,7 @@ struct RDList: Codable, Identifiable, Hashable {
     var roomIds: [String]
 
     // MARK: - Init from Address (might not be needed)
+
     init(
         address: Address,
         installDate: String = "",
@@ -34,53 +35,53 @@ struct RDList: Codable, Identifiable, Hashable {
         roomNames: [String] = [],
         listType: DocumentType
     ) {
-        self.id = UUID().uuidString
+        id = UUID().uuidString
         self.listType = listType
 
         self.address = address
-        self.addressId = address.id
+        addressId = address.id
 
-        self.createdDate = ISO8601DateFormatter().string(from: Date())
+        createdDate = ISO8601DateFormatter().string(from: Date())
         self.installDate = installDate
         self.installed = installed
         self.client = client
-        self.roomIds = roomNames
+        roomIds = roomNames
     }
 
     // MARK: - Init from Existing List
+
     init(
         pullList: RDList,
         listType: DocumentType
     ) {
-        self.id = pullList.id
+        id = pullList.id
         self.listType = listType
 
-        self.address = pullList.address
-        self.addressId = pullList.address.id
+        address = pullList.address
+        addressId = pullList.address.id
 
-        self.createdDate = pullList.createdDate
-        self.installDate = pullList.installDate
-        self.installed = pullList.installed
-        self.client = pullList.client
-        self.roomIds = pullList.roomIds
+        createdDate = pullList.createdDate
+        installDate = pullList.installDate
+        installed = pullList.installed
+        client = pullList.client
+        roomIds = pullList.roomIds
     }
-    
+
     // MARK: - Init from blank
+
     init(
         listType: DocumentType = .pull_list
     ) {
-        self.id = UUID().uuidString
+        id = UUID().uuidString
         self.listType = listType
 
-        self.address = Warehouse.warehouse1.address
-        self.addressId = address.id
+        address = Warehouse.warehouse1.address
+        addressId = address.id
 
-        self.createdDate = ISO8601DateFormatter().string(from: Date())
-        self.installDate = ""
-        self.installed = false
-        self.client = ""
-        self.roomIds = []
+        createdDate = ISO8601DateFormatter().string(from: Date())
+        installDate = ""
+        installed = false
+        client = ""
+        roomIds = []
     }
 }
-
-

@@ -8,34 +8,33 @@
 import SwiftUI
 
 struct InstalledListDetailView: View {
-    
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: RDListViewModel
     @Binding var path: NavigationPath
-    
+
     init(installedList: RDList, path: Binding<NavigationPath>) {
-        self.viewModel = RDListViewModel(selectedList: installedList)
-        self._path = path
+        viewModel = RDListViewModel(selectedList: installedList)
+        _path = path
     }
-    
+
     @FocusState private var keyboardFocused: Bool
     @State private var isEditing: Bool = false
     @State private var showSheet: Bool = false
     @State private var showCreateRoom: Bool = false
-    
+
     @State private var address: String = ""
-    @State private var date: Date = Date()
-    
+    @State private var date: Date = .init()
+
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
-            
+
             InstalledListDetails()
-            
+
             RoomList()
-            
+
             Spacer()
-            
+
             Footer()
         }
         .onAppear {
@@ -47,8 +46,9 @@ struct InstalledListDetailView: View {
         .toolbar(.hidden)
         .frameHorizontalPadding()
     }
-    
+
     // MARK: TopBar()
+
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             if isEditing {
@@ -64,13 +64,13 @@ struct InstalledListDetailView: View {
         }, header: {
             if isEditing { // TODO: address searching should be a sheet
                 TextField(viewModel.selectedList.address.formattedAddress, text: $address)
-                    .onChange(of: address) { _, newValue in
+                    .onChange(of: address) { _, _ in
                         viewModel.selectedList.id = address
                     }
             } else {
                 Text(viewModel.selectedList.address.formattedAddress)
             }
-            
+
         }, trailingIcon: {
             Button {
                 if isEditing {
@@ -88,10 +88,10 @@ struct InstalledListDetailView: View {
             }
         })
     }
-    
+
     // MARK: InstalledListDetails()
+
     @ViewBuilder private func InstalledListDetails() -> some View {
-        
         VStack(spacing: 12) {
             if isEditing {
                 DatePicker(
@@ -99,7 +99,7 @@ struct InstalledListDetailView: View {
                     selection: $date,
                     displayedComponents: [.date]
                 )
-                
+
                 HStack {
                     Text("Client:")
                     TextField("", text: $viewModel.selectedList.client)
@@ -113,8 +113,9 @@ struct InstalledListDetailView: View {
             }
         }
     }
-    
+
     // MARK: RoomList()
+
     @ViewBuilder private func RoomList() -> some View {
         VStack(spacing: 12) {
             ScrollView {
@@ -129,7 +130,7 @@ struct InstalledListDetailView: View {
                     await viewModel.refreshPullList()
                 }
             }
-            
+
             if isEditing {
                 TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
                     showCreateRoom = true
@@ -137,7 +138,7 @@ struct InstalledListDetailView: View {
             }
         }
     }
-    
+
     @ViewBuilder private func Footer() -> some View {
         if isEditing {
             HStack {
@@ -147,7 +148,7 @@ struct InstalledListDetailView: View {
                         dismiss()
                     }
                 }
-                
+
                 Button("Save Pull List") {
                     viewModel.updatePullList()
                     dismiss()
@@ -160,7 +161,7 @@ struct InstalledListDetailView: View {
 //                RedDoorButton(type: .green, text: "Create Installed List") {
 //                    Task {
 //                        let installedList = await viewModel.createInstalledFromPull()
-////                        path.append(installedList)
+            ////                        path.append(installedList)
 //                    }
 //                }
 //            }
@@ -168,6 +169,6 @@ struct InstalledListDetailView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    InstalledListDetailView()
-//}
+// }

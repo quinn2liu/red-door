@@ -1,44 +1,44 @@
 //
-//  AddItemView.swift
+//  CreateModelView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/22/24.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct CreateModelView: View {
-    
     // Environment variables
-    @State private var viewModel: ModelViewModel = ModelViewModel() // initializes new blank model
+    @State private var viewModel: ModelViewModel = .init() // initializes new blank model
     @Environment(\.dismiss) var dismiss
     @State private var isEditing: Bool = true
 
     // Image Overlay
     @State private var selectedRDImage: RDImage? = nil
     @State private var isImageSelected: Bool = false
-    
+
     // Loading Variables
     @State private var isLoading: Bool = false
 
     init(viewModel: ModelViewModel = ModelViewModel()) {
         self.viewModel = viewModel
     }
-    
+
     // MARK: - Body
+
     var body: some View {
         ZStack {
             VStack(spacing: 12) {
                 TopBar()
-                            
+
                 ScrollView(.vertical) {
                     ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
-                                            
+
                     ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
-                    
-                    Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1...100, step: 1)
-                        
+
+                    Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1 ... 100, step: 1)
+
                     RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
                         saveModel()
                     }
@@ -52,7 +52,7 @@ struct CreateModelView: View {
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
                     .animation(.easeInOut(duration: 0.3), value: isImageSelected)
             )
-            
+
             if isLoading {
                 Color.black.opacity(0.3).ignoresSafeArea()
                 ProgressView("Saving Model...")
@@ -62,9 +62,9 @@ struct CreateModelView: View {
             }
         }
     }
-    
-    
+
     // MARK: saveModel()
+
     private func saveModel() {
         isLoading = true
         Task {
@@ -73,9 +73,9 @@ struct CreateModelView: View {
             dismiss()
         }
     }
-    
-    
+
     // MARK: - Top Bar
+
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(
@@ -97,8 +97,9 @@ struct CreateModelView: View {
             }
         )
     }
-        
+
     // MARK: Model Name Entry
+
     @ViewBuilder
     private func ModelNameEntry() -> some View {
         TextField("Item Name", text: $viewModel.selectedModel.name)

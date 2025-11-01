@@ -5,14 +5,13 @@
 //  Created by Quinn Liu on 8/28/25.
 //
 
-import SwiftUI
 import CachedAsyncImage
+import SwiftUI
 
 struct ModelRDImageOverlay: View {
-    
     let selectedRDImage: RDImage?
     @Binding var isImageSelected: Bool
-    
+
     var body: some View {
         if let selectedRDImage {
             if isImageSelected {
@@ -21,7 +20,7 @@ struct ModelRDImageOverlay: View {
                     .onTapGesture {
                         isImageSelected = false
                     }
-                
+
                 if let uiImage = selectedRDImage.uiImage {
                     Image(uiImage: uiImage)
                         .resizable()

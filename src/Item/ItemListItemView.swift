@@ -8,18 +8,17 @@
 import SwiftUI
 
 struct ItemListItemView: View {
-    
     var item: Item
     @State var model: Model?
     @State private var errorMessage: String?
     var viewModel: ItemViewModel
-    
+
     init(item: Item, model: Model) {
         self.item = item
         self.model = model
-        self.viewModel = ItemViewModel(selectedItem: item)
+        viewModel = ItemViewModel(selectedItem: item)
     }
-    
+
     var body: some View {
         Group {
             if let model {
@@ -47,20 +46,19 @@ struct ItemListItemView: View {
             }
         }
     }
-    
+
     private func getItemModel() {
         viewModel.getItemModel(modelId: item.modelId) { result in
             switch result {
-            case .success(let model):
+            case let .success(model):
                 self.model = model
-            case .failure(let error):
+            case let .failure(error):
                 self.errorMessage = error.localizedDescription
             }
         }
     }
-    
 }
 
-//#Preview {
+// #Preview {
 //    ItemListItemView()
-//}
+// }

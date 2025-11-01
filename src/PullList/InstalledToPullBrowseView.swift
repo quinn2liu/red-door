@@ -1,5 +1,5 @@
 //
-//  InstalledToPullBrowse.swift
+//  InstalledToPullBrowseView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/1/25.

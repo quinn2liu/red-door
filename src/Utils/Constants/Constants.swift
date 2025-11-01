@@ -8,10 +8,9 @@
 import Foundation
 import SwiftUI
 
-struct Constants {
+enum Constants {
     // the width of the screen with padding removed
     static let screenWidthPadding: CGFloat = UIScreen.width - 32
-    
+
     static let screenWidth: CGFloat = UIScreen.width
 }
-

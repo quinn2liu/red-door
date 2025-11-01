@@ -13,9 +13,9 @@ struct Item: Identifiable, Codable, Hashable {
     var listId: String // listId -> RDList ID the item is currently at (1 or 2 signify corresponding warehouse)
     var repair: Bool // whether the item needs to be repaired
     var isAvailable: Bool // whether item is available to be added to a list (in storage)
-    
+
     var image: RDImage
-    
+
     init(modelId: String, id: String = UUID().uuidString, repair: Bool = false, listId: String = Warehouse.warehouse1.name, isAvailable: Bool = true, image: RDImage = RDImage()) {
         self.modelId = modelId
         self.id = id

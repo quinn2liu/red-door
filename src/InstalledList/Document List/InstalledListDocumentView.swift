@@ -1,5 +1,5 @@
 //
-//  InstalledListView.swift
+//  InstalledListDocumentView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/6/24.
@@ -8,31 +8,29 @@
 import SwiftUI
 
 struct InstalledListDocumentView: View {
-    
-    @State private var path: NavigationPath = NavigationPath()
+    @State private var path: NavigationPath = .init()
     @State private var viewModel = DocumentsListViewModel(.installed_list)
-    
+
     @State private var searchText: String = ""
-    
+
     // MARK: View Modifier Variables
+
     @State private var isLoadingLists: Bool = false
     @State private var searchFocused: Bool = false
     @FocusState private var searchTextFocused: Bool
-    
+
     var body: some View {
         NavigationStack(path: $path) {
-            
             VStack(spacing: 16) {
                 if !searchTextFocused {
                     TopBar()
                 }
-                
+
                 if searchFocused {
                     SearchBar()
                 }
-                
+
                 InstalledListList()
-                
             }
             .onAppear {
                 Task {
@@ -43,10 +41,10 @@ struct InstalledListDocumentView: View {
             .frameHorizontalPadding()
             .rootNavigationDestinations(path: $path)
         }
-        
     }
-    
+
     // MARK: Top Bar
+
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
@@ -68,19 +66,20 @@ struct InstalledListDocumentView: View {
                             Image(systemName: "magnifyingglass")
                         }
                     }
-                    
+
                     ToolBarMenu()
                 }
             }
         ).tint(.red)
     }
-    
+
     // MARK: Search Bar
+
     @ViewBuilder private func SearchBar() -> some View {
         HStack(spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                
+
                 TextField("", text: $searchText, prompt: Text("Search..."))
                     .submitLabel(.search)
                     .focused($searchTextFocused)
@@ -96,7 +95,7 @@ struct InstalledListDocumentView: View {
             }
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
-            
+
             if searchTextFocused {
                 Button("Cancel") {
                     searchText = ""
@@ -108,15 +107,16 @@ struct InstalledListDocumentView: View {
         }
         .animation(.bouncy(duration: 0.5), value: searchTextFocused)
     }
-    
+
     // MARK: Tool Bar Menu
+
     @ViewBuilder private func ToolBarMenu() -> some View {
         Menu {
             NavigationLink(destination: CreatePullListView()) {
                 Text("From Scratch")
                 Image(systemName: "checklist")
             }
-            
+
             NavigationLink(destination: InstalledToPullBrowseView()) {
                 Text("From Pull List")
                 Image(systemName: "document.on.document")
@@ -126,7 +126,7 @@ struct InstalledListDocumentView: View {
                 .foregroundStyle(Color.red)
         }
     }
-    
+
     @ViewBuilder private func InstalledListList() -> some View {
         ScrollView {
             LazyVStack(spacing: 8) {
@@ -145,7 +145,7 @@ struct InstalledListDocumentView: View {
                         }
                     }
                 }
-                
+
                 if isLoadingLists {
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -154,10 +154,10 @@ struct InstalledListDocumentView: View {
             }
         }
     }
-    
+
     private func fetchInstalledLists(initial isInitial: Bool, searchText: String?) async {
         var filters: [String: Any] = [:]
-        
+
         if let searchText {
             filters.updateValue(searchText, forKey: "id")
         }

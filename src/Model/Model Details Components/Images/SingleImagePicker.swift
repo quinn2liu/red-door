@@ -1,14 +1,14 @@
 //
-//  CameraAlbumPicker.swift
+//  SingleImagePicker.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 7/30/25.
 //
 
-import Foundation
-import SwiftUI
-import PhotosUI
 import AVFoundation
+import Foundation
+import PhotosUI
+import SwiftUI
 
 // TODO: Figure out how this works lol
 struct SingleCameraPicker: UIViewControllerRepresentable {
@@ -22,7 +22,7 @@ struct SingleCameraPicker: UIViewControllerRepresentable {
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    func updateUIViewController(_: UIImagePickerController, context _: Context) {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -35,7 +35,7 @@ struct SingleCameraPicker: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
                 let newRDImage = RDImage(uiImage: image)
                 parent.primaryRDImage = newRDImage
@@ -43,7 +43,7 @@ struct SingleCameraPicker: UIViewControllerRepresentable {
             parent.dismiss()
         }
 
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        func imagePickerControllerDidCancel(_: UIImagePickerController) {
             parent.dismiss()
         }
     }
@@ -52,43 +52,43 @@ struct SingleCameraPicker: UIViewControllerRepresentable {
 struct SingleLibraryPicker: UIViewControllerRepresentable {
     @Binding var primaryRDImage: RDImage
     var dismiss: () -> Void
-    
+
     func makeUIViewController(context: Context) -> UIViewController {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
         configuration.selectionLimit = 1
-        
+
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
         let nav = UINavigationController(rootViewController: picker)
         return nav
     }
-    
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
-    
+
+    func updateUIViewController(_: UIViewController, context _: Context) {}
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
         let parent: SingleLibraryPicker
-        
+
         init(_ parent: SingleLibraryPicker) {
             self.parent = parent
         }
-        
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+
+        func picker(_: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             if results.isEmpty {
                 // User canceled the selection
                 parent.dismiss()
                 return
             }
-            
+
             guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else {
                 parent.dismiss()
                 return
             }
-            
+
             provider.loadObject(ofClass: UIImage.self) { image, _ in
                 DispatchQueue.main.async {
                     let newRDImage = RDImage(uiImage: image as? UIImage)
@@ -97,7 +97,7 @@ struct SingleLibraryPicker: UIViewControllerRepresentable {
                 }
             }
         }
-        
+
         @objc func didTapCancel() {
             parent.dismiss()
         }

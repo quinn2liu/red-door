@@ -5,29 +5,29 @@
 //  Created by Quinn Liu on 10/21/25.
 //
 
-import SwiftUI
 import MapKit
+import SwiftUI
 
 struct AddressSearchView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedAddress: Address
-    
+
     @State private var unit: String = ""
-    
+
     @State private var searchText = ""
     @State private var searchResults: [MKMapItem] = []
     @State private var cameraPosition: MapCameraPosition = .automatic
 
     @State private var selectedItem: MKMapItem?
-    
+
     init(_ selectedAddress: Binding<Address>) {
-        self._selectedAddress = selectedAddress
-        self.searchText = ""
-        self.searchResults = []
-        self.selectedItem = nil
-        self.cameraPosition = .automatic
+        _selectedAddress = selectedAddress
+        searchText = ""
+        searchResults = []
+        selectedItem = nil
+        cameraPosition = .automatic
     }
-    
+
     var body: some View {
         VStack(spacing: 12) {
             TextField("Search address", text: $searchText)
@@ -41,7 +41,7 @@ struct AddressSearchView: View {
                         searchResults = results
                     }
                 }
-            
+
             Map(position: $cameraPosition, selection: $selectedItem) {
                 ForEach(searchResults, id: \.self) { item in
                     Marker(item.name ?? "Location", coordinate: item.placemark.coordinate)
@@ -50,7 +50,7 @@ struct AddressSearchView: View {
             }
             .cornerRadius(8)
             .layoutPriority(searchResults.isEmpty ? 1 : 0)
-            
+
             ScrollView {
                 LazyVStack(spacing: 8) {
                     ForEach(searchResults, id: \.self) { result in
@@ -59,22 +59,23 @@ struct AddressSearchView: View {
                 }
                 .padding(2)
             }
-            
+
             if let item = selectedItem {
                 Footer()
             }
         }
     }
-    
+
     // MARK: Footer
+
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 0) {
             if let item = selectedItem {
                 TextField("Specify Unit", text: $unit)
-                
+
                 Spacer()
-                
+
                 Button {
                     if let address = convertToAddress(item) {
                         selectedAddress = address
@@ -86,8 +87,9 @@ struct AddressSearchView: View {
             }
         }
     }
-    
+
     // MARK: Search List Item
+
     @ViewBuilder
     private func SearchListItem(_ mapItem: MKMapItem) -> some View {
         let isSelected = mapItem == selectedItem
@@ -117,12 +119,13 @@ struct AddressSearchView: View {
         }
         .buttonStyle(.plain)
     }
-    
+
     // MARK: Search Address Function
-    private func searchAddress(_ searchText: String, completion: @escaping([MKMapItem]) -> Void) {
+
+    private func searchAddress(_ searchText: String, completion: @escaping ([MKMapItem]) -> Void) {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
-        
+
         let search = MKLocalSearch(request: request)
         search.start { response, error in
             guard let response = response else {
@@ -140,9 +143,9 @@ struct AddressSearchView: View {
             completion(searchResults)
         }
     }
-    
-    
+
     // MARK: - Placemark Implementation
+
     private func formatAddress(_ mapItem: MKMapItem) -> String? {
         if #available(iOS 27, *) {
             if let address = mapItem.address {
@@ -152,17 +155,17 @@ struct AddressSearchView: View {
             }
         } else {
             let placemark = mapItem.placemark
-            
+
             return [
                 placemark.thoroughfare,
                 placemark.locality,
                 placemark.administrativeArea,
-                placemark.postalCode
+                placemark.postalCode,
             ]
             .compactMap { $0 }
             .joined(separator: ", ")
         }
-   }
+    }
 
     private func convertToAddress(_ mapItem: MKMapItem) -> Address? {
         if #available(iOS 27, *) {

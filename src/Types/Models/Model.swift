@@ -9,17 +9,16 @@ import Foundation
 import SwiftUI
 
 struct Model: Identifiable, Codable, Hashable {
-    
     // ID
     var id: String
     var name: String
     var nameLowercased: String
-    
+
     // Attributes
     var type: String
     var primaryColor: String
     var primaryMaterial: String
-    
+
     // Items
     var itemIds: [String]
     var availableItemCount: Int
@@ -27,37 +26,38 @@ struct Model: Identifiable, Codable, Hashable {
     // Images
     var primaryImage: RDImage
     var secondaryImages: [RDImage]
-    
+
     init(
         id: String = UUID().uuidString,
         name: String = "",
-        
+
         itemIds: [String] = [],
-        
+
         type: String = "No Selection",
         primaryColor: String = "No Selection",
         primaryMaterial: String = "No Selection",
-        
+
         primaryImage: RDImage = RDImage(),
         secondaryImages: [RDImage] = []
     ) {
         self.id = id
         self.name = name
-        self.nameLowercased = name.lowercased()
-        
+        nameLowercased = name.lowercased()
+
         self.type = type
         self.primaryColor = primaryColor
         self.primaryMaterial = primaryMaterial
-        
+
         self.itemIds = itemIds
-        self.availableItemCount = itemIds.count
-        
+        availableItemCount = itemIds.count
+
         self.primaryImage = primaryImage
         self.secondaryImages = secondaryImages
     }
 }
 
 // MARK: primaryImageExists
+
 extension Model {
     var primaryImageExists: Bool {
         return !(primaryImage.imageURL == nil && primaryImage.uiImage == nil)
@@ -65,7 +65,8 @@ extension Model {
 }
 
 // MARK: - Mock Data
-//extension Model {
+
+// extension Model {
 //    static var MOCK_DATA: [Model] = [
 //        .init(
 //            name: "mock_Chair",
@@ -208,6 +209,4 @@ extension Model {
 //            id: "mock_Stand_id",
 //        )
 //    ]
-//}
-
-
+// }

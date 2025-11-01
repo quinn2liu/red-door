@@ -8,39 +8,40 @@
 import SwiftUI
 
 struct PLGeneratedPDFView: View {
-    
     // MARK: Init Values
+
     let pullList: RDList
     let roomViewModels: [RoomViewModel]
     let preloadedImages: [String: UIImage]
-    
+
     // MARK: Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Header()
-            
+
             VStack(alignment: .leading, spacing: 20) {
                 ForEach(roomViewModels, id: \.selectedRoom.id) { roomVM in
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Room: \(roomVM.selectedRoom.roomName)")
                             .font(.system(size: 18, weight: .bold))
                             .padding(.horizontal, 40)
-                        
+
                         if !roomVM.items.isEmpty {
                             VStack(spacing: 0) {
                                 RoomHeader()
-                                
+
                                 ForEach(roomVM.items, id: \.id) { item in
                                     HStack(spacing: 0) {
                                         ItemImage(item)
                                             .frame(width: 60, alignment: .center)
                                             .padding(.leading, 10)
-                                        
+
                                         Text(item.modelId)
                                             .font(.system(size: 11))
                                             .frame(width: 180, alignment: .leading)
                                             .padding(.leading, 8)
-                                        
+
                                         Text(item.listId)
                                             .font(.system(size: 11))
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -61,14 +62,15 @@ struct PLGeneratedPDFView: View {
                     }
                 }
             }
-            
+
             Spacer()
         }
         .frame(width: 612, height: 792)
         .background(Color.white)
     }
-    
+
     // MARK: Header
+
     @ViewBuilder
     private func Header() -> some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -83,8 +85,9 @@ struct PLGeneratedPDFView: View {
         .padding(.horizontal, 40)
         .padding(.bottom, 20)
     }
-    
+
     // MARK: Room Header
+
     @ViewBuilder
     private func RoomHeader() -> some View {
         HStack(spacing: 0) {
@@ -92,12 +95,12 @@ struct PLGeneratedPDFView: View {
                 .font(.system(size: 12, weight: .bold))
                 .frame(width: 60, alignment: .leading)
                 .padding(.leading, 8)
-            
+
             Text("Item ID")
                 .font(.system(size: 12, weight: .bold))
                 .frame(width: 180, alignment: .leading)
                 .padding(.leading, 8)
-            
+
             Text("Location")
                 .font(.system(size: 12, weight: .bold))
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -107,8 +110,9 @@ struct PLGeneratedPDFView: View {
         .background(Color(white: 0.9))
         .overlay(Rectangle().stroke(Color(white: 0.7), lineWidth: 1))
     }
-    
+
     // MARK: Item Image
+
     @ViewBuilder
     private func ItemImage(_ item: Item) -> some View {
         if let uiImage = preloadedImages[item.id] {

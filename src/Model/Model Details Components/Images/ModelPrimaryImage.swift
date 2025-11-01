@@ -5,22 +5,21 @@
 //  Created by Quinn Liu on 4/10/25.
 //
 
-import Foundation
-import SwiftUI
-import PhotosUI
 import AVFoundation
 import CachedAsyncImage
+import Foundation
+import PhotosUI
+import SwiftUI
 
 struct ModelPrimaryImage: View {
-    
     @State private var showEditAlert: Bool = false
     @State private var activeSheet: ImageSourceEnum?
-    
+
     @Binding var primaryRDImage: RDImage
     @Binding var selectedRDImage: RDImage?
     @Binding var isImageSelected: Bool
     @Binding var isEditing: Bool
-    
+
     var body: some View {
         Button {
             if isEditing {
@@ -74,7 +73,7 @@ struct ModelPrimaryImage: View {
         .contentShape(Rectangle())
         .cornerRadius(12)
     }
-    
+
     @ViewBuilder
     private func EditPhotoAlert() -> some View {
         Group {
@@ -83,24 +82,20 @@ struct ModelPrimaryImage: View {
             } label: {
                 Text("Library")
             }
-            
+
             Button(role: .none) {
                 activeSheet = .camera
             } label: {
                 Text("Camera")
             }
-            
+
             if isEditing {
-                Button(role: .destructive) {
-                    
-                } label: {
+                Button(role: .destructive) {} label: {
                     Text("Delete")
                 }
             }
-            
-            Button(role: .cancel) {
-                
-            } label: {
+
+            Button(role: .cancel) {} label: {
                 Text("Cancel")
             }
         }
@@ -108,7 +103,7 @@ struct ModelPrimaryImage: View {
 }
 
 //
-//#Preview {
+// #Preview {
 //    @Previewable @State var primaryImage: UIImage? = nil
 //    ModelPrimaryImage(primaryImage: $primaryImage)
-//}
+// }

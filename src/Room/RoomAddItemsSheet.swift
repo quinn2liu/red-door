@@ -7,48 +7,53 @@
 
 import SwiftUI
 
-
 struct RoomAddItemsSheet: View {
     // MARK: Environment Variables
+
     @Environment(\.dismiss) private var dismiss
-    
+
     // MARK: View Parameters
-    @State private var inventoryViewModel: DocumentsListViewModel = DocumentsListViewModel(.model)
+
+    @State private var inventoryViewModel: DocumentsListViewModel = .init(.model)
     @Binding var roomViewModel: RoomViewModel
     @Binding var showSheet: Bool
-    
+
     // MARK: init()
+
     init(roomViewModel: Binding<RoomViewModel>, showSheet: Binding<Bool>) {
-        self._roomViewModel = roomViewModel
-        self._showSheet = showSheet
+        _roomViewModel = roomViewModel
+        _showSheet = showSheet
     }
-    
+
     // MARK: Filter Variables
+
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
-    
+
     // MARK: State Variables
-    @State var path: NavigationPath = NavigationPath()
+
+    @State var path: NavigationPath = .init()
     @State private var searchFocused: Bool = false
     @FocusState var searchTextFocused: Bool
     @State private var isLoadingModels: Bool = false
-    
+
     // MARK: Body
+
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 16) {
                 if !searchTextFocused {
                     TopBar()
                 }
-                
+
                 if searchFocused {
                     SearchBar()
                 }
-                
+
                 ModelInventoryFilterView(selectedType: $selectedType)
-                
+
                 InventoryList()
-                
+
                 Spacer()
             }
             .frameTop()
@@ -87,8 +92,9 @@ struct RoomAddItemsSheet: View {
             }
         }
     }
-    
+
     // MARK: Top Bar
+
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
@@ -110,19 +116,20 @@ struct RoomAddItemsSheet: View {
                             Image(systemName: "magnifyingglass")
                         }
                     }
-                    
+
                     ToolBarMenu()
                 }
             }
         ).tint(.red)
     }
-    
+
     // MARK: Search Bar
+
     @ViewBuilder private func SearchBar() -> some View {
         HStack(spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                
+
                 TextField("", text: $searchText, prompt: Text("Search..."))
                     .submitLabel(.search)
                     .focused($searchTextFocused)
@@ -138,7 +145,7 @@ struct RoomAddItemsSheet: View {
             }
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
-            
+
             if searchTextFocused {
                 Button("Cancel") {
                     searchText = ""
@@ -150,22 +157,24 @@ struct RoomAddItemsSheet: View {
         }
         .animation(.bouncy(duration: 0.5), value: searchTextFocused)
     }
-    
+
     // MARK: ToolBarMenu
+
     @ViewBuilder private func ToolBarMenu() -> some View {
         Menu {
             NavigationLink(destination: CreateModelView()) {
                 Label("Add Item", systemImage: "plus")
             }
-                
+
             Label("Scan Item", systemImage: "qrcode.viewfinder")
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.red)
         }
     }
-    
+
     // MARK: InventoryList
+
     @ViewBuilder private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
@@ -182,43 +191,43 @@ struct RoomAddItemsSheet: View {
                         }
                     }
                 }
-                
+
                 if isLoadingModels {
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding()
                 }
-                
             }
         }
     }
-    
+
     // MARK: Fetch Models (Using the Abstracted ViewModel)
+
     @MainActor
     private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {
         isLoadingModels = true
-        
+
         var filters: [String: Any] = [:]
         filters["itemsAvailable"] = true
-        
+
         if let modelType {
             filters["type"] = modelType.rawValue
         }
-        
+
         if let searchText {
             filters["nameLowercased"] = searchText.lowercased()
         }
-        
+
         if isInitial {
             await inventoryViewModel.fetchInitialDocuments(filters: filters)
         } else {
             await inventoryViewModel.fetchMoreDocuments(filters: filters)
         }
-        
+
         isLoadingModels = false
     }
 }
 
-//#Preview {
+// #Preview {
 //    RoomAddItemsSheet(room: Room.MOCK_DATA[0], showSheet: .constant(true))
-//}
+// }

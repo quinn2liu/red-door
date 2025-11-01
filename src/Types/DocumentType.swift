@@ -9,7 +9,7 @@ import Foundation
 
 enum DocumentType: String, Codable {
     case model, pull_list, installed_list, storage
-    
+
     var collectionString: String {
         switch self {
         case .model:
@@ -22,16 +22,16 @@ enum DocumentType: String, Codable {
             return "storage"
         }
     }
-    
+
     var documentDataType: Codable.Type {
         switch self {
-            case .model:
-                return Model.self
-            case .pull_list, .installed_list, .storage:
-                return RDList.self
+        case .model:
+            return Model.self
+        case .pull_list, .installed_list, .storage:
+            return RDList.self
         }
     }
-    
+
     var orderByField: String {
         switch self {
         case .model:

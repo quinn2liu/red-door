@@ -9,29 +9,30 @@ import SwiftUI
 
 struct CreatePullListView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var viewModel: RDListViewModel = RDListViewModel()
-    
+
+    @State private var viewModel: RDListViewModel = .init()
+
     @State private var showAddressSheet: Bool = false
     @State private var selectedAddressMode: String = "Search"
     let addressOptions = ["Search", "Entry"]
     @State private var address: String = ""
-    @State private var date: Date = Date()
-    
+    @State private var date: Date = .init()
+
     @State private var showCreateRoom: Bool = false
     private var rooms: [Room]?
-    
+
     // MARK: Body
+
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
-            
+
             DatePicker(
                 "Install Date:",
                 selection: $date,
                 displayedComponents: [.date]
             )
-            
+
             HStack {
                 Text("Client:")
                 TextField("", text: $viewModel.selectedList.client)
@@ -39,7 +40,7 @@ struct CreatePullListView: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
             }
-            
+
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
@@ -48,12 +49,12 @@ struct CreatePullListView: View {
                         }
                     }
                 }
-                
+
                 TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
                     showCreateRoom = true
                 }
             }
-            
+
             Spacer()
         }
         .ignoresSafeArea(.keyboard)
@@ -70,8 +71,9 @@ struct CreatePullListView: View {
             AddressSheet()
         }
     }
-    
+
     // MARK: TopBar
+
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             BackButton()
@@ -96,7 +98,7 @@ struct CreatePullListView: View {
             }
         })
     }
-    
+
     @ViewBuilder
     private func AddressSheet() -> some View {
         VStack(alignment: .center, spacing: 12) {
@@ -104,14 +106,14 @@ struct CreatePullListView: View {
                 .fill(Color(.systemGray3))
                 .frame(width: 40, height: 5)
                 .padding(.top, 8)
-            
+
             Picker("Address Mode", selection: $selectedAddressMode) {
                 ForEach(addressOptions, id: \.self) { mode in
                     Text(mode).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
-            
+
             Group {
                 if selectedAddressMode == "Search" {
                     AddressSearchView($viewModel.selectedList.address)
@@ -124,18 +126,18 @@ struct CreatePullListView: View {
         .frameTopPadding()
         .frameHorizontalPadding()
     }
-    
+
     // MARK: Create Empty Room Sheet ()
+
     @FocusState var keyboardFocused: Bool
     @State private var newRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
     @ViewBuilder private func CreateEmptyRoomSheet() -> some View {
-
         VStack(spacing: 16) {
             TextField("Room Name", text: $newRoomName)
                 .focused($keyboardFocused)
                 .submitLabel(.done)
-            
+
             HStack(spacing: 0) {
                 Button {
                     showCreateRoom = false
@@ -159,19 +161,19 @@ struct CreatePullListView: View {
             }
         }
         .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
-            Button("Ok", role: .cancel) { }
+            Button("Ok", role: .cancel) {}
         }
         .frameHorizontalPadding()
         .presentationDetents([.fraction(0.1)])
     }
-    
+
     // MARK: EmptyRoomListItem()
+
     @ViewBuilder private func EmptyRoomListItem(_ roomName: String) -> some View {
-    
         HStack(spacing: 0) {
             Text(roomName)
                 .foregroundStyle(Color(.label))
-                    
+
             Spacer()
         }
         .padding(.vertical, 8)
@@ -180,7 +182,6 @@ struct CreatePullListView: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
-
 
 #Preview {
     CreatePullListView()

@@ -5,8 +5,8 @@
 //  Created by Quinn Liu on 1/6/25.
 //
 
-import Foundation
 import CoreLocation
+import Foundation
 import MapKit
 
 struct Address: Codable, Hashable {
@@ -15,7 +15,7 @@ struct Address: Codable, Hashable {
     var warehouseNumber: String?
     let formattedAddress: String
 //    var coordinates: GeoPoint?
-    
+
     init(
         street: String,
         city: String,
@@ -27,37 +27,36 @@ struct Address: Codable, Hashable {
         //        coordinates: GeoPoint? = nil
     ) {
         // ID: concatenated, lowercased, trimmed, no punctuation or spaces
-        self.id = Address.normalize([street, city, state, zipcode, country].joined())
-        
+        id = Address.normalize([street, city, state, zipcode, country].joined())
+
         // Formatted address: standard comma-separated form
-        self.formattedAddress = [
+        formattedAddress = [
             street,
             city,
             state,
             zipcode,
             country,
-            unit
+            unit,
         ]
         .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
         .filter { !$0.isEmpty }
         .joined(separator: ", ")
-        
+
         self.warehouseNumber = warehouseNumber
     }
-    
+
     @available(iOS 26.0, *)
     init(address: MKAddress, unit: String? = nil, warehouseNumber: String? = nil) {
-        self.id = Address.normalize(address.fullAddress)
-        self.formattedAddress = address.fullAddress
+        id = Address.normalize(address.fullAddress)
+        formattedAddress = address.fullAddress
         self.unit = unit
         self.warehouseNumber = warehouseNumber
     }
-    
 
     init(placemark: MKPlacemark, unit: String? = nil, warehouseNumber: String? = nil) {
         let street = [
             placemark.subThoroughfare,
-            placemark.thoroughfare
+            placemark.thoroughfare,
         ]
         .compactMap { $0 }
         .joined(separator: " ")
@@ -67,15 +66,15 @@ struct Address: Codable, Hashable {
         let zipcode = placemark.postalCode ?? ""
         let country = placemark.country ?? ""
 
-        self.id = Address.normalize([street, city, state, zipcode, country].joined())
+        id = Address.normalize([street, city, state, zipcode, country].joined())
 
-        self.formattedAddress = [
+        formattedAddress = [
             street,
             city,
             state,
             zipcode,
             country,
-            unit
+            unit,
         ]
         .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
         .filter { !$0.isEmpty }
@@ -84,11 +83,11 @@ struct Address: Codable, Hashable {
         self.unit = unit
         self.warehouseNumber = warehouseNumber
     }
-    
+
     func isInitialized() -> Bool {
         warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
     }
-    
+
     static func normalize(_ input: String) -> String {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         let lowercase = trimmed.lowercased()
@@ -97,4 +96,3 @@ struct Address: Codable, Hashable {
         return noSpaces
     }
 }
-
