@@ -20,6 +20,8 @@ struct AddressSearchView: View {
 
     @State private var selectedItem: MKMapItem?
 
+    // MARK: Init
+    
     init(_ selectedAddress: Binding<Address>) {
         _selectedAddress = selectedAddress
         searchText = ""
@@ -27,6 +29,8 @@ struct AddressSearchView: View {
         selectedItem = nil
         cameraPosition = .automatic
     }
+
+    // MARK: Body
 
     var body: some View {
         VStack(spacing: 12) {
@@ -69,8 +73,14 @@ struct AddressSearchView: View {
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 0) {
-            if let item = selectedItem {
+            if let item: MKMapItem = selectedItem {
                 TextField("Specify Unit", text: $unit)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(.systemGray6), lineWidth: 2)
+                    )
 
                 Spacer()
 
@@ -80,7 +90,12 @@ struct AddressSearchView: View {
                     }
                     dismiss()
                 } label: {
-                    Text("Use This Address")
+                    RedDoorButton(type: .green, text: "Use This Address", action: {
+                        if let address = convertToAddress(item) {
+                            selectedAddress = address
+                        }
+                        dismiss()
+                    })
                 }
             }
         }
@@ -165,6 +180,8 @@ struct AddressSearchView: View {
         }
     }
 
+    // MARK: Convert to Address Function
+
     private func convertToAddress(_ mapItem: MKMapItem) -> Address? {
         if #available(iOS 27, *) {
             if let address = mapItem.address {
@@ -174,7 +191,7 @@ struct AddressSearchView: View {
             }
         } else {
             let placemark = mapItem.placemark
-            return Address(placemark: placemark)
+            return Address(placemark: placemark, unit: unit)
         }
     }
 }

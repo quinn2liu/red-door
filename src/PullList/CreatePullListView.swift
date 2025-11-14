@@ -125,7 +125,7 @@ struct CreatePullListView: View {
             }
         }
         .frameTop()
-        .frameTopPadding()
+        .frameVerticalPadding()
         .frameHorizontalPadding()
     }
 

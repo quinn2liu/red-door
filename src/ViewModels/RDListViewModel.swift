@@ -27,7 +27,7 @@ class RDListViewModel {
         self.selectedList = selectedList
         self.rooms = rooms
 
-        listDocumentRef = db.collection("\(selectedList.listType.collectionString)").document("\(selectedList.id)")
+        listDocumentRef = db.collection(selectedList.listType.collectionString).document(selectedList.id)
         roomsDocumentRef = listDocumentRef.collection("rooms")
     }
 
