@@ -1,38 +1,39 @@
-BIG FEATURES:
-    ☐ 
+Major Changes:
+    Architecture:
+        ☐ Navigation Coordinator
+        ☐ Kingfisher
+        ☐ DataStores (Model, Item, Room, RDList, Images, etc.)
 
-Addresses:
+    ☐ Update all Edit views to be a sheet instead of "isEditing" state variable
+
+Address:
     ✔ Finish styling the button @started(25-11-14 18:19) @done(25-11-14 18:42) @lasted(23m56s)
     ✔ refactor address functions @done(25-11-16 12:54)
     ✔ Make sure publishing the address works @done(25-11-16 13:31)
 
 Pull Lists:
-        
+    ✔ create pull list from installed list @started(25-11-16 15:43) @done(25-11-16 16:19) @lasted(36m15s)
+
     Pull List View / Create Pull List View:
-        ☐ update room list item
-        ☐ add option to add an image of the location
+        ☐ VIEW: update room list item
+        ☐ VIEW: add option to add an image of the location
         ☐ BUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
 
     Room:
-        ☐ update room ID (what would the best format be?)
+        ☐ FEATURE: update room ID (what would the best format be?)
 
 Installed Lists:
     Pipeline:
-        ☐ validate installed list behavior (populate only available items vs. populate all items even if invalid)
+        ☐ FEATURE:validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
 RDList:
-    ☐ RDList List Item
+    ☐ VIEW: RDList List Item
 
     RDList View Model:
-        ☐ RDList generic functions
-        ☐ Pull List View Model that extends RDList View Model
-        ☐ Installed List View Model that extends RDList View Model
+        ✔ RDList generic functions @done(25-11-16 16:20)
+        ✔ Pull List View Model that extends RDList View Model @done(25-11-16 15:43)
+        ✔ Installed List View Model that extends RDList View Model @done(25-11-16 15:43)
 
 Model:
-    ☐ Item count stepper (create model view, item stepper goes from 0 -> 2)
-
-Architecture:
-    ☐ Navigation Coordinator
-    ☐ Kingfisher
-    ☐ DataStores (Model, Item, Room, RDList, Images, etc.)
+    ☐ BUG: Item count stepper (create model view, item stepper goes from 0 -> 2)
         

@@ -163,9 +163,8 @@ struct InstalledListDetailView: View {
 
                 Button {
                     Task {
-                        // TODO: create pull list from installed list
-                        // let pullList = try await viewModel.createInstalledFromPull()
-                        // path.append(pullList)
+                        let pullList = try await viewModel.createPullFromInstalled()
+                        path.append(pullList)
                     }
                 } label: {
                     Text("Create Pull List")

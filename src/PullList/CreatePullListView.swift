@@ -10,7 +10,7 @@ import SwiftUI
 struct CreatePullListView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @State private var viewModel: RDListViewModel = .init()
+    @State private var viewModel: PullListViewModel = .init()
 
     @State private var showAddressSheet: Bool = false
     @State private var selectedAddressMode: String = "Search"
@@ -84,7 +84,7 @@ struct CreatePullListView: View {
                 showAddressSheet = true
             } label: {
                 if viewModel.selectedList.address.isInitialized() {
-                    Text(viewModel.selectedList.address.formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                    Text(viewModel.selectedList.address.getStreetAddress() ?? "")
                 } else {
                     Text("Enter Address")
                 }

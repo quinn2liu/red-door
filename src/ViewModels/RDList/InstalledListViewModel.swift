@@ -13,14 +13,17 @@ class InstalledListViewModel: RDListViewModel {
     // MARK: Create Pull List from Installed List
 
     func createPullFromInstalled() async throws -> RDList {
-        let pullList = RDList(list: selectedList, listType: .pull_list)
-        let pullListRef = db.collection("pull_lists").document(pullList.id)
-        let roomsRef = pullListRef.collection("rooms")
+        // Empty Pull List Copy
+        var copyPullList = RDList(address: Address(street: "Copy of \(selectedList.address.getStreetAddress() ?? "")"), listType: .pull_list)
+        copyPullList.roomIds = selectedList.roomIds
+
+        let copyPullListRef = db.collection("pull_lists").document(copyPullList.id)
+        let roomsRef = copyPullListRef.collection("rooms")
 
         let result = try await db.runTransaction { transaction, _ in
             // 1. Create pull list
             do {
-                try transaction.setData(from: pullList, forDocument: pullListRef)
+                try transaction.setData(from: copyPullList, forDocument: copyPullListRef)
             } catch {
                 print("Error creating pullList document: (\(error.localizedDescription))")
                 return nil
@@ -36,13 +39,13 @@ class InstalledListViewModel: RDListViewModel {
                     return nil
                 }
             }
-            return pullList
+            return copyPullList
         }
 
-        guard let pullList = result as? RDList else {
+        guard let pullList: RDList = result as? RDList else {
             throw InstalledFromPullError.creationFailed
         }
-
+        print("pullList copy from installed: \(pullList)")
         return pullList
     }
 }

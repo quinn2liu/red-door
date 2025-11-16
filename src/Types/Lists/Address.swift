@@ -10,17 +10,19 @@ import Foundation
 import MapKit
 
 struct Address: Codable, Hashable {
-    var id: String // lowercased, trimmed, not punctuation
+    var id: String // adderss string that's lowercased, trimmed, not punctuation
     var warehouseNumber: String?
     var formattedAddress: String
 //    var coordinates: GeoPoint?
 
+    // MARK: Init
+
     init(
-        street: String,
-        city: String,
-        state: String,
-        zipcode: String,
-        country: String,
+        street: String = "",
+        city: String = "",
+        state: String = "",
+        zipcode: String = "",
+        country: String = "",
         unit: String? = nil,
         warehouseNumber: String? = nil
         //        coordinates: GeoPoint? = nil
@@ -63,10 +65,13 @@ struct Address: Codable, Hashable {
         self.warehouseNumber = warehouseNumber
     }
 
+    // MARK: isInitialized
+
     func isInitialized() -> Bool {
         warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
     }
 
+    // MARK: Formatted Address
     static func formattedAddress(street: String, city: String, state: String, zipcode: String, country: String, unit: String? = nil) -> String {
         return [
             street,
@@ -81,11 +86,19 @@ struct Address: Codable, Hashable {
         .joined(separator: ", ")
     }
 
+    // MARK: Normalize
+
     static func normalize(_ input: String) -> String {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         let lowercase = trimmed.lowercased()
         let noPunctuation = lowercase.components(separatedBy: CharacterSet.punctuationCharacters).joined()
         let noSpaces = noPunctuation.replacingOccurrences(of: " ", with: "")
         return noSpaces
+    }
+
+    // MARK: Get Street Address
+
+    func getStreetAddress() -> String? {
+        return formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
