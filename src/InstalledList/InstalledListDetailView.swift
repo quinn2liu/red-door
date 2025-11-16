@@ -9,11 +9,11 @@ import SwiftUI
 
 struct InstalledListDetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var viewModel: RDListViewModel
+    @State private var viewModel: InstalledListViewModel
     @Binding var path: NavigationPath
 
     init(installedList: RDList, path: Binding<NavigationPath>) {
-        viewModel = RDListViewModel(selectedList: installedList)
+        viewModel = InstalledListViewModel(selectedList: installedList)
         _path = path
     }
 
@@ -25,6 +25,7 @@ struct InstalledListDetailView: View {
     @State private var address: String = ""
     @State private var date: Date = .init()
 
+    // MARK: Body
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
@@ -47,7 +48,7 @@ struct InstalledListDetailView: View {
         .frameHorizontalPadding()
     }
 
-    // MARK: TopBar()
+    // MARK: Top Bar
 
     @ViewBuilder 
     private func TopBar() -> some View {
@@ -90,7 +91,7 @@ struct InstalledListDetailView: View {
         })
     }
 
-    // MARK: InstalledListDetails()
+    // MARK: Installed List Details
 
     @ViewBuilder 
     private func InstalledListDetails() -> some View {
@@ -116,7 +117,7 @@ struct InstalledListDetailView: View {
         }
     }
 
-    // MARK: RoomList()
+    // MARK: Room List
 
     @ViewBuilder 
     private func RoomList() -> some View {
@@ -142,7 +143,7 @@ struct InstalledListDetailView: View {
         }
     }
 
-    // MARK: Footer()
+        // MARK: Footer
 
     @ViewBuilder 
     private func Footer() -> some View {
@@ -162,8 +163,9 @@ struct InstalledListDetailView: View {
 
                 Button {
                     Task {
-                        let pullList = try await viewModel.createInstalledFromPull()
-                        path.append(pullList)
+                        // TODO: create pull list from installed list
+                        // let pullList = try await viewModel.createInstalledFromPull()
+                        // path.append(pullList)
                     }
                 } label: {
                     Text("Create Pull List")

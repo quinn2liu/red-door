@@ -51,20 +51,20 @@ struct RDList: Codable, Identifiable, Hashable {
     // MARK: - Init from Existing List
 
     init(
-        pullList: RDList,
+        list: RDList,
         listType: DocumentType
     ) {
-        id = pullList.id
+        id = list.id
         self.listType = listType
 
-        address = pullList.address
-        addressId = pullList.address.id
+        address = list.address
+        addressId = list.address.id
 
-        createdDate = pullList.createdDate
-        installDate = pullList.installDate
-        installed = pullList.installed
-        client = pullList.client
-        roomIds = pullList.roomIds
+        createdDate = list.createdDate
+        installDate = list.installDate
+        installed = list.installed
+        client = list.client
+        roomIds = list.roomIds
     }
 
     // MARK: - Init from blank

@@ -22,15 +22,15 @@ struct PullListDetailsView: View {
     @State private var showCreateRoom: Bool = false
     @State private var errorMessage: String?
     @State private var showPDF: Bool = false
-
-    // MARK: PullListData
-
+    @State private var newRoomName: String = ""
+    @State private var existingRoomAlert: Bool = false
+    
     @State private var address: String = ""
     @State private var date: Date = .init()
-    @State private var viewModel: RDListViewModel
+    @State private var viewModel: PullListViewModel
 
     init(pullList: RDList, path: Binding<NavigationPath>) {
-        viewModel = RDListViewModel(selectedList: pullList)
+        viewModel = PullListViewModel(selectedList: pullList)
         _path = path
     }
 
@@ -58,18 +58,29 @@ struct PullListDetailsView: View {
             PullListPDFView(pullList: viewModel.selectedList, rooms: viewModel.rooms)
         }
         .alert("Pull List Not Valid",
-               isPresented: .constant(errorMessage != nil),
-               actions: {
-                   Button("Close") { errorMessage = nil }
-               },
-               message: {
-                   if let errorMessage = errorMessage {
-                       Text(errorMessage)
-                   }
-               })
+            isPresented: .constant(errorMessage != nil),
+            actions: {
+                Button("Close") { errorMessage = nil }
+            },
+            message: {
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                }
+            }
+        )
+        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
+            Button("Ok", role: .cancel) {}
+        }
+        .sheet(isPresented: $showCreateRoom) {
+            CreateEmptyRoomSheet()
+                .onAppear {
+                    newRoomName = ""
+                    keyboardFocused = true
+                }
+        }
     }
 
-    // MARK: TopBar()
+    // MARK: Top Bar
 
     @ViewBuilder
     private func TopBar() -> some View {
@@ -112,7 +123,7 @@ struct PullListDetailsView: View {
         })
     }
 
-    // MARK: PullListDetails()
+    // MARK: Pull List Details
 
     @ViewBuilder
     private func PullListDetails() -> some View {
@@ -138,7 +149,7 @@ struct PullListDetailsView: View {
         }
     }
 
-    // MARK: RoomList()
+    // MARK: Room List
 
     @ViewBuilder
     private func RoomList() -> some View {
@@ -164,7 +175,7 @@ struct PullListDetailsView: View {
         }
     }
 
-    // MARK: Footer()
+    // MARK: Footer
 
     @ViewBuilder
     private func Footer() -> some View {
@@ -192,6 +203,7 @@ struct PullListDetailsView: View {
                     Task { // TODO: consider wrapping this in some error-handling function
                         do {
                             let installedlist = try await viewModel.createInstalledFromPull()
+                            path.append(installedlist)
                         } catch let PullListValidationError.itemDoesNotExist(id) {
                             errorMessage = "Item \(id) does not exist."
                         } catch let PullListValidationError.itemNotAvailable(id) {
@@ -217,5 +229,44 @@ struct PullListDetailsView: View {
                 }
             }
         }
+    }
+
+    // MARK: Create Empty Room Sheet
+
+    @ViewBuilder
+    private func CreateEmptyRoomSheet() -> some View {
+        VStack(spacing: 16) {
+            TextField("Room Name", text: $newRoomName)
+                .focused($keyboardFocused)
+                .submitLabel(.done)
+
+            HStack(spacing: 0) {
+                Button {
+                    showCreateRoom = false
+                } label: {
+                    Text("Cancel")
+                        .foregroundStyle(.red)
+                }
+
+                Spacer()
+
+                Button {
+                    existingRoomAlert = !viewModel.createEmptyRoom(newRoomName)
+                    print("selectedList.roomIds: \(viewModel.selectedList.roomIds)")
+                    if !existingRoomAlert { showCreateRoom = false }
+                } label: {
+                    Text("Add Room")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.blue)
+                }
+            }
+        }
+        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
+            Button("Ok", role: .cancel) {}
+        }
+        .frameTop()
+        .frameHorizontalPadding()
+        .frameVerticalPadding()
+        .presentationDetents([.fraction(0.125)])
     }
 }
