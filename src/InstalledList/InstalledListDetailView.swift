@@ -49,7 +49,8 @@ struct InstalledListDetailView: View {
 
     // MARK: TopBar()
 
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder 
+    private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             if isEditing {
                 Button {
@@ -78,7 +79,7 @@ struct InstalledListDetailView: View {
                     if dateString != viewModel.selectedList.installDate {
                         viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
                     }
-                    viewModel.updatePullList()
+                    viewModel.updateRDList()
                 }
                 isEditing.toggle()
             } label: {
@@ -91,7 +92,8 @@ struct InstalledListDetailView: View {
 
     // MARK: InstalledListDetails()
 
-    @ViewBuilder private func InstalledListDetails() -> some View {
+    @ViewBuilder 
+    private func InstalledListDetails() -> some View {
         VStack(spacing: 12) {
             if isEditing {
                 DatePicker(
@@ -116,7 +118,8 @@ struct InstalledListDetailView: View {
 
     // MARK: RoomList()
 
-    @ViewBuilder private func RoomList() -> some View {
+    @ViewBuilder 
+    private func RoomList() -> some View {
         VStack(spacing: 12) {
             ScrollView {
                 LazyVStack {
@@ -127,7 +130,7 @@ struct InstalledListDetailView: View {
             }
             .refreshable {
                 Task {
-                    await viewModel.refreshPullList()
+                    await viewModel.refreshRDList()
                 }
             }
 
@@ -139,36 +142,33 @@ struct InstalledListDetailView: View {
         }
     }
 
-    @ViewBuilder private func Footer() -> some View {
+    // MARK: Footer()
+
+    @ViewBuilder 
+    private func Footer() -> some View {
         if isEditing {
             HStack {
-                Button("Delete Pull List") {
+                Button("Delete Installed List") {
                     Task {
-                        await viewModel.deletePullList()
+                        await viewModel.deleteRDList()
                         dismiss()
                     }
                 }
 
-                Button("Save Pull List") {
-                    viewModel.updatePullList()
+                Button("Save Installed List") {
+                    viewModel.updateRDList()
                     dismiss()
                 }
+
+                Button {
+                    Task {
+                        let pullList = try await viewModel.createInstalledFromPull()
+                        path.append(pullList)
+                    }
+                } label: {
+                    Text("Create Pull List")
+                }                
             }
-        } else {
-//            Button {
-//                // turn into installed list
-//            } label: {
-//                RedDoorButton(type: .green, text: "Create Installed List") {
-//                    Task {
-//                        let installedList = await viewModel.createInstalledFromPull()
-            ////                        path.append(installedList)
-//                    }
-//                }
-//            }
         }
     }
 }
-
-// #Preview {
-//    InstalledListDetailView()
-// }

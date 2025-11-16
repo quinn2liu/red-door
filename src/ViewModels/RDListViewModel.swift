@@ -67,38 +67,38 @@ extension RDListViewModel {
     // MARK: Refresh PL
 
     @MainActor
-    func refreshPullList() async {
+    func refreshRDList() async {
         do {
             let document = try await selectedListReference.getDocument()
 
-            if let data = document.data() {
+            if let data: [String : Any] = document.data() {
                 let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
-                let updatedPullList = try JSONDecoder().decode(RDList.self, from: jsonData)
+                let updatedRDList = try JSONDecoder().decode(RDList.self, from: jsonData)
 
-                if selectedList != updatedPullList {
-                    selectedList = updatedPullList
+                if selectedList != updatedRDList {
+                    selectedList = updatedRDList
                 }
 
                 await loadRooms()
             }
         } catch {
-            print("Error refreshing pull list: \(error.localizedDescription)")
+            print("Error refreshing RDList: \(error.localizedDescription)")
         }
     }
 
     // MARK: Update PL
 
-    func updatePullList() {
+    func updateRDList() {
         do {
             try selectedListReference.setData(from: selectedList, merge: true)
         } catch {
-            print("Error adding pull list: \(selectedList.id): \(error)")
+            print("Error adding RDList: \(selectedList.id): \(error)")
         }
     }
 
     // MARK: Delete PL
 
-    func deletePullList() async {
+    func deleteRDList() async {
         do {
             let roomsSnapshot = try await selectedListReference.collection("rooms").getDocuments()
 
@@ -165,6 +165,7 @@ extension RDListViewModel {
 // MARK: - Installed List
 
 extension RDListViewModel {
+    
     // MARK: Create Installed List from Pull List
 
     func createInstalledFromPull() async throws -> RDList {

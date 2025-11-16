@@ -101,7 +101,7 @@ struct PullListDetailsView: View {
                     if dateString != viewModel.selectedList.installDate {
                         viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
                     }
-                    viewModel.updatePullList()
+                    viewModel.updateRDList()
                 }
                 isEditing.toggle()
             } label: {
@@ -152,7 +152,7 @@ struct PullListDetailsView: View {
             }
             .refreshable {
                 Task {
-                    await viewModel.refreshPullList()
+                    await viewModel.refreshRDList()
                 }
             }
 
@@ -172,13 +172,13 @@ struct PullListDetailsView: View {
             HStack(spacing: 12) {
                 Button("Delete Pull List") {
                     Task {
-                        await viewModel.deletePullList()
+                        await viewModel.deleteRDList()
                         dismiss()
                     }
                 }
 
                 Button("Save Pull List") {
-                    viewModel.updatePullList()
+                    viewModel.updateRDList()
                     dismiss()
                 }
             }
@@ -212,7 +212,7 @@ struct PullListDetailsView: View {
 
                 RedDoorButton(type: .blue, text: "Refresh Contents") {
                     Task {
-                        await viewModel.refreshPullList()
+                        await viewModel.refreshRDList()
                     }
                 }
             }

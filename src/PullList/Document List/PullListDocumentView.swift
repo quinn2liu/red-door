@@ -12,6 +12,7 @@ struct PullListDocumentView: View {
     @State private var viewModel = DocumentsListViewModel(.pull_list)
 
     @State private var searchText: String = ""
+    @State private var showFromInstalledCover: Bool = false
 
     // MARK: View Modifier Variables
 
@@ -116,18 +117,21 @@ struct PullListDocumentView: View {
                 Text("From Scratch")
                 Image(systemName: "checklist")
             }
-
-            NavigationLink(destination: InstalledToPullBrowseView()) {
-                Text("From Installed List")
-                Image(systemName: "document.on.document")
-            }
+            // Button {
+            //     showFromInstalledCover = true
+            // } label: {
+            //     Text("From Installed List")
+            //     Image(systemName: "document.on.document")
+            // }
         } label: {
             Image(systemName: "plus")
                 .foregroundStyle(Color.red)
         }
     }
 
-    @ViewBuilder private func PullListList() -> some View {
+
+    @ViewBuilder 
+    private func PullListList() -> some View {
         ScrollView {
             LazyVStack(spacing: 8) {
                 ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { pullList in
@@ -154,6 +158,8 @@ struct PullListDocumentView: View {
             }
         }
     }
+
+    // MARK: Fetch Pull Lists
 
     private func fetchPullLists(initial isInitial: Bool, searchText: String?) async {
         var filters: [String: Any] = [:]

@@ -1,11 +1,30 @@
+
 Addresses:
     ✔ Finish styling the button @started(25-11-14 18:19) @done(25-11-14 18:42) @lasted(23m56s)
-    ☐ refactor address functions
-    ☐ Make sure publishing the address works
+    ✔ refactor address functions @done(25-11-16 12:54)
+    ✔ Make sure publishing the address works @done(25-11-16 13:31)
 
 Pull Lists:
-    Pull List View Model:
-
-    Pull List View:
+    Create Pull List from Installed List:
+        1. navigate to specific installed list and hit create pull list
+        
+    Pull List View / Create Pull List View:
+        ☐ update room list item
         ☐ add option to add an image of the location
-        ☐ 
+
+    Room:
+        ☐ update room ID (what would the best format be?)
+
+RDList:
+    ☐ RDList List Item
+
+    RDList View Model:
+        ☐ RDList generic functions
+        ☐ Pull List View Model that extends RDList View Model
+        ☐ Installed List View Model that extends RDList View Model
+
+Architecture:
+    ☐ Navigation Coordinator
+    ☐ Kingfisher
+    ☐ DataStores (Model, Item, Room, RDList, Images, etc.)
+        

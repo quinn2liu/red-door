@@ -75,7 +75,8 @@ struct InstalledListDocumentView: View {
 
     // MARK: Search Bar
 
-    @ViewBuilder private func SearchBar() -> some View {
+    @ViewBuilder 
+    private func SearchBar() -> some View {
         HStack(spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
@@ -110,7 +111,8 @@ struct InstalledListDocumentView: View {
 
     // MARK: Tool Bar Menu
 
-    @ViewBuilder private func ToolBarMenu() -> some View {
+    @ViewBuilder 
+    private func ToolBarMenu() -> some View {
         Menu {
             NavigationLink(destination: CreatePullListView()) {
                 Text("From Scratch")
@@ -127,7 +129,10 @@ struct InstalledListDocumentView: View {
         }
     }
 
-    @ViewBuilder private func InstalledListList() -> some View {
+    // MARK: Installed List List
+
+    @ViewBuilder 
+    private func InstalledListList() -> some View {
         ScrollView {
             LazyVStack(spacing: 8) {
                 ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { installedList in
@@ -154,6 +159,8 @@ struct InstalledListDocumentView: View {
             }
         }
     }
+
+    // MARK: Fetch Installed Lists
 
     private func fetchInstalledLists(initial isInitial: Bool, searchText: String?) async {
         var filters: [String: Any] = [:]
