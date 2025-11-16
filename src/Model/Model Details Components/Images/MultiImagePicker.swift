@@ -5,10 +5,10 @@
 //  Created by Quinn Liu on 7/30/25.
 //
 
-import Foundation
-import SwiftUI
-import PhotosUI
 import AVFoundation
+import Foundation
+import PhotosUI
+import SwiftUI
 
 struct MultiCameraPicker: UIViewControllerRepresentable {
     @Binding var selectedRDImages: [RDImage]
@@ -22,7 +22,7 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    func updateUIViewController(_: UIImagePickerController, context _: Context) {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -35,10 +35,10 @@ struct MultiCameraPicker: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
                 let newRDImage = RDImage(uiImage: image)
-                if parent.editIndex >= 0 && parent.editIndex < parent.selectedRDImages.count {
+                if parent.editIndex >= 0, parent.editIndex < parent.selectedRDImages.count {
                     // Replace existing image at editIndex
                     parent.selectedRDImages[parent.editIndex] = newRDImage
                 } else {
@@ -70,7 +70,7 @@ struct MultiLibraryPicker: UIViewControllerRepresentable {
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    func updateUIViewController(_: PHPickerViewController, context _: Context) {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -87,11 +87,11 @@ struct MultiLibraryPicker: UIViewControllerRepresentable {
             picker.dismiss(animated: true)
             for result in results {
                 if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { object, _ in
                         if let image = object as? UIImage {
                             let newRDImage = RDImage(uiImage: image)
                             DispatchQueue.main.async {
-                                if self.parent.editIndex >= 0 && self.parent.editIndex < self.parent.selectedRDImages.count {
+                                if self.parent.editIndex >= 0, self.parent.editIndex < self.parent.selectedRDImages.count {
                                     self.parent.selectedRDImages[self.parent.editIndex] = newRDImage
                                 } else {
                                     self.parent.selectedRDImages.append(newRDImage)

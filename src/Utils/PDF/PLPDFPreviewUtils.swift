@@ -6,20 +6,21 @@
 //
 
 import Foundation
-import SwiftUI
 import PDFKit
+import SwiftUI
 
 // MARK: - Sample SwiftUI View
+
 struct PullListPDFView: View {
-    
     // MARK: view variables
+
     @Environment(\.dismiss) private var dismiss
     @State private var pdfDocument: PDFDocument? = nil
     @State private var isGeneratingPDF: Bool = false
     @State private var pdfData: Data? = nil
 
-    
     // MARK: Init variables
+
     var pullList: RDList
     var rooms: [Room]
 
@@ -31,16 +32,16 @@ struct PullListPDFView: View {
                 Image(systemName: "xmark")
                     .foregroundStyle(.red)
             }
-            
+
             VStack(alignment: .center, spacing: 0) {
                 if pdfDocument == nil {
                     Spacer()
-                    
+
                     VStack(spacing: 12) {
                         ProgressView()
                         Text("Generating PDF")
                     }
-                    
+
                     Spacer()
                 } else {
                     PDFKitView(document: pdfDocument!)
@@ -51,7 +52,7 @@ struct PullListPDFView: View {
                         ProgressView("Preparing PDF for export...")
                             .padding()
                     }
-                    
+
                     // iOS 17+ ShareLink
                     if #available(iOS 17, *), let pdfData {
                         ShareLink(
@@ -68,7 +69,7 @@ struct PullListPDFView: View {
                 }
             }
         }
-        .onAppear() {
+        .onAppear {
             Task {
                 await generatePDF()
             }
@@ -79,36 +80,36 @@ struct PullListPDFView: View {
     }
 
     // MARK: PDF Generator
+
     @MainActor
     private func generatePDF() async {
         isGeneratingPDF = true
-        
+
         // Ensure all RoomViewModels are ready
         var roomViewModels: [RoomViewModel] = []
-        
+
         for room in rooms {
             let roomVM = RoomViewModel(room: room)
             await roomVM.getRoomItems()
             await roomVM.getRoomModels() // TODO: good place for model and item store
             roomViewModels.append(roomVM)
         }
-        
+
         let preloadedImages: [String: UIImage] = await preloadImages(for: roomViewModels)
 
-        
         // Create PDF using ImageRenderer
         let pdfView = PLGeneratedPDFView(
             pullList: pullList,
             roomViewModels: roomViewModels,
             preloadedImages: preloadedImages
         )
-        
+
         let renderer = ImageRenderer(content: pdfView)
         renderer.proposedSize = .init(width: 612, height: 792) // US Letter
-        
+
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString + ".pdf")
-        
+
         renderer.render { size, context in
             var box = CGRect(origin: .zero, size: size)
             guard let pdf = CGContext(tempURL as CFURL, mediaBox: &box, nil) else { return }
@@ -118,25 +119,23 @@ struct PullListPDFView: View {
             pdf.endPDFPage()
             pdf.closePDF()
         }
-        
 
         if let data = try? Data(contentsOf: tempURL) {
             pdfData = data
             pdfDocument = PDFDocument(data: data)
         }
-        
+
         try? FileManager.default.removeItem(at: tempURL)
 
         isGeneratingPDF = false
     }
 }
 
-
 // MARK: - Preload Images
+
 func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
     var result: [String: UIImage] = [:]
-    let group = DispatchGroup()
-    
+
     for room in rooms {
         for item in room.items {
             if let url = item.image.imageExists ? item.image.imageURL : room.modelsById[item.modelId]?.primaryImage.imageURL {
@@ -154,13 +153,12 @@ func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
     return result
 }
 
-
-
 // MARK: - PDFKit View Wrapper
+
 struct PDFKitView: UIViewRepresentable {
     let document: PDFDocument
 
-    func makeUIView(context: Context) -> PDFView {
+    func makeUIView(context _: Context) -> PDFView {
         let pdfView = PDFView()
         pdfView.document = document
         pdfView.autoScales = true
@@ -169,16 +167,16 @@ struct PDFKitView: UIViewRepresentable {
         return pdfView
     }
 
-    func updateUIView(_ uiView: PDFView, context: Context) {
+    func updateUIView(_ uiView: PDFView, context _: Context) {
         uiView.document = document
     }
 }
 
 // MARK: - PDF File Wrapper for ShareLink
-@available(iOS 17, *)
+
 struct PDFFile: Transferable {
     let data: Data
-    
+
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(exportedContentType: .pdf) { pdf in
             pdf.data

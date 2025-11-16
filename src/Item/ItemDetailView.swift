@@ -10,11 +10,11 @@ import SwiftUI
 struct ItemDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ItemViewModel
-    
+
     init(item: Item) {
-        self.viewModel = ItemViewModel(selectedItem: item)
+        viewModel = ItemViewModel(selectedItem: item)
     }
-    
+
     var body: some View {
         Text("Item ID: \(viewModel.selectedItem.id)")
         Button("Delete Item") {
@@ -26,6 +26,6 @@ struct ItemDetailView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    ItemDetailView()
-//}
+// }

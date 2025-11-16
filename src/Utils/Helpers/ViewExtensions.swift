@@ -21,47 +21,42 @@ extension View {
             self
         }
     }
-    
+
     func onHighPriorityTap(action: @escaping () -> Void) -> some View {
-        self
-            .highPriorityGesture(TapGesture().onEnded({ action() }))
+        highPriorityGesture(TapGesture().onEnded { action() })
     }
 }
 
 // MARK: Frame
+
 extension View {
     func frameTop() -> some View {
-        self
-            .frame(maxHeight: .infinity, alignment: .top)
+        frame(maxHeight: .infinity, alignment: .top)
     }
-    
+
     func frameHorizontalPadding() -> some View {
-        self
-            .padding(.horizontal, 16)
+        padding(.horizontal, 16)
     }
-    
+
     func frameVerticalPadding() -> some View {
-        self
-            .padding(.vertical, 16)
+        padding(.vertical, 16)
     }
-    
+
     func frameTopPadding() -> some View {
-        self
-            .padding(.top, 16)
+        padding(.top, 16)
     }
-    
+
     func frame(_ size: CGFloat) -> some View {
-        self
-            .frame(width: size, height: size)
+        frame(width: size, height: size)
     }
-    
+
     func cornerRadius(_ radius: CGFloat) -> some View {
-        self
-            .clipShape(.rect(cornerRadius: radius))
+        clipShape(.rect(cornerRadius: radius))
     }
 }
 
 // MARK: UIWindow
+
 extension UIWindow {
     static var current: UIWindow? {
         return MainActor.assumeIsolated {
@@ -77,15 +72,16 @@ extension UIWindow {
 }
 
 // MARK: UIScreen
+
 extension UIScreen {
     static var current: UIScreen? {
         UIWindow.current?.screen
     }
-    
+
     static var width: CGFloat {
         UIScreen.current?.bounds.width ?? 0
     }
-    
+
     static var height: CGFloat {
         UIScreen.current?.bounds.height ?? 0
     }

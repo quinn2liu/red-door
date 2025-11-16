@@ -1,5 +1,5 @@
 //
-//  PLGeneratedPDFView.swift
+//  ILGeneratedPDFView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 10/7/25.
@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct PLGeneratedPDFView: View {
+struct ILGeneratedPDFView: View {
     // MARK: Init Values
 
-    let pullList: RDList
+    let installedList: RDList
     let roomViewModels: [RoomViewModel]
     let preloadedImages: [String: UIImage]
 
@@ -74,12 +74,12 @@ struct PLGeneratedPDFView: View {
     @ViewBuilder
     private func Header() -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Pull List: \(pullList.id)")
+            Text("Installed List: \(installedList.id)")
                 .font(.system(size: 24, weight: .bold))
                 .padding(.bottom, 6)
-            Text("Client: \(pullList.client)").font(.system(size: 14))
-            Text("Install Date: \(pullList.installDate)").font(.system(size: 14))
-            Text("Type: \(pullList.listType.rawValue)").font(.system(size: 14))
+            Text("Client: \(installedList.client)").font(.system(size: 14))
+            Text("Install Date: \(installedList.installDate)").font(.system(size: 14))
+            Text("Type: \(installedList.listType.rawValue)").font(.system(size: 14))
         }
         .padding(.top, 40)
         .padding(.horizontal, 40)

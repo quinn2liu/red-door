@@ -5,32 +5,31 @@
 //  Created by Quinn Liu on 7/30/25.
 //
 
-import SwiftUI
 import CachedAsyncImage
+import SwiftUI
 
 struct ModelSecondaryImages: View {
-    
     @State private var activeSheet: ImageSourceEnum?
     @State private var showAlert: Bool = false
     @State private var editIndex: Int? = nil
-    
+
     @Binding var secondaryRDImages: [RDImage]
     @Binding var selectedRDImage: RDImage?
     @Binding var isImageFullScreen: Bool
     @Binding var isEditing: Bool
-    
+
     var visibleImages: [RDImage] {
         secondaryRDImages.filter { $0.imageType != .delete }
     }
-    
+
     var body: some View {
         Group {
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-                ForEach(0..<2) { row in
+                ForEach(0 ..< 2) { row in
                     GridRow {
-                        ForEach(0..<2) { col in
+                        ForEach(0 ..< 2) { col in
                             let index = 2 * row + col
-                            
+
                             SecondaryImageItem(index: index)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
@@ -51,10 +50,10 @@ struct ModelSecondaryImages: View {
         }
         .frame(maxWidth: Constants.screenWidthPadding / 2,
                maxHeight: Constants.screenWidthPadding / 2)
-
     }
-    
+
     // MARK: Edit Image Alert
+
     @ViewBuilder
     private func EditImageAlert() -> some View {
         if let index = editIndex {
@@ -69,7 +68,7 @@ struct ModelSecondaryImages: View {
             } label: {
                 Text("Camera")
             }
-            
+
             if isEditing {
                 Button(role: .destructive) {
                     DeleteSecondaryImage(index: index)
@@ -78,19 +77,16 @@ struct ModelSecondaryImages: View {
                 }
             }
 
-            Button(role: .cancel) {
-
-            } label: {
+            Button(role: .cancel) {} label: {
                 Text("Cancel")
             }
         }
-        
     }
 
     // MARK: Secondary Image Item
+
     @ViewBuilder
     private func SecondaryImageItem(index: Int) -> some View {
-     
         if index < visibleImages.count {
             Button {
                 if isEditing {
@@ -104,7 +100,7 @@ struct ModelSecondaryImages: View {
                     }
                     isImageFullScreen = true
                 }
-                
+
             } label: {
                 if let imageUrl = visibleImages[index].imageURL {
                     CachedAsyncImage(url: imageUrl) { image in
@@ -133,9 +129,9 @@ struct ModelSecondaryImages: View {
                     editIndex = index
                 }
             } label: {
-                ZStack (alignment: .center) {
+                ZStack(alignment: .center) {
                     PlaceholderRectangle()
-                    
+
                     Image(systemName: isEditing ? "plus" : "photo")
                         .font(.largeTitle)
                         .bold()
@@ -147,13 +143,13 @@ struct ModelSecondaryImages: View {
             PlaceholderRectangle()
         }
     }
-    
+
     private func DeleteSecondaryImage(index: Int) {
         secondaryRDImages[index].imageType = .delete
         secondaryRDImages[index].uiImage = nil
         secondaryRDImages[index].imageURL = nil
     }
-    
+
     @ViewBuilder
     private func PickerSheet(item: ImageSourceEnum, editIndex: Int) -> some View {
         Group {
@@ -169,7 +165,7 @@ struct ModelSecondaryImages: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private func PlaceholderRectangle() -> some View {
         RoundedRectangle(cornerRadius: 12)
@@ -183,6 +179,6 @@ struct ModelSecondaryImages: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    ModelSecondaryImages()
-//}
+// }

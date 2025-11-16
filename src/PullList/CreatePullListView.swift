@@ -9,26 +9,30 @@ import SwiftUI
 
 struct CreatePullListView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var viewModel: RDListViewModel = RDListViewModel()
-    
-    @State private var addressQuery: String = ""
-    @State private var date: Date = Date()
-    
+
+    @State private var viewModel: RDListViewModel = .init()
+
+    @State private var showAddressSheet: Bool = false
+    @State private var selectedAddressMode: String = "Search"
+    let addressOptions = ["Search", "Entry"]
+    @State private var address: String = ""
+    @State private var date: Date = .init()
+
     @State private var showCreateRoom: Bool = false
     private var rooms: [Room]?
-    
+
     // MARK: Body
+
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
-            
+
             DatePicker(
                 "Install Date:",
                 selection: $date,
                 displayedComponents: [.date]
             )
-            
+
             HStack {
                 Text("Client:")
                 TextField("", text: $viewModel.selectedList.client)
@@ -36,7 +40,7 @@ struct CreatePullListView: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
             }
-            
+
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack {
@@ -45,12 +49,14 @@ struct CreatePullListView: View {
                         }
                     }
                 }
-                
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
-                    showCreateRoom = true
+
+                TransparentButton(backgroundColor: .green, foregroundColor: .green, text: "Save", fullWidth: true) {
+                    viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
+                    viewModel.createPullList()
+                    dismiss()
                 }
             }
-            
+
             Spacer()
         }
         .ignoresSafeArea(.keyboard)
@@ -63,46 +69,81 @@ struct CreatePullListView: View {
                     keyboardFocused = true
                 }
         }
+        .sheet(isPresented: $showAddressSheet) {
+            AddressSheet()
+        }
     }
-    
+
     // MARK: TopBar
+
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            TextField("Type Address", text: $addressQuery)
-                .onChange(of: addressQuery) { _, newValue in
-                    // do the address searching stuff (use a sheet?)
-                    let address = Address(fullAddress: newValue)
-                    viewModel.selectedList.id = address.toUniqueID()
+            Button {
+                showAddressSheet = true
+            } label: {
+                if viewModel.selectedList.address.isInitialized() {
+                    Text(viewModel.selectedList.address.formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                } else {
+                    Text("Enter Address")
                 }
-                .padding(6)
-                .background(Color(.systemGray5))
-                .cornerRadius(8)
-                .multilineTextAlignment(.center)
+            }
         }, trailingIcon: {
             Button {
-                viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
-                viewModel.createPullList()
-                dismiss()
+                showCreateRoom = true
             } label: {
-                Text("Save")
-                    .fontWeight(.bold)
+                HStack(spacing: 8) {
+                    Image(systemName: "plus")
+                    Text("Room")
+                        .fontWeight(.semibold)
+                }
             }
+            .tint(.red)
         })
     }
-    
+
+    // MARK: Address Sheet
+
+    @ViewBuilder
+    private func AddressSheet() -> some View {
+        VStack(alignment: .center, spacing: 12) {
+            Capsule()
+                .fill(Color(.systemGray3))
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+
+            Picker("Address Mode", selection: $selectedAddressMode) {
+                ForEach(addressOptions, id: \.self) { mode in
+                    Text(mode).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Group {
+                if selectedAddressMode == "Search" {
+                    AddressSearchView($viewModel.selectedList.address)
+                } else {
+                    AddressEntryView($viewModel.selectedList.address)
+                }
+            }
+        }
+        .frameTop()
+        .frameVerticalPadding()
+        .frameHorizontalPadding()
+    }
+
     // MARK: Create Empty Room Sheet ()
+
     @FocusState var keyboardFocused: Bool
     @State private var newRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
     @ViewBuilder private func CreateEmptyRoomSheet() -> some View {
-
         VStack(spacing: 16) {
             TextField("Room Name", text: $newRoomName)
                 .focused($keyboardFocused)
                 .submitLabel(.done)
-            
+
             HStack(spacing: 0) {
                 Button {
                     showCreateRoom = false
@@ -126,19 +167,21 @@ struct CreatePullListView: View {
             }
         }
         .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
-            Button("Ok", role: .cancel) { }
+            Button("Ok", role: .cancel) {}
         }
+        .frameTop()
         .frameHorizontalPadding()
-        .presentationDetents([.fraction(0.1)])
+        .frameVerticalPadding()
+        .presentationDetents([.fraction(0.125)])
     }
-    
+
     // MARK: EmptyRoomListItem()
+
     @ViewBuilder private func EmptyRoomListItem(_ roomName: String) -> some View {
-    
         HStack(spacing: 0) {
             Text(roomName)
                 .foregroundStyle(Color(.label))
-                    
+
             Spacer()
         }
         .padding(.vertical, 8)
@@ -147,7 +190,6 @@ struct CreatePullListView: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
-
 
 #Preview {
     CreatePullListView()

@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct DeleteButton: View {
-    
     var size: CGFloat = 16
     var offset: CGFloat = -8
     var action: () -> Void
-    
+
     var body: some View {
         Button {
             action()

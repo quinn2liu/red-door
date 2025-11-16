@@ -5,23 +5,24 @@
 //  Created by Quinn Liu on 10/4/25.
 //
 
-import SwiftUI
 import CachedAsyncImage
+import SwiftUI
 
 struct RoomDetailsView: View {
-    
     // MARK: init Variables
-    @Binding  var viewModel: RoomViewModel
-    
+
+    @Binding var viewModel: RoomViewModel
+
     // MARK: State Variables
+
     @State private var showItems: Bool = false
     @State private var showSheet: Bool = false
     @State private var isEditing: Bool = false
-    
+
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
-            
+
             RoomItemList()
         }
         .sheet(isPresented: $showSheet) {
@@ -41,8 +42,9 @@ struct RoomDetailsView: View {
         .frameHorizontalPadding()
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
-    
+
     // MARK: TopBar()
+
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
@@ -55,20 +57,23 @@ struct RoomDetailsView: View {
             }
         })
     }
-    
+
     // MARK: RoomItemList()
+
     @ViewBuilder
     private func RoomItemList() -> some View {
         LazyVStack(spacing: 12) {
             ForEach(viewModel.items, id: \.self) { item in
                 NavigationLink(destination: RoomItemView(item: item, roomViewModel: $viewModel)) { // MARK: RoomItemView should take in a viewmodel
+
                     RoomItemListItem(item)
                 }
             }
         }
     }
-    
+
     // MARK: RoomItemListItem()
+
     @ViewBuilder
     private func RoomItemListItem(_ item: Item) -> some View {
         HStack(spacing: 12) {
@@ -93,12 +98,12 @@ struct RoomDetailsView: View {
                         .foregroundStyle(.gray)
                         .frame(width: 40, height: 40)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(model.name)
                         .font(.headline)
                         .foregroundStyle(Color(.label))
-                    
+
                     HStack {
                         Text(model.type)
                         Text("•")
@@ -114,8 +119,7 @@ struct RoomDetailsView: View {
                 Text(item.id)
                     .foregroundStyle(Color(.label))
             }
-            
-            
+
             if item.repair {
                 Spacer()
 
@@ -124,27 +128,26 @@ struct RoomDetailsView: View {
             }
         }
     }
-    
+
     // MARK: EditRoomMenu()
+
     @ViewBuilder
     private func EditRoomMenu() -> some View {
         Group {
-            Button {
-                
-            } label: {
+            Button {} label: {
                 HStack(spacing: 0) { // TODO: replace with label item
                     Text("Delete Room")
-                    
+
                     Spacer()
                 }
             }
-            
+
             Button {
                 showSheet = true
             } label: {
                 HStack(spacing: 0) {
                     Text("Add Items")
-                    
+
                     Spacer()
                 }
             }

@@ -5,52 +5,87 @@
 //  Created by Quinn Liu on 1/6/25.
 //
 
+import CoreLocation
 import Foundation
+import MapKit
 
-struct Address {
-    let number: String = ""
-    let street: String = ""
-    let streetType: String = ""
-    let city: String = ""
-    let state: String = ""
-    let zipcode: String = ""
-    let warehouseNumber: String?
-    let fullAddress: String?
-    
-    init(warehouseNumber: String? = nil, fullAddress: String? = nil) {
+struct Address: Codable, Hashable {
+    var id: String // lowercased, trimmed, not punctuation
+    var warehouseNumber: String?
+    var formattedAddress: String
+//    var coordinates: GeoPoint?
+
+    init(
+        street: String,
+        city: String,
+        state: String,
+        zipcode: String,
+        country: String,
+        unit: String? = nil,
+        warehouseNumber: String? = nil
+        //        coordinates: GeoPoint? = nil
+    ) {
+        // ID: concatenated, lowercased, trimmed, no punctuation or spaces
+        id = Address.normalize([street, city, state, zipcode, country].joined())
+
+        formattedAddress = Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
+
         self.warehouseNumber = warehouseNumber
-        self.fullAddress = fullAddress
     }
-    
-    // Normalize the street type using a dictionary
-    static let streetTypeMapping: [String: String] = [
-        "road": "rd", "rd": "rd",
-        "avenue": "ave", "ave": "ave",
-        "street": "st", "st": "st",
-        "boulevard": "blvd", "blvd": "blvd",
-        "drive": "dr", "dr": "dr",
-        "lane": "ln", "ln": "ln",
-        "circle": "cir", "cir": "cir",
-        "court": "ct", "ct": "ct",
-        "place": "pl", "pl": "pl"
-    ]
-    
-    static func normalizeStreetType(_ input: String) -> String {
-        let lowercaseInput = input.lowercased()
-        return streetTypeMapping[lowercaseInput] ?? lowercaseInput // Default to the input if no match
+
+    @available(iOS 26.0, *)
+    init(address: MKAddress, unit: String? = nil, warehouseNumber: String? = nil) {
+        id = Address.normalize(address.fullAddress)
+        formattedAddress = address.fullAddress
+        if let unit = unit {
+            formattedAddress += ", " + unit
+        }
+        self.warehouseNumber = warehouseNumber
     }
-    
-    func toUniqueID() -> String {
-        if let warehouseNumber {
-            return "warehouse-\(warehouseNumber)"
-        }
-        
-        if let fullAddress {
-//            let normalizedStreetType = Address.normalizeStreetType(streetType)
-//            return "\(number)-\(street.lowercased())-\(normalizedStreetType)-\(city.lowercased())-\(state.lowercased())-\(zipcode)"
-            return fullAddress
-        }
-        
-        return "Error: Address"
+
+    init(placemark: MKPlacemark, unit: String? = nil, warehouseNumber: String? = nil) {
+        let street = [
+            placemark.subThoroughfare,
+            placemark.thoroughfare,
+        ]
+        .compactMap { $0 }
+        .joined(separator: " ")
+
+        let city = placemark.locality ?? ""
+        let state = placemark.administrativeArea ?? ""
+        let zipcode = placemark.postalCode ?? ""
+        let country = placemark.country ?? ""
+
+        id = Address.normalize([street, city, state, zipcode, country].joined())
+
+        formattedAddress = Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
+
+        self.warehouseNumber = warehouseNumber
+    }
+
+    func isInitialized() -> Bool {
+        warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
+    }
+
+    static func formattedAddress(street: String, city: String, state: String, zipcode: String, country: String, unit: String? = nil) -> String {
+        return [
+            street,
+            city,
+            state,
+            zipcode,
+            country,
+            unit,
+        ]
+        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+        .joined(separator: ", ")
+    }
+
+    static func normalize(_ input: String) -> String {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let lowercase = trimmed.lowercased()
+        let noPunctuation = lowercase.components(separatedBy: CharacterSet.punctuationCharacters).joined()
+        let noSpaces = noPunctuation.replacingOccurrences(of: " ", with: "")
+        return noSpaces
     }
 }

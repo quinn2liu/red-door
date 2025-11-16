@@ -5,46 +5,46 @@
 //  Created by Quinn Liu on 2/16/25.
 //
 
-import SwiftUI
 import CachedAsyncImage
+import SwiftUI
 
 struct ModelListItemView: View {
     var model: Model
-    
+
     var body: some View {
         HStack(spacing: 0) {
             ModelImage()
-            
+
             Spacer()
-            
+
             Text(model.name)
-            
+
             Spacer()
 
             Text(model.type)
-            
+
             Spacer()
 
             Text(model.primaryMaterial)
-            
+
             Spacer()
 
             Text(model.primaryColor)
-  
+
             // TODO: Fix
 //            Spacer()
 //
 //            Text(String(model.itemCount))
         }
     }
-    
+
     @ViewBuilder private func ModelImage() -> some View {
         if let imageURL = model.primaryImage.imageURL {
             CachedAsyncImage(url: imageURL) { phase in
                 switch phase {
                 case .empty:
                     ProgressView() // Placeholder while loading
-                case .success(let image):
+                case let .success(image):
                     image.resizable().frame(50)
                 case .failure:
                     Image(systemName: "photo.badge.plus")
@@ -60,6 +60,6 @@ struct ModelListItemView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    ModelListItemView(model: Model())
-//}
+// }

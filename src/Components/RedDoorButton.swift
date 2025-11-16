@@ -12,7 +12,7 @@ enum RedDoorButtonType {
     case red
     case blue
     case gray
-    
+
     var buttonColor: Color {
         switch self {
         case .green: .green
@@ -21,27 +21,26 @@ enum RedDoorButtonType {
         case .gray: .gray
         }
     }
-
 }
 
 struct RedDoorButton: View {
     var isButton: Bool = true
-    
+
     let type: RedDoorButtonType
-    
+
     var leadingIcon: String?
     var leadingIconColor: Color?
-    
+
     let text: String
     var textColor: Color?
-    
+
     var buttonColor: Color?
-    
+
     var fullWidth: Bool = false
     var alignment: Alignment = .center
     var semibold: Bool = false
     let action: () -> Void
-    
+
     var body: some View {
         if isButton {
             Button(action: action) {
@@ -51,7 +50,7 @@ struct RedDoorButton: View {
             RedDoorButtonView()
         }
     }
-    
+
     @ViewBuilder
     private func RedDoorButtonView() -> some View {
         HStack {
@@ -60,9 +59,8 @@ struct RedDoorButton: View {
                     Image(systemName: leadingIcon)
                         .foregroundStyle(leadingIconColor ?? .white)
                         .frame(maxWidth: 16, maxHeight: 16)
-                    
                 }
-                
+
                 Text(text)
                     .foregroundStyle(textColor ?? .white)
             }
@@ -80,7 +78,6 @@ struct RedDoorButton: View {
         .frame(maxWidth: .infinity)
     }
 }
-
 
 #Preview {
     RedDoorButton(type: .red, leadingIcon: "plus", text: "Button", fullWidth: true, semibold: true, action: {})

@@ -11,7 +11,7 @@ enum SmallCTAType {
     case primary
     case secondary
     case tertiary
-    
+
     var buttonColor: Color {
         switch self {
         case .primary:
@@ -20,7 +20,7 @@ enum SmallCTAType {
             return Color(.systemGray6)
         }
     }
-    
+
     var foregroundColor: Color {
         switch self {
         case .primary:
@@ -28,7 +28,8 @@ enum SmallCTAType {
         case .secondary:
             return .primary
         case .tertiary:
-            return .secondary}
+            return .secondary
+        }
     }
 }
 
@@ -38,8 +39,8 @@ struct SmallCTA: View {
     var text: String = ""
     var textColor: Color?
     var buttonColor: Color?
-    var action: () -> Void = { }
-    
+    var action: () -> Void = {}
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
@@ -48,7 +49,7 @@ struct SmallCTA: View {
                         .foregroundStyle(textColor ?? type.foregroundColor)
                         .frame(12)
                 }
-                
+
                 if text != "" {
                     Text(text)
                         .font(.caption2)

@@ -1,5 +1,5 @@
 //
-//  ItemDetailsView.swift
+//  ModelDetailsView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 12/21/24.
@@ -8,24 +8,20 @@
 import SwiftUI
 
 struct ModelDetailsView: View {
-    
     var isEditing: Bool
     @Binding var viewModel: ModelViewModel
-        
+
     var body: some View {
-        
-        Button {
-            
-        } label: {
+        Button {} label: {
             Text("Show QR Code")
         }
-        
-        if (isEditing) {
+
+        if isEditing {
             Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
                 ForEach(Array(ModelViewModel.colorMap), id: \.key) { option, color in
                     HStack(spacing: 0) {
                         Text(option)
-                        
+
                         Image(systemName: "circle.fill")
                             .foregroundStyle(color)
                             .overlay(
@@ -56,14 +52,13 @@ struct ModelDetailsView: View {
             HStack {
                 Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
                 Image(systemName: "circle.fill")
-                    .foregroundStyle(ModelViewModel.colorMap[viewModel.selectedModel.primaryColor
-                                                            ] ?? .black)
+                    .foregroundStyle(ModelViewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
                     .overlay(
                         Image(systemName: "circle")
                             .foregroundColor(.black.opacity(0.5))
                     )
             }
-            
+
             HStack {
                 Text("Item Type: \(viewModel.selectedModel.type)")
                 Image(systemName: ModelViewModel.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
@@ -74,6 +69,6 @@ struct ModelDetailsView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    ItemDetailsView()
-//}
+// }

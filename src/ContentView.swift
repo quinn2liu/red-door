@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var path = NavigationPath()
-    
+
     var body: some View {
         TabView {
             Group {

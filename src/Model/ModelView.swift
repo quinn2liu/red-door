@@ -5,45 +5,46 @@
 //  Created by Quinn Liu on 8/13/24.
 //
 
-import SwiftUI
-import PhotosUI
 import CachedAsyncImage
+import PhotosUI
+import SwiftUI
 
 struct ModelView: View {
     // Environment variables
     @Environment(\.dismiss) private var dismiss
-    
+
     // Data
     @State private var viewModel: ModelViewModel
     @State private var backupModel: Model?
-    
+
     // Presented variables
     @State private var showDeleteAlert: Bool = false
     @State private var isLoading: Bool = false
     @State private var isEditingModel: Bool = false
     @State private var showEditingItems: Bool = false
-    
+
     // Image selected variables
     @State private var selectedRDImage: RDImage?
     @State private var isImageSelected: Bool = false
-    
+
     // Initializer
-    init(model: Model, editable: Bool = true) {
-        self.viewModel = ModelViewModel(model: model)
+    init(model: Model, editable _: Bool = true) {
+        viewModel = ModelViewModel(model: model)
     }
-    
+
     // MARK: - Body
+
     var body: some View {
         ZStack {
             VStack(spacing: 12) {
                 TopBar()
-                
+
                 ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditingModel)
-                                
+
                 ModelDetailsView(isEditing: isEditingModel, viewModel: $viewModel)
-                
+
                 ItemListView()
-                
+
                 HStack {
                     if isEditingModel {
                         Button("Delete Model") {
@@ -59,15 +60,13 @@ struct ModelView: View {
                             } label: {
                                 Text("Delete")
                             }
-                            
-                            Button(role: .cancel) {
 
-                            } label: {
+                            Button(role: .cancel) {} label: {
                                 Text("Cancel")
                             }
                         }
                     } else {
-                        Button("Add Item to Pull List") { }
+                        Button("Add Item to Pull List") {}
                     }
                 }
             }
@@ -83,7 +82,7 @@ struct ModelView: View {
             .task {
                 await loadItems()
             }
-            
+
             if isLoading {
                 Color.black.opacity(0.3).ignoresSafeArea()
                 ProgressView("Saving Model...")
@@ -93,9 +92,9 @@ struct ModelView: View {
             }
         }
     }
-    
 
     // MARK: Model Name
+
     @ViewBuilder
     private func ModelNameView() -> some View {
         if isEditingModel {
@@ -114,8 +113,8 @@ struct ModelView: View {
         }
     }
 
-    
     // MARK: Top Bar
+
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(
@@ -152,23 +151,23 @@ struct ModelView: View {
         )
     }
 
-    
     // MARK: - Item List View
+
     @ViewBuilder
     private func ItemListView() -> some View {
         VStack(spacing: 12) {
             HStack {
                 Text("Item Count: \(viewModel.itemCount)")
-                
+
                 Spacer()
-                
+
                 Button {
                     showEditingItems = true
                 } label: {
                     Text("Edit")
                 }
             }
-            
+
             if !viewModel.items.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(viewModel.items, id: \.self) { item in
@@ -182,10 +181,11 @@ struct ModelView: View {
     }
 
     // MARK: Item List Item
+
     @ViewBuilder
     private func ItemListItem(_ item: Item) -> some View {
         let model = viewModel.selectedModel
-        
+
         HStack {
             if item.image.imageExists {
                 CachedAsyncImage(url: item.image.imageURL)
@@ -197,8 +197,9 @@ struct ModelView: View {
             Text(item.repair.description)
         }
     }
-    
+
     // MARK: EditItemsSheet
+
     // TODO: maybe put this in separate file...?
     @ViewBuilder
     private func EditItemsSheet() -> some View {
@@ -206,8 +207,9 @@ struct ModelView: View {
             ItemListItem(item)
         }
     }
-    
+
     // MARK: - Helper Functions
+
     private func saveModel() {
         isLoading = true
         Task {
@@ -215,7 +217,7 @@ struct ModelView: View {
             isLoading = false
         }
     }
-    
+
     private func deleteModel() {
         isLoading = true
         Task {
@@ -224,7 +226,7 @@ struct ModelView: View {
             dismiss()
         }
     }
-    
+
     private func loadItems() async {
         do {
             viewModel.items = try await viewModel.getModelItems()

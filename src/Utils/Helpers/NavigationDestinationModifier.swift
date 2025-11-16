@@ -10,9 +10,8 @@ import Foundation
 import SwiftUI
 
 struct NavigationDestinationsModifier: ViewModifier {
-    
     @Binding var path: NavigationPath
-    
+
     func body(content: Content) -> some View {
         content
             .navigationDestination(for: Model.self) { model in
@@ -30,9 +29,7 @@ struct NavigationDestinationsModifier: ViewModifier {
             }
             .navigationDestination(for: String.self) { string in
                 Group {
-                    if string == "might be useful" {
-                        
-                    }
+                    if string == "might be useful" {}
                 }
             }
     }
