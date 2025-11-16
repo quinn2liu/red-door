@@ -27,7 +27,7 @@ struct PLGeneratedPDFView: View {
                             .font(.system(size: 18, weight: .bold))
                             .padding(.horizontal, 40)
 
-                        if !roomVM.items.isEmpty {
+                        if !roomVM.items.isEmpty && roomVM.selectedRoom.itemModelMap.count > 0 {
                             VStack(spacing: 0) {
                                 RoomHeader()
 
@@ -75,7 +75,7 @@ struct PLGeneratedPDFView: View {
     private func Header() -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Pull List: \(pullList.id)")
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .padding(.bottom, 6)
             Text("Client: \(pullList.client)").font(.system(size: 14))
             Text("Install Date: \(pullList.installDate)").font(.system(size: 14))

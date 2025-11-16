@@ -138,7 +138,8 @@ struct CreatePullListView: View {
     @FocusState var keyboardFocused: Bool
     @State private var newRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
-    @ViewBuilder private func CreateEmptyRoomSheet() -> some View {
+    @ViewBuilder 
+    private func CreateEmptyRoomSheet() -> some View {
         VStack(spacing: 16) {
             TextField("Room Name", text: $newRoomName)
                 .focused($keyboardFocused)
