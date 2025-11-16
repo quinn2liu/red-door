@@ -64,7 +64,7 @@ struct InstalledListDetailView: View {
                 BackButton(path: $path)
             }
         }, header: {
-            if isEditing { // TODO: address searching should be a sheet
+            if isEditing {
                 TextField(viewModel.selectedList.address.formattedAddress, text: $address)
                     .onChange(of: address) { _, _ in
                         viewModel.selectedList.id = address

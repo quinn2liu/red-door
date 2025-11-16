@@ -1,18 +1,14 @@
-Major Changes:
-    Architecture:
-        ☐ Navigation Coordinator
-        ☐ Kingfisher
-        ☐ DataStores (Model, Item, Room, RDList, Images, etc.)
+TODO: General:
+    ☐ FEATURE: Authentication
+    ☐ FEATURE: "Staging" view 
+        - pull list is created, but not installed
+        - users can check items that are installed
+        - then, create installed list from only checked items 
 
-    ☐ Update all Edit views to be a sheet instead of "isEditing" state variable
+TODO: Address:
 
-Address:
-    ✔ Finish styling the button @started(25-11-14 18:19) @done(25-11-14 18:42) @lasted(23m56s)
-    ✔ refactor address functions @done(25-11-16 12:54)
-    ✔ Make sure publishing the address works @done(25-11-16 13:31)
-
-Pull Lists:
-    ✔ create pull list from installed list @started(25-11-16 15:43) @done(25-11-16 16:19) @lasted(36m15s)
+TODO: Pull Lists:
+    ☐ FEATURE: filtering via-address formatted string
 
     Pull List View / Create Pull List View:
         ☐ VIEW: update room list item
@@ -22,18 +18,31 @@ Pull Lists:
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
 
-Installed Lists:
+TODO: Installed Lists:
     Pipeline:
-        ☐ FEATURE:validate installed list behavior (populate only available items vs. populate all items even if invalid)
+        ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
-RDList:
+TODO: RDList:
     ☐ VIEW: RDList List Item
 
-    RDList View Model:
-        ✔ RDList generic functions @done(25-11-16 16:20)
-        ✔ Pull List View Model that extends RDList View Model @done(25-11-16 15:43)
-        ✔ Installed List View Model that extends RDList View Model @done(25-11-16 15:43)
-
-Model:
+TODO: Model:
+    ☐ FEATURE: add model description
+    ☐ FEATURE: search by description?
+    ☐ FEATURE: add essentials v custom
     ☐ BUG: Item count stepper (create model view, item stepper goes from 0 -> 2)
-        
+
+TODO: Item:
+        ☐ FEATURE: Barcode/QR Code Generation
+        ☐ FEATURE: Barcode/QR Code Scanning
+        ☐ FEATURE: Flag for attention (like repairs)
+        ☐ VIEW: Better Item View
+        ☐ VIEW: Navigate to pull list button (if not in storage)
+
+TODO: Major Changes:
+    ☐ VIEW: Update all Edit views to be a sheet instead of "isEditing" state variable
+        ☐ FEATURE: ^^^ When editing, create a copy of the original object, i.e. changes only applied to copy and then saved to original if confirmed.
+
+    Architecture:
+        ☐ FEATURE:Navigation Coordinator
+        ☐ FEATURE:Kingfisher
+        ☐ FEATURE:DataStores (Model, Item, Room, RDList, Images, etc.)

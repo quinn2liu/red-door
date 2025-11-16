@@ -4,12 +4,12 @@ struct ModelInventoryView: View {
     @State private var viewModel = DocumentsListViewModel(.model)
     @State private var path: NavigationPath = .init()
 
-    // MARK: Filter Variables
+    // Filter Variables
 
     @State private var searchText: String = ""
     @State private var selectedType: ModelType?
 
-    // MARK: View Modifier Variables
+    // View Modifier Variables
 
     @State private var isLoadingModels: Bool = false
     @State private var searchFocused: Bool = false

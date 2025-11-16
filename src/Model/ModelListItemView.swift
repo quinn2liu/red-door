@@ -30,11 +30,6 @@ struct ModelListItemView: View {
             Spacer()
 
             Text(model.primaryColor)
-
-            // TODO: Fix
-//            Spacer()
-//
-//            Text(String(model.itemCount))
         }
     }
 
