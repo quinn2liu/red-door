@@ -50,8 +50,10 @@ struct CreatePullListView: View {
                     }
                 }
 
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
-                    showCreateRoom = true
+                TransparentButton(backgroundColor: .green, foregroundColor: .green, text: "Save", fullWidth: true) {
+                    viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
+                    viewModel.createPullList()
+                    dismiss()
                 }
             }
 
@@ -78,24 +80,26 @@ struct CreatePullListView: View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            if viewModel.selectedList.address.isInitialized() {
-                Text(viewModel.selectedList.address.formattedAddress)
-            } else {
-                Button {
-                    showAddressSheet = true
-                } label: {
+            Button {
+                showAddressSheet = true
+            } label: {
+                if viewModel.selectedList.address.isInitialized() {
+                    Text(viewModel.selectedList.address.formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                } else {
                     Text("Enter Address")
                 }
             }
         }, trailingIcon: {
             Button {
-                viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
-                viewModel.createPullList()
-                dismiss()
+                showCreateRoom = true
             } label: {
-                Text("Save")
-                    .fontWeight(.bold)
+                HStack(spacing: 8) {
+                    Image(systemName: "plus")
+                    Text("Room")
+                        .fontWeight(.semibold)
+                }
             }
+            .tint(.red)
         })
     }
 
@@ -165,8 +169,10 @@ struct CreatePullListView: View {
         .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
             Button("Ok", role: .cancel) {}
         }
+        .frameTop()
         .frameHorizontalPadding()
-        .presentationDetents([.fraction(0.1)])
+        .frameVerticalPadding()
+        .presentationDetents([.fraction(0.125)])
     }
 
     // MARK: EmptyRoomListItem()

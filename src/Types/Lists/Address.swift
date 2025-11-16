@@ -11,9 +11,8 @@ import MapKit
 
 struct Address: Codable, Hashable {
     var id: String // lowercased, trimmed, not punctuation
-    var unit: String?
     var warehouseNumber: String?
-    let formattedAddress: String
+    var formattedAddress: String
 //    var coordinates: GeoPoint?
 
     init(
@@ -29,18 +28,7 @@ struct Address: Codable, Hashable {
         // ID: concatenated, lowercased, trimmed, no punctuation or spaces
         id = Address.normalize([street, city, state, zipcode, country].joined())
 
-        // Formatted address: standard comma-separated form
-        formattedAddress = [
-            street,
-            city,
-            state,
-            zipcode,
-            country,
-            unit,
-        ]
-        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-        .filter { !$0.isEmpty }
-        .joined(separator: ", ")
+        formattedAddress = Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
 
         self.warehouseNumber = warehouseNumber
     }
@@ -49,7 +37,9 @@ struct Address: Codable, Hashable {
     init(address: MKAddress, unit: String? = nil, warehouseNumber: String? = nil) {
         id = Address.normalize(address.fullAddress)
         formattedAddress = address.fullAddress
-        self.unit = unit
+        if let unit = unit {
+            formattedAddress += ", " + unit
+        }
         self.warehouseNumber = warehouseNumber
     }
 
@@ -68,7 +58,17 @@ struct Address: Codable, Hashable {
 
         id = Address.normalize([street, city, state, zipcode, country].joined())
 
-        formattedAddress = [
+        formattedAddress = Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
+
+        self.warehouseNumber = warehouseNumber
+    }
+
+    func isInitialized() -> Bool {
+        warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
+    }
+
+    static func formattedAddress(street: String, city: String, state: String, zipcode: String, country: String, unit: String? = nil) -> String {
+        return [
             street,
             city,
             state,
@@ -79,13 +79,6 @@ struct Address: Codable, Hashable {
         .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
         .filter { !$0.isEmpty }
         .joined(separator: ", ")
-
-        self.unit = unit
-        self.warehouseNumber = warehouseNumber
-    }
-
-    func isInitialized() -> Bool {
-        warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
     }
 
     static func normalize(_ input: String) -> String {

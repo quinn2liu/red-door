@@ -169,14 +169,12 @@ struct AddressSearchView: View {
         } else {
             let placemark = mapItem.placemark
 
-            return [
-                placemark.thoroughfare,
-                placemark.locality,
-                placemark.administrativeArea,
-                placemark.postalCode,
-            ]
-            .compactMap { $0 }
-            .joined(separator: ", ")
+            let street = placemark.thoroughfare ?? ""
+            let city = placemark.locality ?? ""
+            let state = placemark.administrativeArea ?? ""
+            let zipcode = placemark.postalCode ?? ""
+            let country = placemark.country ?? ""
+            return Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
         }
     }
 
