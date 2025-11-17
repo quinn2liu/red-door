@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ModelInventoryView: View {
     @State private var viewModel = DocumentsListViewModel(.model)
-    @State private var path: NavigationPath = .init()
+    @Binding var path: NavigationPath
 
     // Filter Variables
 
@@ -208,5 +208,5 @@ struct ModelInventoryView: View {
 }
 
 #Preview {
-    ModelInventoryView()
+    ModelInventoryView(path: .constant(.init()))
 }

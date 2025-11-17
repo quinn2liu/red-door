@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct InstalledListDocumentView: View {
-    @State private var path: NavigationPath = .init()
+    @Binding var path: NavigationPath
     @State private var viewModel = DocumentsListViewModel(.installed_list)
 
     @State private var searchText: String = ""
@@ -185,5 +185,5 @@ struct InstalledListDocumentView: View {
 }
 
 #Preview {
-    InstalledListDocumentView()
+    InstalledListDocumentView(path: .constant(.init()))
 }
