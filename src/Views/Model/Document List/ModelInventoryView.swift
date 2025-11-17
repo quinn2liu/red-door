@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ModelInventoryView: View {
     @State private var viewModel = DocumentsListViewModel(.model)
-    @State private var path: NavigationPath = .init()
+    @Binding var path: NavigationPath
 
     // Filter Variables
 
@@ -16,6 +16,8 @@ struct ModelInventoryView: View {
     @FocusState private var searchTextFocused: Bool
 
     @State private var showCreateModelCover: Bool = false
+    @State private var showScannerCover: Bool = false
+    @State private var scannedItem: Item? = nil
 
     // MARK: Body
 
@@ -67,6 +69,15 @@ struct ModelInventoryView: View {
             .fullScreenCover(isPresented: $showCreateModelCover) {
                 CreateModelView()
             }
+            .fullScreenCover(isPresented: $showScannerCover) {
+                ItemScannerView(scannedItem: $scannedItem)
+            }
+            .onChange(of: scannedItem) { oldValue, newValue in
+                if let item = newValue {
+                    path.append(item)
+                    scannedItem = nil
+                }
+            }
         }
     }
 
@@ -95,8 +106,11 @@ struct ModelInventoryView: View {
                         }
                     }
 
-                    // TODO: add scan button here
-                    Image(systemName: "qrcode.viewfinder")
+                    Button {
+                        showScannerCover = true
+                    } label: {
+                        Image(systemName: "qrcode.viewfinder")
+                    }
 
                     Button {
                         showCreateModelCover = true
@@ -143,7 +157,7 @@ struct ModelInventoryView: View {
         .animation(.bouncy(duration: 0.5), value: searchTextFocused)
     }
 
-    // MARK: InventoryList
+    // MARK: Inventory List
 
     @ViewBuilder private func InventoryList() -> some View {
         ScrollView {
@@ -191,22 +205,17 @@ struct ModelInventoryView: View {
             filters.updateValue(searchText.lowercased(), forKey: "nameLowercased")
         }
 
-        DispatchQueue.main.async {
-            isLoadingModels = true
-        }
-
+        isLoadingModels = true
         if isInitial {
             await viewModel.fetchInitialDocuments(filters: filters)
         } else {
             await viewModel.fetchMoreDocuments(filters: filters)
         }
+        isLoadingModels = false
 
-        DispatchQueue.main.async {
-            isLoadingModels = false
-        }
     }
 }
 
 #Preview {
-    ModelInventoryView()
+    ModelInventoryView(path: .constant(.init()))
 }

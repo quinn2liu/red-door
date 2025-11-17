@@ -1,5 +1,5 @@
 //
-//  PullListDocumentView.swift
+//  InstalledListDocumentView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/6/24.
@@ -7,12 +7,11 @@
 
 import SwiftUI
 
-struct PullListDocumentView: View {
-    @State private var path: NavigationPath = .init()
-    @State private var viewModel = DocumentsListViewModel(.pull_list)
+struct InstalledListDocumentView: View {
+    @Binding var path: NavigationPath
+    @State private var viewModel = DocumentsListViewModel(.installed_list)
 
     @State private var searchText: String = ""
-    @State private var showFromInstalledCover: Bool = false
 
     // MARK: View Modifier Variables
 
@@ -31,11 +30,11 @@ struct PullListDocumentView: View {
                     SearchBar()
                 }
 
-                PullListList()
+                InstalledListList()
             }
             .onAppear {
                 Task {
-                    await fetchPullLists(initial: true, searchText: nil)
+                    await fetchInstalledLists(initial: true, searchText: nil)
                 }
             }
             .frameTop()
@@ -49,7 +48,7 @@ struct PullListDocumentView: View {
     @ViewBuilder private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                Text("Pull Lists")
+                Text("Installed Lists")
                     .font(.system(.title2, design: .default))
                     .bold()
                     .foregroundStyle(.red)
@@ -76,7 +75,8 @@ struct PullListDocumentView: View {
 
     // MARK: Search Bar
 
-    @ViewBuilder private func SearchBar() -> some View {
+    @ViewBuilder 
+    private func SearchBar() -> some View {
         HStack(spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
@@ -87,7 +87,7 @@ struct PullListDocumentView: View {
                     .onSubmit {
                         if !searchText.isEmpty {
                             Task {
-                                await fetchPullLists(initial: true, searchText: searchText)
+                                await fetchInstalledLists(initial: true, searchText: searchText)
                             }
                         }
                         searchTextFocused = false
@@ -111,39 +111,40 @@ struct PullListDocumentView: View {
 
     // MARK: Tool Bar Menu
 
-    @ViewBuilder private func ToolBarMenu() -> some View {
+    @ViewBuilder 
+    private func ToolBarMenu() -> some View {
         Menu {
             NavigationLink(destination: CreatePullListView()) {
                 Text("From Scratch")
                 Image(systemName: "checklist")
             }
-            // Button {
-            //     showFromInstalledCover = true
-            // } label: {
-            //     Text("From Installed List")
-            //     Image(systemName: "document.on.document")
-            // }
+
+            NavigationLink(destination: InstalledToPullBrowseView()) {
+                Text("From Pull List")
+                Image(systemName: "document.on.document")
+            }
         } label: {
             Image(systemName: "plus")
                 .foregroundStyle(Color.red)
         }
     }
 
+    // MARK: Installed List List
 
     @ViewBuilder 
-    private func PullListList() -> some View {
+    private func InstalledListList() -> some View {
         ScrollView {
             LazyVStack(spacing: 8) {
-                ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { pullList in
-                    NavigationLink(value: pullList) {
-                        Text(pullList.id) // TODO: make a PL list item
+                ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { installedList in
+                    NavigationLink(value: installedList) {
+                        Text(installedList.id) // TODO: make a InstalledListView
                     }
                     .buttonStyle(PlainButtonStyle())
                     .onAppear {
-                        if pullList == viewModel.documentsArray.last as? RDList {
+                        if installedList == viewModel.documentsArray.last as? RDList {
                             Task {
                                 if !isLoadingLists {
-                                    await fetchPullLists(initial: false, searchText: !searchText.isEmpty ? searchText : nil)
+                                    await fetchInstalledLists(initial: false, searchText: !searchText.isEmpty ? searchText : nil)
                                 }
                             }
                         }
@@ -159,9 +160,9 @@ struct PullListDocumentView: View {
         }
     }
 
-    // MARK: Fetch Pull Lists
+    // MARK: Fetch Installed Lists
 
-    private func fetchPullLists(initial isInitial: Bool, searchText: String?) async {
+    private func fetchInstalledLists(initial isInitial: Bool, searchText: String?) async {
         var filters: [String: Any] = [:]
 
         if let searchText {
@@ -184,5 +185,5 @@ struct PullListDocumentView: View {
 }
 
 #Preview {
-    PullListDocumentView()
+    InstalledListDocumentView(path: .constant(.init()))
 }

@@ -13,7 +13,7 @@ TODO: Pull Lists:
     Pull List View / Create Pull List View:
         ☐ VIEW: update room list item
         ☐ VIEW: add option to add an image of the location
-        ☐ BUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
+        ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
@@ -29,7 +29,7 @@ TODO: Model:
     ☐ FEATURE: add model description
     ☐ FEATURE: search by description?
     ☐ FEATURE: add essentials v custom
-    ☐ BUG: Item count stepper (create model view, item stepper goes from 0 -> 2)
+    ☐ DEBUG: Item count stepper (create model view, item stepper goes from 0 -> 2)
 
 TODO: Item:
         ☐ FEATURE: Barcode/QR Code Generation
@@ -43,6 +43,6 @@ TODO: Major Changes:
         ☐ FEATURE: ^^^ When editing, create a copy of the original object, i.e. changes only applied to copy and then saved to original if confirmed.
 
     Architecture:
-        ☐ FEATURE:Navigation Coordinator
-        ☐ FEATURE:Kingfisher
-        ☐ FEATURE:DataStores (Model, Item, Room, RDList, Images, etc.)
+        ☐ FEATURE: Navigation Coordinator @started(25-11-16 20:35)
+        ☐ FEATURE: Kingfisher
+        ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)
