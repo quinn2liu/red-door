@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ItemDetailView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(NavigationCoordinator.self) var coordinator
     @State private var viewModel: ItemViewModel
 
     init(item: Item) {
@@ -21,7 +21,7 @@ struct ItemDetailView: View {
             Task {
                 await viewModel.deleteItem()
             }
-            dismiss()
+            coordinator.resetSelectedPath()
         }
     }
 }

@@ -18,7 +18,33 @@ class NavigationCoordinator {
     }
 
     var selectedTab: Tab = .inventory
-    var inventoryPath: NavigationPath = .init()
-    var pullListPath: NavigationPath = .init()
-    var installedListPath: NavigationPath = .init()
+    var inventoryPath: NavigationPath = NavigationPath()
+    var pullListPath: NavigationPath = NavigationPath()
+    var installedListPath: NavigationPath = NavigationPath()
+
+    var selectedPath: NavigationPath {
+        switch selectedTab {
+        case .inventory:
+            return inventoryPath
+        case .pullList:
+            return pullListPath
+        case .installedList:
+            return installedListPath
+        case .account:
+            return NavigationPath()
+        }
+    }
+
+    func resetSelectedPath() {
+        switch selectedTab {
+        case .inventory:
+            inventoryPath = NavigationPath()
+        case .pullList:
+            pullListPath = NavigationPath()
+        case .installedList:
+            installedListPath = NavigationPath()
+        case .account:
+            break
+        }
+    }
 }
