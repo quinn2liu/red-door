@@ -32,7 +32,7 @@ TODO: Model:
     ☐ DEBUG: Item count stepper (create model view, item stepper goes from 0 -> 2)
 
 TODO: Item:
-        ☐ FEATURE: Barcode/QR Code Generation
+        ✔ FEATURE: Barcode/QR Code Generation @started(25-11-18 21:06) @done(25-11-18 21:34) @lasted(28m33s)
         ☐ FEATURE: Barcode/QR Code Scanning
         ☐ FEATURE: Flag for attention (like repairs)
         ☐ VIEW: Better Item View
@@ -43,6 +43,6 @@ TODO: Major Changes:
         ☐ FEATURE: ^^^ When editing, create a copy of the original object, i.e. changes only applied to copy and then saved to original if confirmed.
 
     Architecture:
-        ☐ FEATURE: Navigation Coordinator @started(25-11-16 20:35)
+        ✔ FEATURE: Navigation Coordinator @started(25-11-16 20:35) @done(25-11-16 21:43) @lasted(1h8m39s)
         ☐ FEATURE: Kingfisher
         ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)

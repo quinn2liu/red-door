@@ -47,7 +47,7 @@ struct ModelItemListView: View {
             }
             Text(item.id)
             Text(model.type)
-            Text(item.repair.description)
+            Text(item.attention.description)
         }
     }
 }
