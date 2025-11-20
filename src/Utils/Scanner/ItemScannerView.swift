@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CodeScanner
 
 struct ItemScannerView: View {
 
@@ -15,22 +16,14 @@ struct ItemScannerView: View {
 
     @State private var item: Item? = Item(modelId: "123", id: "456")
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Item Scanner")
-            
-            Spacer()
-
-            if let item {
-                Button {
-                    scannedItem = item
-                    dismiss()
-                } label: {
-                    Text("View Item Details")
-                }
+        CodeScannerView(codeTypes: [.qr], simulatedData: "SIMULATION_MODEL_ID") { response in
+            if case let .success(result) = response {
+                let itemId = result.string
+                let item = Item(modelId: itemId)
+                scannedItem = item
+                dismiss()
             }
         }
-        .frameTop()
-        .frameHorizontalPadding()
     }
 }
 

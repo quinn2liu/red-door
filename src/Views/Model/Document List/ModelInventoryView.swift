@@ -1,4 +1,5 @@
 import SwiftUI
+import CodeScanner
 
 struct ModelInventoryView: View {
     @State private var viewModel = DocumentsListViewModel(.model)
@@ -16,7 +17,7 @@ struct ModelInventoryView: View {
     @FocusState private var searchTextFocused: Bool
 
     @State private var showCreateModelCover: Bool = false
-    @State private var showScannerCover: Bool = false
+    @State private var showScannerSheet: Bool = false
     @State private var scannedItem: Item? = nil
 
     // MARK: Body
@@ -69,8 +70,16 @@ struct ModelInventoryView: View {
             .fullScreenCover(isPresented: $showCreateModelCover) {
                 CreateModelView()
             }
-            .fullScreenCover(isPresented: $showScannerCover) {
-                ItemScannerView(scannedItem: $scannedItem)
+            .sheet(isPresented: $showScannerSheet) {
+                CodeScannerView(codeTypes: [.qr], simulatedData: "SIMULATION_MODEL_ID") { response in
+                    if case let .success(result) = response {
+                        let itemId = result.string
+                        let item = Item(modelId: itemId)
+                        print("Scanned item: \(item)")
+                        scannedItem = item
+                        showScannerSheet = false
+                    }
+                }
             }
             .onChange(of: scannedItem) { oldValue, newValue in
                 if let item = newValue {
@@ -107,7 +116,7 @@ struct ModelInventoryView: View {
                     }
 
                     Button {
-                        showScannerCover = true
+                        showScannerSheet = true
                     } label: {
                         Image(systemName: "qrcode.viewfinder")
                     }
