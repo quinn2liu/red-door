@@ -18,7 +18,7 @@ struct ModelInventoryView: View {
 
     @State private var showCreateModelCover: Bool = false
     @State private var showScannerSheet: Bool = false
-    @State private var scannedItem: Item? = nil
+    @State private var scannedItemId: String? = nil
 
     // MARK: Body
 
@@ -42,28 +42,18 @@ struct ModelInventoryView: View {
             .frameTop()
             .frameHorizontalPadding()
             .onAppear {
-                Task {
-                    if !isLoadingModels {
-                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                    }
-                }
+                emptyQuerySearch()
             }
             .onChange(of: path) {
                 searchFocused = false
             }
             .onChange(of: selectedType) {
                 searchText = ""
-                Task {
-                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                }
+                emptyQuerySearch()
             }
             .onChange(of: searchText) {
                 if searchText.isEmpty {
-                    Task {
-                        isLoadingModels = true
-                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                        isLoadingModels = false
-                    }
+                    emptyQuerySearch()
                 }
             }
             .rootNavigationDestinations(path: $path)
@@ -71,21 +61,11 @@ struct ModelInventoryView: View {
                 CreateModelView()
             }
             .sheet(isPresented: $showScannerSheet) {
-                CodeScannerView(codeTypes: [.qr], simulatedData: "SIMULATION_MODEL_ID") { response in
-                    if case let .success(result) = response {
-                        let itemId = result.string
-                        let item = Item(modelId: itemId)
-                        print("Scanned item: \(item)")
-                        scannedItem = item
-                        showScannerSheet = false
-                    }
-                }
+                ItemScannerView(scannedItemId: $scannedItemId)
             }
-            .onChange(of: scannedItem) { oldValue, newValue in
-                if let item = newValue {
-                    path.append(item)
-                    scannedItem = nil
-                }
+            .onChange(of: scannedItemId) { _, newValue in
+                guard let newValue else { return }
+                handleScannedItemId(itemId: newValue)
             }
         }
     }
@@ -221,7 +201,26 @@ struct ModelInventoryView: View {
             await viewModel.fetchMoreDocuments(filters: filters)
         }
         isLoadingModels = false
+    }
 
+    // MARK: Handlers/Helpers
+
+    private func emptyQuerySearch() {
+        if !isLoadingModels {
+            isLoadingModels = true
+            Task {
+                await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+            }
+            isLoadingModels = false
+        }
+    }
+
+    private func handleScannedItemId(itemId: String) {
+        Task {
+            let item = try await Item.getItem(itemId: itemId)
+            path.append(item)
+        }
+        scannedItemId = nil
     }
 }
 

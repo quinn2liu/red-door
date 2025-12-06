@@ -12,21 +12,32 @@ struct ItemScannerView: View {
 
     @Environment(NavigationCoordinator.self) var coordinator
     @Environment(\.dismiss) private var dismiss: DismissAction
-    @Binding var scannedItem: Item?
+    @Binding var scannedItemId: String?
 
-    @State private var item: Item? = Item(modelId: "123", id: "456")
+    @State private var itemId: String? = nil
     var body: some View {
-        CodeScannerView(codeTypes: [.qr], simulatedData: "SIMULATION_MODEL_ID") { response in
-            if case let .success(result) = response {
-                let itemId = result.string
-                let item = Item(modelId: itemId)
-                scannedItem = item
-                dismiss()
+        VStack(spacing: 0) {
+            DragIndicator()
+
+            HStack {
+                Text("Scan Item")
+                Image(systemName: "qrcode")
             }
+            .font(.system(.title2, design: .default))
+            .bold()
+            .foregroundStyle(.red)
+            .padding(.top, 16)
+
+            ZStack {
+                CodeScannerView(codeTypes: [.qr], simulatedData: "SIMULATION_MODEL_ID") { response in
+                    if case let .success(result) = response {
+                        let itemId: String = result.string
+                        scannedItemId = itemId
+                        dismiss()
+                    }
+                }
+            }
+            .padding(16)
         }
     }
-}
-
-#Preview {
-    ItemScannerView(scannedItem: .constant(nil))
 }

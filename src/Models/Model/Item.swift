@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct Item: Identifiable, Codable, Hashable {
     var modelId: String // comes from the "parent" model
@@ -23,5 +24,15 @@ struct Item: Identifiable, Codable, Hashable {
         self.listId = listId
         self.isAvailable = isAvailable
         self.image = image
+    }
+
+    static func getItemModel(modelId: String) async throws -> Model {
+        let documentSnapshot = try await Firestore.firestore().collection("models").document(modelId).getDocument()
+        return try documentSnapshot.data(as: Model.self)
+    }
+
+    static func getItem(itemId: String) async throws -> Item {
+        let documentSnapshot = try await Firestore.firestore().collection("items").document(itemId).getDocument()
+        return try documentSnapshot.data(as: Item.self)
     }
 }

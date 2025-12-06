@@ -29,7 +29,8 @@ TODO: Model:
     ☐ FEATURE: add model description
     ☐ FEATURE: search by description?
     ☐ FEATURE: add essentials v custom
-    ☐ DEBUG: Item count stepper (create model view, item stepper goes from 0 -> 2)
+    ☐ DEBUG: CreateModelView: Item count stepper (create model view, item stepper goes from 0 -> 2)
+    ☐ DEBUG: CreateModelView: when creating a new model and selecting an image, the item picker overflows
 
 TODO: Item:
         ✔ FEATURE: Barcode/QR Code Generation @started(25-11-18 21:06) @done(25-11-18 21:34) @lasted(28m33s)
