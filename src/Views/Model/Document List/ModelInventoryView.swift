@@ -1,4 +1,5 @@
 import SwiftUI
+import CodeScanner
 
 struct ModelInventoryView: View {
     @State private var viewModel = DocumentsListViewModel(.model)
@@ -16,8 +17,8 @@ struct ModelInventoryView: View {
     @FocusState private var searchTextFocused: Bool
 
     @State private var showCreateModelCover: Bool = false
-    @State private var showScannerCover: Bool = false
-    @State private var scannedItem: Item? = nil
+    @State private var showScannerSheet: Bool = false
+    @State private var scannedItemId: String? = nil
 
     // MARK: Body
 
@@ -41,42 +42,30 @@ struct ModelInventoryView: View {
             .frameTop()
             .frameHorizontalPadding()
             .onAppear {
-                Task {
-                    if !isLoadingModels {
-                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                    }
-                }
+                emptyQuerySearch()
             }
             .onChange(of: path) {
                 searchFocused = false
             }
             .onChange(of: selectedType) {
                 searchText = ""
-                Task {
-                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                }
+                emptyQuerySearch()
             }
             .onChange(of: searchText) {
                 if searchText.isEmpty {
-                    Task {
-                        isLoadingModels = true
-                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                        isLoadingModels = false
-                    }
+                    emptyQuerySearch()
                 }
             }
             .rootNavigationDestinations(path: $path)
             .fullScreenCover(isPresented: $showCreateModelCover) {
                 CreateModelView()
             }
-            .fullScreenCover(isPresented: $showScannerCover) {
-                ItemScannerView(scannedItem: $scannedItem)
+            .sheet(isPresented: $showScannerSheet) {
+                ItemScannerView(scannedItemId: $scannedItemId)
             }
-            .onChange(of: scannedItem) { oldValue, newValue in
-                if let item = newValue {
-                    path.append(item)
-                    scannedItem = nil
-                }
+            .onChange(of: scannedItemId) { _, newValue in
+                guard let newValue else { return }
+                handleScannedItemId(itemId: newValue)
             }
         }
     }
@@ -107,7 +96,7 @@ struct ModelInventoryView: View {
                     }
 
                     Button {
-                        showScannerCover = true
+                        showScannerSheet = true
                     } label: {
                         Image(systemName: "qrcode.viewfinder")
                     }
@@ -212,7 +201,26 @@ struct ModelInventoryView: View {
             await viewModel.fetchMoreDocuments(filters: filters)
         }
         isLoadingModels = false
+    }
 
+    // MARK: Handlers/Helpers
+
+    private func emptyQuerySearch() {
+        if !isLoadingModels {
+            isLoadingModels = true
+            Task {
+                await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+            }
+            isLoadingModels = false
+        }
+    }
+
+    private func handleScannedItemId(itemId: String) {
+        Task {
+            let item = try await Item.getItem(itemId: itemId)
+            path.append(item)
+        }
+        scannedItemId = nil
     }
 }
 

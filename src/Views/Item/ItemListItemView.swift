@@ -26,7 +26,7 @@ struct ItemListItemView: View {
                     Text(model.name)
                     Text(item.id)
                     Text(model.type)
-                    Text(item.repair.description)
+                    Text(item.attention.description)
                     Text(item.listId)
                 }
             } else if let errorMessage {

@@ -84,9 +84,12 @@ struct InstalledListDetailView: View {
                 }
                 isEditing.toggle()
             } label: {
-                Text(isEditing ? "Save" : "Edit")
-                    .foregroundStyle(isEditing ? .blue : .red)
-                    .fontWeight(isEditing ? .semibold : .regular)
+                if isEditing {
+                    Text("Save")
+                        .foregroundStyle(.blue)
+                } else {
+                    Image(systemName: "square.and.pencil")
+                }
             }
         })
     }

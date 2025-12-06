@@ -120,7 +120,7 @@ struct RoomDetailsView: View {
                     .foregroundStyle(Color(.label))
             }
 
-            if item.repair {
+            if item.attention {
                 Spacer()
 
                 Image(systemName: "wrench.fill")
@@ -134,7 +134,9 @@ struct RoomDetailsView: View {
     @ViewBuilder
     private func EditRoomMenu() -> some View {
         Group {
-            Button {} label: {
+            Button {
+
+            } label: {
                 HStack(spacing: 0) { // TODO: replace with label item
                     Text("Delete Room")
 

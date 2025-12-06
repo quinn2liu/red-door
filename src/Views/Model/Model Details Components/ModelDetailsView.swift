@@ -12,10 +12,6 @@ struct ModelDetailsView: View {
     @Binding var viewModel: ModelViewModel
 
     var body: some View {
-        Button {} label: {
-            Text("Show QR Code")
-        }
-
         if isEditing {
             Picker("Primary Color", selection: $viewModel.selectedModel.primaryColor) {
                 ForEach(Array(ModelViewModel.colorMap), id: \.key) { option, color in

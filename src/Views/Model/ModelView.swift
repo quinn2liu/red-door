@@ -20,7 +20,7 @@ struct ModelView: View {
     // Presented variables
     @State private var showDeleteAlert: Bool = false
     @State private var isLoading: Bool = false
-    @State private var isEditingModel: Bool = false
+    @State private var isEditing: Bool = false
     @State private var showEditingItems: Bool = false
 
     // Image selected variables
@@ -39,14 +39,14 @@ struct ModelView: View {
             VStack(spacing: 12) {
                 TopBar()
 
-                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditingModel)
+                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
 
-                ModelDetailsView(isEditing: isEditingModel, viewModel: $viewModel)
+                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
 
                 ItemListView()
 
                 HStack {
-                    if isEditingModel {
+                    if isEditing {
                         Button("Delete Model") {
                             showDeleteAlert = true
                         }
@@ -97,7 +97,7 @@ struct ModelView: View {
 
     @ViewBuilder
     private func ModelNameView() -> some View {
-        if isEditingModel {
+        if isEditing {
             HStack {
                 TextField("", text: $viewModel.selectedModel.name)
                     .padding(6)
@@ -119,12 +119,12 @@ struct ModelView: View {
     private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                if isEditingModel {
+                if isEditing {
                     Button {
                         if let backup = backupModel {
                             viewModel.selectedModel = backup
                         }
-                        isEditingModel = false
+                        isEditing = false
                     } label: {
                         Text("Cancel")
                     }
@@ -137,15 +137,20 @@ struct ModelView: View {
             },
             trailingIcon: {
                 Button {
-                    if isEditingModel {
+                    if isEditing {
                         saveModel()
-                        isEditingModel = false
+                        isEditing = false
                     } else {
                         backupModel = viewModel.selectedModel
-                        isEditingModel = true
+                        isEditing = true
                     }
                 } label: {
-                    Text(isEditingModel ? "Save" : "Edit")
+                    if isEditing {
+                        Text("Save")
+                            .foregroundStyle(.blue)
+                    } else {
+                        Image(systemName: "square.and.pencil")
+                    }                
                 }
             }
         )
@@ -155,18 +160,8 @@ struct ModelView: View {
 
     @ViewBuilder
     private func ItemListView() -> some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text("Item Count: \(viewModel.itemCount)")
-
-                Spacer()
-
-                Button {
-                    showEditingItems = true
-                } label: {
-                    Text("Edit")
-                }
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Item Count: \(viewModel.itemCount)")
 
             if !viewModel.items.isEmpty {
                 VStack(spacing: 0) {
@@ -194,7 +189,7 @@ struct ModelView: View {
             }
             Text(item.id)
             Text(model.type)
-            Text(item.repair.description)
+            Text(item.attention.description)
         }
     }
 
