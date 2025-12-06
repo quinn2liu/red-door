@@ -8,12 +8,14 @@ TODO: General:
 TODO: Address:
 
 TODO: Pull Lists:
-    ☐ FEATURE: filtering via-address formatted string
+    ☐ FEATURE: filtering via address formatted string
 
     Pull List View / Create Pull List View:
-        ☐ VIEW: update room list item
+        ☐ VIEW: update room list item view
         ☐ VIEW: add option to add an image of the location
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
+        ☐ FEATURE: new "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
+            - from this view, they can create an installed list from the pull list (where only the items that have been installed are included).
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
@@ -34,7 +36,7 @@ TODO: Model:
 
 TODO: Item:
         ✔ FEATURE: Barcode/QR Code Generation @started(25-11-18 21:06) @done(25-11-18 21:34) @lasted(28m33s)
-        ☐ FEATURE: Barcode/QR Code Scanning
+        ✔ FEATURE: Barcode/QR Code Scanning @started(25-12-06 16:48) @done(25-12-06 16:48) @lasted(16s)
         ☐ FEATURE: Flag for attention (like repairs)
         ☐ VIEW: Better Item View
         ☐ VIEW: Navigate to pull list button (if not in storage)
