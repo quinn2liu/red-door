@@ -17,16 +17,13 @@ struct PullListDetailsView: View {
     // MARK: View State
 
     @FocusState private var keyboardFocused: Bool
-    @State private var isEditing: Bool = false
-    @State private var showSheet: Bool = false
+    @State private var showEditSheet: Bool = false
     @State private var showCreateRoom: Bool = false
     @State private var errorMessage: String?
     @State private var showPDF: Bool = false
     @State private var newRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
     
-    @State private var address: String = ""
-    @State private var date: Date = .init()
     @State private var viewModel: PullListViewModel
 
     init(pullList: RDList, path: Binding<NavigationPath>) {
@@ -45,6 +42,9 @@ struct PullListDetailsView: View {
             Spacer()
 
             Footer()
+        }
+        .sheet(isPresented: $showEditSheet) {
+            EditPullListDetailsSheet(viewModel: $viewModel)
         }
         .onAppear {
             Task {
@@ -84,43 +84,32 @@ struct PullListDetailsView: View {
 
     @ViewBuilder
     private func TopBar() -> some View {
-        TopAppBar(leadingIcon: {
-            if isEditing {
-                Button {
-                    isEditing = false
-                } label: {
-                    Text("Cancel")
-                        .foregroundStyle(.blue)
-                }
-            } else {
-                BackButton()
-            }
-        }, header: {
-            if isEditing { // TODO: address searching should be a sheet
-                TextField(viewModel.selectedList.address.formattedAddress, text: $address)
-                    .onChange(of: address) { _, _ in
-                        viewModel.selectedList.id = address
-                    }
-            } else {
+        TopAppBar(
+            leadingIcon: { BackButton() }, 
+            header: {
                 Text(viewModel.selectedList.address.formattedAddress)
-            }
-
-        }, trailingIcon: {
-            Button {
-                if isEditing {
-                    let dateString = date.formatted(.dateTime.year().month().day())
-                    if dateString != viewModel.selectedList.installDate {
-                        viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
+            }, 
+            trailingIcon: {
+                Menu {
+                    Button("Add Room", systemImage: "plus") {
+                        showCreateRoom = true
                     }
-                    viewModel.updateRDList()
+
+                    Button("Edit List Details", systemImage: "pencil") {
+                        showEditSheet = true
+                    }
+
+                    Button("Delete Pull List", systemImage: "trash") {
+                        Task {
+                            await viewModel.deleteRDList()
+                            dismiss()
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
                 }
-                isEditing.toggle()
-            } label: {
-                Text(isEditing ? "Save" : "Edit")
-                    .foregroundStyle(isEditing ? .blue : .red)
-                    .fontWeight(isEditing ? .semibold : .regular)
             }
-        })
+        )
     }
 
     // MARK: Pull List Details
@@ -128,24 +117,8 @@ struct PullListDetailsView: View {
     @ViewBuilder
     private func PullListDetails() -> some View {
         VStack(spacing: 12) {
-            if isEditing {
-                DatePicker(
-                    "Install Date:",
-                    selection: $date,
-                    displayedComponents: [.date]
-                )
-
-                HStack {
-                    Text("Client:")
-                    TextField("", text: $viewModel.selectedList.client)
-                        .padding(6)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                }
-            } else {
-                Text("Install Date: \(viewModel.selectedList.installDate)")
-                Text("Client: \(viewModel.selectedList.client)")
-            }
+            Text("Install Date: \(viewModel.selectedList.installDate)")
+            Text("Client: \(viewModel.selectedList.client)")
         }
     }
 
@@ -166,12 +139,6 @@ struct PullListDetailsView: View {
                     await viewModel.refreshRDList()
                 }
             }
-
-            if isEditing {
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
-                    showCreateRoom = true
-                }
-            }
         }
     }
 
@@ -179,53 +146,37 @@ struct PullListDetailsView: View {
 
     @ViewBuilder
     private func Footer() -> some View {
-        if isEditing {
-            HStack(spacing: 12) {
-                Button("Delete Pull List") {
-                    Task {
-                        await viewModel.deleteRDList()
-                        dismiss()
-                    }
-                }
-
-                Button("Save Pull List") {
-                    viewModel.updateRDList()
-                    dismiss()
-                }
+        HStack(spacing: 12) {
+            Button("Show PDF") {
+                showPDF = true
             }
-        } else {
-            HStack(spacing: 12) {
-                Button("Show PDF") {
-                    showPDF = true
-                }
 
-                Button {
-                    Task { // TODO: consider wrapping this in some error-handling function
-                        do {
-                            let installedlist = try await viewModel.createInstalledFromPull()
-                            path.append(installedlist)
-                        } catch let PullListValidationError.itemDoesNotExist(id) {
-                            errorMessage = "Item \(id) does not exist."
-                        } catch let PullListValidationError.itemNotAvailable(id) {
-                            errorMessage = "Item \(id) is not available."
-                        } catch let PullListValidationError.modelDoesNotExist(id) {
-                            errorMessage = "Model \(id) does not exist."
-                        } catch let PullListValidationError.modelAvailableCountInvalid(id) {
-                            errorMessage = "Model \(id) has insufficient available items."
-                        } catch InstalledFromPullError.creationFailed {
-                            errorMessage = "Unable to create Installed list."
-                        } catch {
-                            errorMessage = "Unexpected error: \(error.localizedDescription)"
-                        }
+            Button {
+                Task { // TODO: consider wrapping this in some error-handling function
+                    do {
+                        let installedlist = try await viewModel.createInstalledFromPull()
+                        path.append(installedlist)
+                    } catch let PullListValidationError.itemDoesNotExist(id) {
+                        errorMessage = "Item \(id) does not exist."
+                    } catch let PullListValidationError.itemNotAvailable(id) {
+                        errorMessage = "Item \(id) is not available."
+                    } catch let PullListValidationError.modelDoesNotExist(id) {
+                        errorMessage = "Model \(id) does not exist."
+                    } catch let PullListValidationError.modelAvailableCountInvalid(id) {
+                        errorMessage = "Model \(id) has insufficient available items."
+                    } catch InstalledFromPullError.creationFailed {
+                        errorMessage = "Unable to create Installed list."
+                    } catch {
+                        errorMessage = "Unexpected error: \(error.localizedDescription)"
                     }
-                } label: {
-                    Text("Create Installed List")
                 }
+            } label: {
+                Text("Create Installed List")
+            }
 
-                RedDoorButton(type: .blue, text: "Refresh Contents") {
-                    Task {
-                        await viewModel.refreshRDList()
-                    }
+            RedDoorButton(type: .blue, text: "Refresh Contents") {
+                Task {
+                    await viewModel.refreshRDList()
                 }
             }
         }

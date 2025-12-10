@@ -8,8 +8,11 @@
 import Foundation
 import MapKit
 
-import Foundation
-import MapKit
+enum InstallationStatus: String, Codable {
+    case planning = "planning"
+    case installing = "installing"
+    case installed = "installed"
+}
 
 struct RDList: Codable, Identifiable, Hashable {
     var id: String
@@ -20,7 +23,7 @@ struct RDList: Codable, Identifiable, Hashable {
 
     var createdDate: String
     var installDate: String
-    var installed: Bool
+    var status: InstallationStatus
     var client: String
 
     var roomIds: [String]
@@ -31,7 +34,7 @@ struct RDList: Codable, Identifiable, Hashable {
         address: Address,
         installDate: String = "",
         client: String = "",
-        installed: Bool = false,
+        status: InstallationStatus = .planning,
         roomNames: [String] = [],
         listType: DocumentType
     ) {
@@ -43,7 +46,7 @@ struct RDList: Codable, Identifiable, Hashable {
 
         createdDate = ISO8601DateFormatter().string(from: Date())
         self.installDate = installDate
-        self.installed = installed
+        self.status = status
         self.client = client
         roomIds = roomNames
     }
@@ -62,7 +65,7 @@ struct RDList: Codable, Identifiable, Hashable {
 
         createdDate = list.createdDate
         installDate = list.installDate
-        installed = list.installed
+        status = list.status
         client = list.client
         roomIds = list.roomIds
     }
@@ -80,7 +83,7 @@ struct RDList: Codable, Identifiable, Hashable {
 
         createdDate = ISO8601DateFormatter().string(from: Date())
         installDate = ""
-        installed = false
+        status = .planning
         client = ""
         roomIds = []
     }

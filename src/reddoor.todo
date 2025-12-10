@@ -1,3 +1,11 @@
+Installing List Todo:
+    ☐ FEATURE: Add a "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
+    
+        ✔ update rdlist model to include installation status @started(25-12-09 22:08) @done(25-12-09 22:22) @lasted(14m12s)
+        ☐ add button to pull list detail view to navigate to installing view
+        ☐ initial installing view
+        ☐ update pulllist document view to filter between "installing" and "planning" pull lists
+
 TODO: General:
     ☐ FEATURE: Authentication
     ☐ FEATURE: "Staging" view 
@@ -21,6 +29,7 @@ TODO: Pull Lists:
         ☐ FEATURE: update room ID (what would the best format be?)
 
 TODO: Installed Lists:
+    ☐ FEATURE: add functionality to reset all items back to available
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
