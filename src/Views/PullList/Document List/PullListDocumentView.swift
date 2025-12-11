@@ -157,19 +157,25 @@ struct PullListDocumentView: View {
                 }
             }
         }
+        .refreshable {
+            Task {
+                if !isLoadingLists {
+                    await fetchPullLists(initial: true, searchText: nil)
+                }
+            }
+        }
     }
 
     // MARK: Fetch Pull Lists
-
+    @MainActor
     private func fetchPullLists(initial isInitial: Bool, searchText: String?) async {
         var filters: [String: Any] = [:]
 
         if let searchText {
             filters.updateValue(searchText, forKey: "id")
         }
-        DispatchQueue.main.async {
-            isLoadingLists = true
-        }
+        
+        isLoadingLists = true
 
         if isInitial {
             await viewModel.fetchInitialDocuments(filters: filters)
@@ -177,9 +183,7 @@ struct PullListDocumentView: View {
             await viewModel.fetchMoreDocuments(filters: filters)
         }
 
-        DispatchQueue.main.async {
-            isLoadingLists = false
-        }
+        isLoadingLists = false
     }
 }
 

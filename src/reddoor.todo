@@ -1,10 +1,10 @@
 Installing List Todo:
-    ☐ FEATURE: Add a "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
+    ☐ FEATURE: Add a "staging" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
     
         ✔ update rdlist model to include installation status @started(25-12-09 22:08) @done(25-12-09 22:22) @lasted(14m12s)
-        ☐ add button to pull list detail view to navigate to installing view
-        ☐ initial installing view
-        ☐ update pulllist document view to filter between "installing" and "planning" pull lists
+        ✔ add button to pull list detail view to navigate to installing view @done(25-12-10 21:02)
+        ☐ initial staging view
+        ☐ update pulllist document view to filter between "staging" and "planning" pull lists
 
 TODO: General:
     ☐ FEATURE: Authentication
@@ -12,6 +12,7 @@ TODO: General:
         - pull list is created, but not installed
         - users can check items that are installed
         - then, create installed list from only checked items 
+    ☐ VIEW: Create reusable button components (RedDoorButton, TransparentButton, SmallCTA, etc.)
 
 TODO: Address:
 
@@ -24,6 +25,9 @@ TODO: Pull Lists:
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
         ☐ FEATURE: new "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
             - from this view, they can create an installed list from the pull list (where only the items that have been installed are included).
+        ☐ FEATURE: Find an easy way to move items between rooms or delete items (like swipe to delete, drag and drop, etc.)
+        ☐ FEATURE: Add a "uninstall" button and view that allows users to specify where items in the pull list should be uninstalled to.
+
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)

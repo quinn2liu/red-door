@@ -39,7 +39,7 @@ class RDListViewModel {
 
     // MARK: Update RDList
 
-    func updateRDList() {
+    func updateSelectedList() {
         do {
             try selectedListReference.setData(from: selectedList, merge: true)
         } catch {

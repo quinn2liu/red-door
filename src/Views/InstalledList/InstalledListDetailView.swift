@@ -80,7 +80,7 @@ struct InstalledListDetailView: View {
                     if dateString != viewModel.selectedList.installDate {
                         viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
                     }
-                    viewModel.updateRDList()
+                    viewModel.updateSelectedList()
                 }
                 isEditing.toggle()
             } label: {
@@ -160,7 +160,7 @@ struct InstalledListDetailView: View {
                 }
 
                 Button("Save Installed List") {
-                    viewModel.updateRDList()
+                    viewModel.updateSelectedList()
                     dismiss()
                 }
 

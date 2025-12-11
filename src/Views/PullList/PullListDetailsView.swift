@@ -31,6 +31,8 @@ struct PullListDetailsView: View {
         _path = path
     }
 
+    // MARK: Body
+
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
@@ -87,7 +89,7 @@ struct PullListDetailsView: View {
         TopAppBar(
             leadingIcon: { BackButton() }, 
             header: {
-                Text(viewModel.selectedList.address.formattedAddress)
+                Text(viewModel.selectedList.address.formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? viewModel.selectedList.address.formattedAddress)
             }, 
             trailingIcon: {
                 Menu {
@@ -147,38 +149,62 @@ struct PullListDetailsView: View {
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 12) {
-            Button("Show PDF") {
-                showPDF = true
-            }
 
             Button {
-                Task { // TODO: consider wrapping this in some error-handling function
-                    do {
-                        let installedlist = try await viewModel.createInstalledFromPull()
-                        path.append(installedlist)
-                    } catch let PullListValidationError.itemDoesNotExist(id) {
-                        errorMessage = "Item \(id) does not exist."
-                    } catch let PullListValidationError.itemNotAvailable(id) {
-                        errorMessage = "Item \(id) is not available."
-                    } catch let PullListValidationError.modelDoesNotExist(id) {
-                        errorMessage = "Model \(id) does not exist."
-                    } catch let PullListValidationError.modelAvailableCountInvalid(id) {
-                        errorMessage = "Model \(id) has insufficient available items."
-                    } catch InstalledFromPullError.creationFailed {
-                        errorMessage = "Unable to create Installed list."
-                    } catch {
-                        errorMessage = "Unexpected error: \(error.localizedDescription)"
-                    }
-                }
-            } label: {
-                Text("Create Installed List")
-            }
-
-            RedDoorButton(type: .blue, text: "Refresh Contents") {
                 Task {
                     await viewModel.refreshRDList()
                 }
+            } label: {
+                Image(systemName: "arrow.counterclockwise")
             }
+            
+            Button {
+                showPDF = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "richtext.page.fill")
+                    Text("PDF")
+                }
+            }
+
+            Button {
+                // update to installing, then navigate to installing view
+                viewModel.selectedList.status = .staging
+                viewModel.updateSelectedList()
+                Task { @MainActor in
+                    path = NavigationPath()
+                    try? await Task.sleep(for: .milliseconds(500))
+                    path.append(viewModel.selectedList)
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "chair.lounge.fill")
+                    Text("Begin Install")
+                }
+            }
+
+            // Button {
+            //     Task { // TODO: consider wrapping this in some error-handling function
+            //         do {
+            //             let installedlist = try await viewModel.createInstalledFromPull()
+            //             path.append(installedlist)
+            //         } catch let PullListValidationError.itemDoesNotExist(id) {
+            //             errorMessage = "Item \(id) does not exist."
+            //         } catch let PullListValidationError.itemNotAvailable(id) {
+            //             errorMessage = "Item \(id) is not available."
+            //         } catch let PullListValidationError.modelDoesNotExist(id) {
+            //             errorMessage = "Model \(id) does not exist."
+            //         } catch let PullListValidationError.modelAvailableCountInvalid(id) {
+            //             errorMessage = "Model \(id) has insufficient available items."
+            //         } catch InstalledFromPullError.creationFailed {
+            //             errorMessage = "Unable to create Installed list."
+            //         } catch {
+            //             errorMessage = "Unexpected error: \(error.localizedDescription)"
+            //         }
+            //     }
+            // } label: {
+            //     Text("Create Installed List")
+            // }
         }
     }
 

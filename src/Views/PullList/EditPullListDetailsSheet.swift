@@ -28,9 +28,8 @@ struct EditPullListDetailsSheet: View {
 
             HStack {
                 Text("Address:")
-                Text(editingList.address.formattedAddress)
+                Text(editingList.address.formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? editingList.address.formattedAddress)
                     .foregroundColor(.blue)
-                    .fontWeight(.semibold)
                     .onTapGesture {
                         showAddressSheet = true
                     }
@@ -74,10 +73,9 @@ struct EditPullListDetailsSheet: View {
                 }
                 if editingList != viewModel.selectedList {
                     viewModel.selectedList = editingList
-                    // viewModel.updateRDList()
-                    // TODO: UPDATE RDLIST SHOULD TAKE IN THE EDITED LIST
+                    viewModel.updateSelectedList()
                 }
-                
+                dismiss()
             } label: {
                 Text("Save")
             }

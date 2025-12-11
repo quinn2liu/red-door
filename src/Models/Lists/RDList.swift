@@ -10,7 +10,7 @@ import MapKit
 
 enum InstallationStatus: String, Codable {
     case planning = "planning"
-    case installing = "installing"
+    case staging = "staging"
     case installed = "installed"
 }
 
