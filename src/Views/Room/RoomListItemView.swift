@@ -1,5 +1,5 @@
 //
-//  RoomListItemView.swift
+//  RoomPreviewListItemView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/1/25.
@@ -20,6 +20,7 @@ struct RoomListItemView: View {
     // MARK: State Variables
 
     @State private var showRoomPreview: Bool = false
+    @State private var selectedItemIds: Set<String> = []
 
     var body: some View {
         VStack(spacing: 16) {
@@ -29,7 +30,7 @@ struct RoomListItemView: View {
 
                 Spacer()
 
-                Text("Items \(viewModel.selectedRoom.itemModelMap.count)")
+                Text("Items \(viewModel.selectedRoom.itemModelIdMap.count)")
 
                 Image(systemName: showRoomPreview ? "minus" : "plus")
             }
@@ -39,6 +40,10 @@ struct RoomListItemView: View {
                     RoomPreview()
                 }
             }
+        }
+        .task {
+            await viewModel.loadItemsAndModels()
+            selectedItemIds = Set(viewModel.items.map { $0.id })
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -53,51 +58,98 @@ struct RoomListItemView: View {
 
     @ViewBuilder
     private func RoomPreview() -> some View {
-        let columns = [
-            GridItem(.adaptive(minimum: 120, maximum: 200), spacing: 12),
-        ]
-
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(Array(viewModel.modelsById.values), id: \.self) { model in
-                    ModelPreviewImage(model: model)
+            LazyVStack(spacing: 8) {
+                ForEach(viewModel.items, id: \.self) { item in
+                    ItemListItem(
+                        item: item,
+                        isSelected: selectedItemIds.contains(item.id)
+                    )
                 }
             }
-            .padding()
         }
         .task {
-            if !viewModel.selectedRoom.itemModelMap.isEmpty {
+            if !viewModel.selectedRoom.itemModelIdMap.isEmpty {
                 await viewModel.getRoomModels()
             }
         }
     }
+    
+    private func toggleItemSelection(_ itemId: String) {
+        if selectedItemIds.contains(itemId) {
+            selectedItemIds.remove(itemId)
+        } else {
+            selectedItemIds.insert(itemId)
+        }
+    }
 
     @ViewBuilder
-    private func ModelPreviewImage(model: Model) -> some View {
-        CachedAsyncImage(url: model.primaryImage.imageURL) { phase in
+    private func ItemListItem(item: Item, isSelected: Bool) -> some View {
+        let model: Model? = viewModel.getModelForItem(item)
+
+        HStack(spacing: 8) {
+            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(isSelected ? .blue : .gray)
+                .font(.system(size: 20))
+                .onTapGesture {
+                    toggleItemSelection(item.id)
+                }
+            
+            Group {
+                ItemPreviewImage(item: item, model: model)
+
+                Text(model?.name ?? "No Model Name")
+            }
+            .opacity(isSelected ? 1.0 : 0.5)
+        }
+    }
+
+    // MARK: Item Preview Image
+
+    // TODO: good place for image store or other optimization?
+
+    @ViewBuilder
+    private func ItemPreviewImage(item: Item, model: Model? = nil) -> some View {
+        Group {
+            if item.image.imageExists, let imageURL = item.image.imageURL {
+                ItemCachedAsyncImage(imageURL: imageURL)
+            } else if let modelImageURL = model?.primaryImage.imageURL {
+                ItemCachedAsyncImage(imageURL: modelImageURL)
+            } else {
+                Color.gray
+                    .overlay(
+                        Image(systemName: "photo.badge.exclamationmark.fill")
+                            .foregroundColor(.white)
+                    )
+            }
+        }
+        .frame(32)
+        .cornerRadius(8)
+    }
+
+    @ViewBuilder
+    private func ItemCachedAsyncImage(imageURL: URL) -> some View {
+        CachedAsyncImage(url: imageURL) { phase in
             switch phase {
             case .empty:
                 ProgressView()
                     .frame(maxWidth: .infinity)
-                    .aspectRatio(1, contentMode: .fill)
             case let .success(image):
                 image
                     .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(1, contentMode: .fill)
-                    .clipped()
-                    .cornerRadius(8)
+                    .scaledToFill()                        
             case .failure:
                 Color.gray
                     .overlay(
-                        Image(systemName: "xmark.octagon")
+                        Image(systemName: "photo.badge.exclamationmark.fill")
                             .foregroundColor(.white)
                     )
-                    .aspectRatio(1, contentMode: .fill)
             @unknown default:
-                EmptyView()
-                    .aspectRatio(1, contentMode: .fill)
+                Color.gray
+                    .overlay(
+                        Image(systemName: "photo.badge.exclamationmark.fill")
+                            .foregroundColor(.white)
+                    )
             }
         }
     }

@@ -69,10 +69,8 @@ struct PullListPDFView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                await generatePDF()
-            }
+        .task {
+            await generatePDF()
         }
         .frameTopPadding()
         .frameHorizontalPadding()

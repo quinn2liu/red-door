@@ -27,7 +27,7 @@ struct PLGeneratedPDFView: View {
                             .font(.system(size: 18, weight: .bold))
                             .padding(.horizontal, 40)
 
-                        if !roomVM.items.isEmpty && roomVM.selectedRoom.itemModelMap.count > 0 {
+                        if !roomVM.items.isEmpty && roomVM.selectedRoom.itemModelIdMap.count > 0 {
                             VStack(spacing: 0) {
                                 RoomHeader()
 

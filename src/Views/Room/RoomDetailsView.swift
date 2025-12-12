@@ -28,10 +28,14 @@ struct RoomDetailsView: View {
         .sheet(isPresented: $showSheet) {
             RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showSheet)
         }
-        .task {
-            await viewModel.loadItemsAndModels()
+        .onAppear {
+            if !viewModel.items.isEmpty {
+                Task {
+                    await viewModel.loadItemsAndModels()
+                }
+            }
         }
-        .onChange(of: viewModel.selectedRoom.itemModelMap) { // TODO: not auto-reload?
+        .onChange(of: viewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
             Task {
                 await viewModel.loadItemsAndModels()
             }

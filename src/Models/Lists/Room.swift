@@ -13,13 +13,13 @@ struct Room: Codable, Identifiable, Hashable {
 
     var roomName: String
     var listId: String // Id of parent list (pull list or installed list)
-    var itemModelMap: [String: String] = [:]
+    var itemModelIdMap: [String: String] = [:]
 
     init(roomName: String, listId: String, itemToModelIds: [String: String] = [:]) {
         id = listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
         self.roomName = roomName
         self.listId = listId
-        itemModelMap = itemToModelIds
+        itemModelIdMap = itemToModelIds
     }
 }
 

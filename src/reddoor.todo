@@ -3,7 +3,9 @@ Installing List Todo:
     
         ✔ update rdlist model to include installation status @started(25-12-09 22:08) @done(25-12-09 22:22) @lasted(14m12s)
         ✔ add button to pull list detail view to navigate to installing view @done(25-12-10 21:02)
-        ☐ initial staging view
+        ☐ initial staging view 
+            ☐ create room list item view for each of the items in the room @started(25-12-11 21:08)
+            ☐ allow items to be moved to other rooms
         ☐ update pulllist document view to filter between "staging" and "planning" pull lists
 
 TODO: General:
@@ -25,7 +27,8 @@ TODO: Pull Lists:
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
         ☐ FEATURE: new "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
             - from this view, they can create an installed list from the pull list (where only the items that have been installed are included).
-        ☐ FEATURE: Find an easy way to move items between rooms or delete items (like swipe to delete, drag and drop, etc.)
+        ☐ FEATURE: when viewing a room, implement a "send to room" function that allows users to send items from one room to another.
+            - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
         ☐ FEATURE: Add a "uninstall" button and view that allows users to specify where items in the pull list should be uninstalled to.
 
 

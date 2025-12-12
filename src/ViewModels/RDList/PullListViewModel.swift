@@ -43,7 +43,7 @@ class PullListViewModel: RDListViewModel {
             var modelItemCounts: [String: Int] = [:]
 
             for room in self.rooms {
-                for (itemId, modelId) in room.itemModelMap {
+                for (itemId, modelId) in room.itemModelIdMap {
                     let itemRef = self.db.collection("items").document(itemId)
                     transaction.updateData([
                         "listId": installedList.id,
@@ -80,7 +80,7 @@ class PullListViewModel: RDListViewModel {
 
         // validate item availability
         for room in rooms {
-            for (itemId, modelId) in room.itemModelMap {
+            for (itemId, modelId) in room.itemModelIdMap {
                 modelItemCounts[modelId, default: 0] += 1
 
                 let itemRef = db.collection("items").document(itemId)

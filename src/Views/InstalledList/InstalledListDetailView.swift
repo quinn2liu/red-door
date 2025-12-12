@@ -38,10 +38,8 @@ struct InstalledListDetailView: View {
 
             Footer()
         }
-        .onAppear {
-            Task {
-                await viewModel.loadRooms()
-            }
+        .task {
+            await viewModel.loadRooms()
         }
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)

@@ -56,13 +56,13 @@ extension RoomViewModel {
     func addItemToRoomDraft(item: Item) -> Bool {
         let roomRef = Self.db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(selectedRoom.id)
 
-        var itemIdsSet = Set(selectedRoom.itemModelMap.keys)
+        var itemIdsSet = Set(selectedRoom.itemModelIdMap.keys)
         let (inserted, _) = itemIdsSet.insert(item.id)
         if inserted { // the itemId doesn't already exist in the room's items and was added
-            selectedRoom.itemModelMap.updateValue(item.modelId, forKey: item.id) // insert into map
+            selectedRoom.itemModelIdMap.updateValue(item.modelId, forKey: item.id) // insert into map
 
             // update the room with the new item
-            roomRef.updateData(["itemModelMap": selectedRoom.itemModelMap])
+            roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
             return true
         } else { // itemId already exists for the room
             return false
@@ -72,7 +72,7 @@ extension RoomViewModel {
     // MARK: Load Items and Models
 
     func loadItemsAndModels() async {
-        if !selectedRoom.itemModelMap.isEmpty {
+        if !selectedRoom.itemModelIdMap.isEmpty {
             await getRoomItems()
             await getRoomModels()
         }
@@ -84,7 +84,7 @@ extension RoomViewModel {
     func getRoomItems() async {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
-            let itemIds = Array(selectedRoom.itemModelMap.keys)
+            let itemIds = Array(selectedRoom.itemModelIdMap.keys)
             let itemsRef = Self.db.collection("items")
                 .whereField("id", in: itemIds)
 
@@ -106,7 +106,7 @@ extension RoomViewModel {
     @MainActor
     func getRoomModels(reloadModels: Bool = false) async {
         if !modelsLoaded || reloadModels {
-            let modelIds = Set(selectedRoom.itemModelMap.values)
+            let modelIds = Set(selectedRoom.itemModelIdMap.values)
 
             do {
                 // Fetch models with those IDs
@@ -144,7 +144,7 @@ extension RoomViewModel {
     static func getItemsByRoom(_ room: Room) async -> [Item]? {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
-            let itemIds = Array(room.itemModelMap.keys)
+            let itemIds = Array(room.itemModelIdMap.keys)
             let itemsRef = db.collection("items")
                 .whereField("id", in: itemIds)
 

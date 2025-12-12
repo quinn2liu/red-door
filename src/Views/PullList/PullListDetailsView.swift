@@ -12,6 +12,7 @@ struct PullListDetailsView: View {
     // MARK: Navigation
 
     @Environment(\.dismiss) private var dismiss
+    @State private var viewModel: PullListViewModel
     @Binding var path: NavigationPath
 
     // MARK: View State
@@ -21,10 +22,9 @@ struct PullListDetailsView: View {
     @State private var showCreateRoom: Bool = false
     @State private var errorMessage: String?
     @State private var showPDF: Bool = false
+
     @State private var newRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
-    
-    @State private var viewModel: PullListViewModel
 
     init(pullList: RDList, path: Binding<NavigationPath>) {
         viewModel = PullListViewModel(selectedList: pullList)
@@ -35,9 +35,13 @@ struct PullListDetailsView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            TopBar()
+            PullListTopBar(
+                streetAddress: $viewModel.selectedList.address, 
+                trailingIcon: TopBarMenu,
+                status: viewModel.selectedList.status
+            )
 
-            PullListDetails()
+            PullListDetails(installDate: $viewModel.selectedList.installDate, client: $viewModel.selectedList.client)
 
             RoomList()
 
@@ -45,17 +49,13 @@ struct PullListDetailsView: View {
 
             Footer()
         }
+        .ignoresSafeArea(.keyboard)
+        .toolbar(.hidden)
+        .frameTop()
+        .frameHorizontalPadding()
         .sheet(isPresented: $showEditSheet) {
             EditPullListDetailsSheet(viewModel: $viewModel)
         }
-        .onAppear {
-            Task {
-                await viewModel.loadRooms()
-            }
-        }
-        .ignoresSafeArea(.keyboard)
-        .toolbar(.hidden)
-        .frameHorizontalPadding()
         .fullScreenCover(isPresented: $showPDF) {
             PullListPDFView(pullList: viewModel.selectedList, rooms: viewModel.rooms)
         }
@@ -82,45 +82,27 @@ struct PullListDetailsView: View {
         }
     }
 
-    // MARK: Top Bar
+    // MARK: Top Bar Menu
 
     @ViewBuilder
-    private func TopBar() -> some View {
-        TopAppBar(
-            leadingIcon: { BackButton() }, 
-            header: {
-                Text(viewModel.selectedList.address.formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? viewModel.selectedList.address.formattedAddress)
-            }, 
-            trailingIcon: {
-                Menu {
-                    Button("Add Room", systemImage: "plus") {
-                        showCreateRoom = true
-                    }
+    private var TopBarMenu: some View {
+        Menu {
+            Button("Add Room", systemImage: "plus") {
+                showCreateRoom = true
+            }
 
-                    Button("Edit List Details", systemImage: "pencil") {
-                        showEditSheet = true
-                    }
+            Button("Edit List Details", systemImage: "pencil") {
+                showEditSheet = true
+            }
 
-                    Button("Delete Pull List", systemImage: "trash") {
-                        Task {
-                            await viewModel.deleteRDList()
-                            dismiss()
-                        }
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
+            Button("Delete Pull List", systemImage: "trash") {
+                Task {
+                    await viewModel.deleteRDList()
+                    dismiss()
                 }
             }
-        )
-    }
-
-    // MARK: Pull List Details
-
-    @ViewBuilder
-    private func PullListDetails() -> some View {
-        VStack(spacing: 12) {
-            Text("Install Date: \(viewModel.selectedList.installDate)")
-            Text("Client: \(viewModel.selectedList.client)")
+        } label: {
+            Image(systemName: "ellipsis")
         }
     }
 
@@ -132,7 +114,7 @@ struct PullListDetailsView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomListItemView(room: room)
+                        RoomPreviewListItemView(room: room)
                     }
                 }
             }
@@ -142,14 +124,18 @@ struct PullListDetailsView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                await viewModel.loadRooms()
+            }
+        }
     }
 
     // MARK: Footer
 
     @ViewBuilder
     private func Footer() -> some View {
-        HStack(spacing: 12) {
-
+        HStack(spacing: 0) {
             Button {
                 Task {
                     await viewModel.refreshRDList()
@@ -158,6 +144,8 @@ struct PullListDetailsView: View {
                 Image(systemName: "arrow.counterclockwise")
             }
             
+            Spacer()
+
             Button {
                 showPDF = true
             } label: {
@@ -167,12 +155,13 @@ struct PullListDetailsView: View {
                 }
             }
 
+            Spacer()
+
             Button {
-                // update to installing, then navigate to installing view
-                viewModel.selectedList.status = .staging
-                viewModel.updateSelectedList()
                 Task { @MainActor in
                     path = NavigationPath()
+                    viewModel.selectedList.status = .staging
+                    viewModel.updateSelectedList()
                     try? await Task.sleep(for: .milliseconds(500))
                     path.append(viewModel.selectedList)
                 }
@@ -182,29 +171,6 @@ struct PullListDetailsView: View {
                     Text("Begin Install")
                 }
             }
-
-            // Button {
-            //     Task { // TODO: consider wrapping this in some error-handling function
-            //         do {
-            //             let installedlist = try await viewModel.createInstalledFromPull()
-            //             path.append(installedlist)
-            //         } catch let PullListValidationError.itemDoesNotExist(id) {
-            //             errorMessage = "Item \(id) does not exist."
-            //         } catch let PullListValidationError.itemNotAvailable(id) {
-            //             errorMessage = "Item \(id) is not available."
-            //         } catch let PullListValidationError.modelDoesNotExist(id) {
-            //             errorMessage = "Model \(id) does not exist."
-            //         } catch let PullListValidationError.modelAvailableCountInvalid(id) {
-            //             errorMessage = "Model \(id) has insufficient available items."
-            //         } catch InstalledFromPullError.creationFailed {
-            //             errorMessage = "Unable to create Installed list."
-            //         } catch {
-            //             errorMessage = "Unexpected error: \(error.localizedDescription)"
-            //         }
-            //     }
-            // } label: {
-            //     Text("Create Installed List")
-            // }
         }
     }
 
