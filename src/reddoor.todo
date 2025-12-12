@@ -3,8 +3,9 @@ Installing List Todo:
     
         ✔ update rdlist model to include installation status @started(25-12-09 22:08) @done(25-12-09 22:22) @lasted(14m12s)
         ✔ add button to pull list detail view to navigate to installing view @done(25-12-10 21:02)
-        ☐ initial staging view 
-            ☐ create room list item view for each of the items in the room @started(25-12-11 21:08)
+        ☐ initial staging view
+            ✔ create room list item view for each of the items in the room @started(25-12-11 21:08) @done(25-12-11 22:55) @lasted(1h47m15s)
+            ☐ add "selected" items to Room Model (when the list is turned into an installed list, this should be removed)
             ☐ allow items to be moved to other rooms
         ☐ update pulllist document view to filter between "staging" and "planning" pull lists
 

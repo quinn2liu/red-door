@@ -11,6 +11,12 @@ import Foundation
 @Observable
 class RoomViewModel {
     static let db = Firestore.firestore()
+    var roomRef: DocumentReference {
+        return Self.db.collection("pull_lists")
+                .document(selectedRoom.listId)
+                .collection("rooms")
+                .document(selectedRoom.id)
+    }
 
     var selectedRoom: Room
     var items: [Item] = [] // for display
@@ -18,7 +24,7 @@ class RoomViewModel {
 
     var modelsLoaded = false
 
-    // MARK: init/deinit
+    // MARK: init
 
     init(room: Room) {
         selectedRoom = room
@@ -31,11 +37,6 @@ class RoomViewModel {
     // MARK: updateRoom
 
     func updateRoom() {
-        let roomRef = Self.db.collection("pull_lists")
-            .document(selectedRoom.listId)
-            .collection("rooms")
-            .document(selectedRoom.id)
-
         do {
             try roomRef.setData(from: selectedRoom)
         } catch {
@@ -54,8 +55,6 @@ extension RoomViewModel {
     // MARK: addItemToRoomDraft()
 
     func addItemToRoomDraft(item: Item) -> Bool {
-        let roomRef = Self.db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(selectedRoom.id)
-
         var itemIdsSet = Set(selectedRoom.itemModelIdMap.keys)
         let (inserted, _) = itemIdsSet.insert(item.id)
         if inserted { // the itemId doesn't already exist in the room's items and was added
@@ -160,5 +159,19 @@ extension RoomViewModel {
             print("Error loading items for room \(room.id): \(error)")
             return nil
         }
+    }
+
+    // MARK: Remove Item from Room
+
+    func removeItemFromRoom(itemId: String) {
+        selectedRoom.itemModelIdMap.removeValue(forKey: itemId)
+        roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
+    }
+
+    // MARK: Add Item to Room
+
+    func addItemToRoom(itemId: String, modelId: String) {
+        selectedRoom.itemModelIdMap.updateValue(modelId, forKey: itemId)
+        roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
     }
 }

@@ -14,12 +14,19 @@ struct Room: Codable, Identifiable, Hashable {
     var roomName: String
     var listId: String // Id of parent list (pull list or installed list)
     var itemModelIdMap: [String: String] = [:]
+    // TODO: IMPLEMENT SELECTED ITEM IDS
+    // var selectedItemIds: Set<String>? = nil
 
-    init(roomName: String, listId: String, itemToModelIds: [String: String] = [:]) {
+    init(roomName: String, listId: String, itemModelIdMap: [String: String] = [:], selectedItemIds: Set<String>? = nil) {
         id = listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
         self.roomName = roomName
         self.listId = listId
-        itemModelIdMap = itemToModelIds
+        self.itemModelIdMap = itemModelIdMap
+        // if selectedItemIds == nil {
+        //     self.selectedItemIds = Set(itemModelIdMap.keys)
+        // } else {
+        //     self.selectedItemIds = selectedItemIds
+        // }
     }
 }
 
