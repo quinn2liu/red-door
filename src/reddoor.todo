@@ -57,6 +57,7 @@ TODO: Item:
         ☐ FEATURE: Flag for attention (like repairs)
         ☐ VIEW: Better Item View
         ☐ VIEW: Navigate to pull list button (if not in storage)
+        ☐ FEATURE: QR Code should generate a LABEL (image, name, etc) instead of just the QR Code
 
 TODO: Major Changes:
     ☐ VIEW: Update all Edit views to be a sheet instead of "isEditing" state variable

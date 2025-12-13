@@ -163,15 +163,27 @@ extension RoomViewModel {
 
     // MARK: Remove Item from Room
 
-    func removeItemFromRoom(itemId: String) {
-        selectedRoom.itemModelIdMap.removeValue(forKey: itemId)
-        roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
+    @MainActor
+    func deselectItem(itemId: String) async {
+        do {
+            selectedRoom.selectedItemIds.remove(itemId)
+            let selectedItemIdsArray: [String] = Array(selectedRoom.selectedItemIds)
+            try await roomRef.updateData(["selectedItemIds": selectedItemIdsArray])
+        } catch {
+            print("Error deselecting item \(itemId): \(error)")
+        }
     }
 
     // MARK: Add Item to Room
 
-    func addItemToRoom(itemId: String, modelId: String) {
-        selectedRoom.itemModelIdMap.updateValue(modelId, forKey: itemId)
-        roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
+    @MainActor
+    func selectItem(itemId: String) async {
+        do {
+            selectedRoom.selectedItemIds.insert(itemId)
+            let selectedItemIdsArray: [String] = Array(selectedRoom.selectedItemIds)
+            try await roomRef.updateData(["selectedItemIds": selectedItemIdsArray])
+        } catch {
+            print("Error selecting item \(itemId): \(error)")
+        }
     }
 }

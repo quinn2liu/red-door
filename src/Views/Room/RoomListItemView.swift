@@ -17,9 +17,7 @@ struct RoomListItemView: View {
         _viewModel = State(initialValue: RoomViewModel(room: room))
     }
 
-
     @State private var showRoomPreview: Bool = false
-    @State private var selectedItemIds: Set<String> = []
 
     // MARK: Body
 
@@ -44,7 +42,6 @@ struct RoomListItemView: View {
         }
         .task {
             await viewModel.loadItemsAndModels()
-            selectedItemIds = Set(viewModel.selectedRoom.itemModelIdMap.keys)
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -64,7 +61,7 @@ struct RoomListItemView: View {
                 ForEach(viewModel.items, id: \.self) { item in
                     ItemListItem(
                         item: item,
-                        isSelected: selectedItemIds.contains(item.id)
+                        isSelected: viewModel.selectedRoom.selectedItemIds.contains(item.id)
                     )
                 }
             }
@@ -83,12 +80,15 @@ struct RoomListItemView: View {
         let model: Model? = viewModel.getModelForItem(item)
 
         HStack(spacing: 8) {
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(isSelected ? .blue : .gray)
-                .font(.system(size: 20))
-                .onTapGesture {
-                    toggleItemSelection(item.id)
+            Button {
+                Task {
+                    await toggleItemSelection(item.id)
                 }
+            } label: {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isSelected ? .blue : .gray)
+                    .font(.system(size: 20))
+            }
             
             Group {
                 ItemPreviewImage(item: item, model: model)
@@ -152,18 +152,11 @@ struct RoomListItemView: View {
     }
 
     // MARK: toggleItemSelection()
-    private func toggleItemSelection(_ itemId: String) {
-        if selectedItemIds.contains(itemId) {
-            selectedItemIds.remove(itemId)
-            viewModel.removeItemFromRoom(itemId: itemId)
+    private func toggleItemSelection(_ itemId: String) async {
+        if viewModel.selectedRoom.selectedItemIds.contains(itemId) {
+            await viewModel.deselectItem(itemId: itemId)
         } else {
-            // TODO: OPTIONAL HANDLING
-            if let item = viewModel.items.first(where: { $0.id == itemId }) {
-                selectedItemIds.insert(itemId)
-                viewModel.addItemToRoom(itemId: itemId, modelId: item.modelId)
-            } else {
-                print("Unable to re-select item for itemId: \(itemId)")
-            }
+            await viewModel.selectItem(itemId: itemId)
         }
     }
 }
