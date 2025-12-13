@@ -1,5 +1,5 @@
 //
-//  RoomPreviewListItemView.swift
+//  StagingRoomListItemView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/1/25.
@@ -8,17 +8,19 @@
 import CachedAsyncImage
 import SwiftUI
 
-struct RoomListItemView: View {
+struct StagingRoomListItemView: View {
     // MARK: init Variables
 
     @State private var viewModel: RoomViewModel
     private var parentList: RDList
+    private var rooms: [Room]
 
     @State private var showRoomPreview: Bool = false
 
-    init(room: Room, parentList: RDList) {
+    init(room: Room, parentList: RDList, rooms: [Room]) {
         _viewModel = State(initialValue: RoomViewModel(room: room))
         self.parentList = parentList
+        self.rooms = rooms
     }
 
     // MARK: Body
@@ -37,7 +39,7 @@ struct RoomListItemView: View {
             }
 
             if showRoomPreview {
-                NavigationLink(destination: RoomDetailsView(parentList: parentList, roomViewModel: $viewModel)) {
+                NavigationLink(destination: StagingRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
                     RoomPreview()
                 }
             }

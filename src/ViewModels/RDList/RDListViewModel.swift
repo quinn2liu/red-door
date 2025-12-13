@@ -97,7 +97,7 @@ class RDListViewModel {
 
 extension RDListViewModel {
 
-    // MARK: Create Empty Room
+    // MARK: Create Empty Room (doesn't exist in firebase)
 
     func createEmptyRoom(_ roomName: String) -> Bool {
         if roomExists(newRoomName: roomName, roomNames: selectedList.roomIds) {

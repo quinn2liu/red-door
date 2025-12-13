@@ -54,7 +54,7 @@ struct StagingPullListView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomListItemView(room: room)
+                        StagingRoomListItemView(room: room, parentList: viewModel.selectedList, rooms: viewModel.rooms)
                     }
                 }
             }
@@ -66,6 +66,7 @@ struct StagingPullListView: View {
         }
         .task {
             await viewModel.loadRooms()
+            print("rooms: \(viewModel.rooms)")
         }
     }
 

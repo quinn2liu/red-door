@@ -40,7 +40,7 @@ TODO: Pull Lists:
         ☐ FEATURE: Remove item from room
 
 TODO: Installed Lists:
-    ☐ FEATURE: add functionality to reset all items back to available
+    ☐ FEATURE: add functionality to reset all items back to available (deleteRDList -> deleteInstalledList vs. deletePullList)
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 

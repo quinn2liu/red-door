@@ -65,9 +65,9 @@ extension RoomViewModel {
         }
     }
 
-    // MARK: Add Item to Separate Room
+    // MARK: Move Item to New Room
 
-    func moveItemToSeparateRoom(item: Item, newRoomId: String) async -> Bool {
+    func moveItemToNewRoom(item: Item, newRoomId: String) async -> Bool {
         let newRoomRef = Self.db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(newRoomId)
         
         do {

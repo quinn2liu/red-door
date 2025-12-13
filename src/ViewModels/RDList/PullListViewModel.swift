@@ -143,4 +143,41 @@ class PullListViewModel: RDListViewModel {
             print("Error creating pull list: \(selectedList.id): \(error)")
         }
     }
+
+    // MARK: Create Empty Room (exists in Firebase)
+
+    // TODO: currently duplicated with RDListViewModel.createEmptyRoom
+
+    @MainActor
+    func createEmptyRoomExists(roomName: String) async -> Bool {
+        do {
+            let newRoom = Room(roomName: roomName, listId: selectedList.id)
+            let roomRef = selectedListReference.collection("rooms").document(newRoom.id)
+            
+            let result = try await db.runTransaction { transaction, _ in
+                transaction.updateData(["roomIds": FieldValue.arrayUnion([newRoom.id])], forDocument: self.listDocumentRef)
+                
+                do {
+                    try transaction.setData(from: newRoom, forDocument: roomRef)
+                } catch {
+                    print("Error setting room data in transaction: \(error)")
+                    return false
+                }
+                
+                return true
+            }
+            
+            guard let success = result as? Bool, success else {
+                return false
+            }
+            
+            // Only update local state if transaction succeeded
+            selectedList.roomIds.append(newRoom.id)
+            rooms.append(newRoom)
+            return true
+        } catch {
+            print("Error creating empty room: \(error)")
+            return false
+        }
+    }
 }

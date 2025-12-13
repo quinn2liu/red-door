@@ -24,7 +24,6 @@ struct PullListDetailsView: View {
     @State private var showPDF: Bool = false
 
     @State private var newRoomName: String = ""
-    @State private var existingRoomAlert: Bool = false
 
     init(pullList: RDList, path: Binding<NavigationPath>) {
         viewModel = PullListViewModel(selectedList: pullList)
@@ -70,9 +69,6 @@ struct PullListDetailsView: View {
                 }
             }
         )
-        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
-            Button("Ok", role: .cancel) {}
-        }
         .sheet(isPresented: $showCreateRoom) {
             CreateEmptyRoomSheet()
                 .onAppear {
@@ -194,18 +190,16 @@ struct PullListDetailsView: View {
                 Spacer()
 
                 Button {
-                    existingRoomAlert = !viewModel.createEmptyRoom(newRoomName)
-                    print("selectedList.roomIds: \(viewModel.selectedList.roomIds)")
-                    if !existingRoomAlert { showCreateRoom = false }
+                    Task {
+                        let added = await viewModel.createEmptyRoomExists(roomName: newRoomName)
+                        if added { showCreateRoom = false }
+                    }
                 } label: {
                     Text("Add Room")
                         .fontWeight(.semibold)
                         .foregroundStyle(.blue)
                 }
             }
-        }
-        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
-            Button("Ok", role: .cancel) {}
         }
         .frameTop()
         .frameHorizontalPadding()
