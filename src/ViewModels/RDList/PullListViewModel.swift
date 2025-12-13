@@ -28,9 +28,26 @@ class PullListViewModel: RDListViewModel {
                 return nil
             }
 
-            // 2. Copy rooms
-            for room in self.rooms {
+            // 2. Copy rooms and update items + collect model counts
+            var modelItemRemovalCounts: [String: Int] = [:]
+
+            for var room in self.rooms {
                 let roomRef = roomsRef.document(room.id)
+                let selectedItemIdSet: Set<String> = room.selectedItemIdSet
+                room.itemModelIdMap = room.itemModelIdMap.filter { selectedItemIdSet.contains($0.key) }
+                room.selectedItemIdSet = []
+
+                // Update Item isAvailable to false
+                for (itemId, modelId) in room.itemModelIdMap {
+                    let itemRef = self.db.collection("items").document(itemId)
+                    transaction.updateData([
+                        "listId": installedList.id,
+                        "isAvailable": false,
+                    ], forDocument: itemRef)
+
+                    modelItemRemovalCounts[modelId, default: 0] += 1
+                }
+                // Copy room with updated items
                 do {
                     try transaction.setData(from: room, forDocument: roomRef)
                 } catch {
@@ -39,23 +56,8 @@ class PullListViewModel: RDListViewModel {
                 }
             }
 
-            // 3. Update items + collect model counts
-            var modelItemCounts: [String: Int] = [:]
-
-            for room in self.rooms {
-                for (itemId, modelId) in room.itemModelIdMap {
-                    let itemRef = self.db.collection("items").document(itemId)
-                    transaction.updateData([
-                        "listId": installedList.id,
-                        "isAvailable": false,
-                    ], forDocument: itemRef)
-
-                    modelItemCounts[modelId, default: 0] += 1
-                }
-            }
-
             // 4. Update models with increments
-            for (modelId, installedItemCount) in modelItemCounts {
+            for (modelId, installedItemCount) in modelItemRemovalCounts {
                 let modelRef = self.db.collection("models").document(modelId)
 
                 transaction.updateData([

@@ -49,15 +49,12 @@ class RoomViewModel {
     }
 }
 
-// MARK: Models + Items
-
 extension RoomViewModel {
-    // MARK: addItemToRoomDraft()
+    // MARK: Add Item to Room
 
-    func addItemToRoomDraft(item: Item) -> Bool {
-        var itemIdsSet = Set(selectedRoom.itemModelIdMap.keys)
-        let (inserted, _) = itemIdsSet.insert(item.id)
-        if inserted { // the itemId doesn't already exist in the room's items and was added
+    func addItemToRoom(item: Item) -> Bool {
+        let itemIdsSet = Set(selectedRoom.itemModelIdMap.keys)
+        if !itemIdsSet.contains(item.id) { // the itemId doesn't already exist in the room's items and was added
             selectedRoom.itemModelIdMap.updateValue(item.modelId, forKey: item.id) // insert into map
 
             // update the room with the new item
@@ -68,6 +65,69 @@ extension RoomViewModel {
         }
     }
 
+    // MARK: Add Item to Separate Room
+
+    func moveItemToSeparateRoom(item: Item, newRoomId: String) async -> Bool {
+        let newRoomRef = Self.db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(newRoomId)
+        
+        do {
+            let result = try await Self.db.runTransaction { transaction, _ -> Any? in
+                // Read both room documents within the transaction
+                let newRoomSnapshot: DocumentSnapshot
+                let currentRoomSnapshot: DocumentSnapshot
+                
+                do {
+                    newRoomSnapshot = try transaction.getDocument(newRoomRef)
+                } catch {
+                    print("Error reading new room document: \(error)")
+                    return nil
+                }
+                
+                do {
+                    currentRoomSnapshot = try transaction.getDocument(self.roomRef)
+                } catch {
+                    print("Error reading current room document: \(error)")
+                    return nil
+                }
+                
+                guard var newRoom = try? newRoomSnapshot.data(as: Room.self) else {
+                    return nil
+                }
+                
+                guard var currentRoom = try? currentRoomSnapshot.data(as: Room.self) else {
+                    return nil
+                }
+                
+                // Check if item already exists in the new room or doesn't exist in the source room
+                let newRoomItemIdSet = Set(newRoom.itemModelIdMap.keys)
+                guard !newRoomItemIdSet.contains(item.id) else {
+                    print("ERROR: Item \(item.id) already exists in target room \(newRoom.roomName)")
+                    return nil
+                }
+                
+                let currentRoomItemIdSet = Set(currentRoom.itemModelIdMap.keys)
+                guard currentRoomItemIdSet.contains(item.id) else {
+                    print("ERROR: Item \(item.id) doesn't exist in source room \(currentRoom.roomName)")
+                    return nil
+                }
+                
+                newRoom.itemModelIdMap.updateValue(item.modelId, forKey: item.id)
+                currentRoom.itemModelIdMap.removeValue(forKey: item.id)
+                
+                self.selectedRoom.itemModelIdMap = currentRoom.itemModelIdMap
+                transaction.updateData(["itemModelIdMap": newRoom.itemModelIdMap], forDocument: newRoomRef)
+                transaction.updateData(["itemModelIdMap": currentRoom.itemModelIdMap], forDocument: self.roomRef)
+                
+                return true
+            }
+            
+            return result != nil
+        } catch {
+            print("Error moving item \(item.id) to separate room: \(error)")
+            return false
+        }
+    }
+    
     // MARK: Load Items and Models
 
     func loadItemsAndModels() async {
@@ -166,9 +226,9 @@ extension RoomViewModel {
     @MainActor
     func deselectItem(itemId: String) async {
         do {
-            selectedRoom.selectedItemIds.remove(itemId)
-            let selectedItemIdsArray: [String] = Array(selectedRoom.selectedItemIds)
-            try await roomRef.updateData(["selectedItemIds": selectedItemIdsArray])
+            selectedRoom.selectedItemIdSet.remove(itemId)
+            let selectedItemIdsArray: [String] = Array(selectedRoom.selectedItemIdSet)
+            try await roomRef.updateData(["selectedItemIdSet": selectedItemIdsArray])
         } catch {
             print("Error deselecting item \(itemId): \(error)")
         }
@@ -179,9 +239,9 @@ extension RoomViewModel {
     @MainActor
     func selectItem(itemId: String) async {
         do {
-            selectedRoom.selectedItemIds.insert(itemId)
-            let selectedItemIdsArray: [String] = Array(selectedRoom.selectedItemIds)
-            try await roomRef.updateData(["selectedItemIds": selectedItemIdsArray])
+            selectedRoom.selectedItemIdSet.insert(itemId)
+            let selectedItemIdsArray: [String] = Array(selectedRoom.selectedItemIdSet)
+            try await roomRef.updateData(["selectedItemIdSet": selectedItemIdsArray])
         } catch {
             print("Error selecting item \(itemId): \(error)")
         }

@@ -10,6 +10,7 @@ import SwiftUI
 struct StagingPullListView: View {
     @State private var viewModel: PullListViewModel
     @Binding var path: NavigationPath
+    @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
 
     @State private var errorMessage: String?
 
@@ -99,7 +100,11 @@ struct StagingPullListView: View {
                 Task { // TODO: consider wrapping this in some error-handling function
                     do {
                         let installedlist = try await viewModel.createInstalledFromPull()
-                        path.append(installedlist)
+                        coordinator.resetSelectedPath()
+                        try? await Task.sleep(for: .milliseconds(250))
+                        coordinator.setSelectedTab(to:.installedList)
+                        try? await Task.sleep(for: .milliseconds(250))
+                        coordinator.appendToSelectedPath(item: installedlist)
                     } catch let PullListValidationError.itemDoesNotExist(id) {
                         errorMessage = "Item \(id) does not exist."
                     } catch let PullListValidationError.itemNotAvailable(id) {

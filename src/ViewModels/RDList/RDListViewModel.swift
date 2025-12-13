@@ -71,6 +71,8 @@ class RDListViewModel {
 
     // MARK: Delete RDList
 
+    // TODO: UPDATE THE LOCATIONS OF ITEMS IF THIS HAPPENS
+
     func deleteRDList() async {
         do {
             let roomsSnapshot = try await selectedListReference.collection("rooms").getDocuments()

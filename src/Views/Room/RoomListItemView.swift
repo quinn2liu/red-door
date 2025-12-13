@@ -12,12 +12,14 @@ struct RoomListItemView: View {
     // MARK: init Variables
 
     @State private var viewModel: RoomViewModel
-
-    init(room: Room) {
-        _viewModel = State(initialValue: RoomViewModel(room: room))
-    }
+    private var parentList: RDList
 
     @State private var showRoomPreview: Bool = false
+
+    init(room: Room, parentList: RDList) {
+        _viewModel = State(initialValue: RoomViewModel(room: room))
+        self.parentList = parentList
+    }
 
     // MARK: Body
 
@@ -35,7 +37,7 @@ struct RoomListItemView: View {
             }
 
             if showRoomPreview {
-                NavigationLink(destination: RoomDetailsView(viewModel: $viewModel)) {
+                NavigationLink(destination: RoomDetailsView(parentList: parentList, roomViewModel: $viewModel)) {
                     RoomPreview()
                 }
             }
@@ -61,7 +63,7 @@ struct RoomListItemView: View {
                 ForEach(viewModel.items, id: \.self) { item in
                     ItemListItem(
                         item: item,
-                        isSelected: viewModel.selectedRoom.selectedItemIds.contains(item.id)
+                        isSelected: viewModel.selectedRoom.selectedItemIdSet.contains(item.id)
                     )
                 }
             }
@@ -153,7 +155,7 @@ struct RoomListItemView: View {
 
     // MARK: toggleItemSelection()
     private func toggleItemSelection(_ itemId: String) async {
-        if viewModel.selectedRoom.selectedItemIds.contains(itemId) {
+        if viewModel.selectedRoom.selectedItemIdSet.contains(itemId) {
             await viewModel.deselectItem(itemId: itemId)
         } else {
             await viewModel.selectItem(itemId: itemId)

@@ -113,7 +113,8 @@ struct ModelInventoryView: View {
 
     // MARK: Search Bar
 
-    @ViewBuilder private func SearchBar() -> some View {
+    @ViewBuilder 
+    private func SearchBar() -> some View {
         HStack(spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
@@ -131,6 +132,7 @@ struct ModelInventoryView: View {
                         searchFocused = false
                     }
             }
+            .transition(.move(edge: .leading).combined(with: .opacity))
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
 
@@ -143,12 +145,13 @@ struct ModelInventoryView: View {
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.bouncy(duration: 0.5), value: searchTextFocused)
+        .animation(.bouncy(duration: 0.25), value: searchTextFocused)
     }
 
     // MARK: Inventory List
 
-    @ViewBuilder private func InventoryList() -> some View {
+    @ViewBuilder 
+    private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(viewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in

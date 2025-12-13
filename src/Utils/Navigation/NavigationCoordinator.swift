@@ -35,6 +35,23 @@ class NavigationCoordinator {
         }
     }
 
+    func setSelectedTab(to tab: Tab) {
+        selectedTab = tab
+    }
+
+    func appendToSelectedPath(item: any Hashable) {
+        switch selectedTab {
+        case .inventory:
+            inventoryPath.append(item)
+        case .pullList:
+            pullListPath.append(item)
+        case .installedList:
+            installedListPath.append(item)
+        case .account:
+            break
+        }
+    }
+
     func resetSelectedPath() {
         switch selectedTab {
         case .inventory:

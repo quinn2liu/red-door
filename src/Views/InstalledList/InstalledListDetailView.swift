@@ -126,7 +126,7 @@ struct InstalledListDetailView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomListItemView(room: room)
+                        RoomPreviewListItemView(room: room)
                     }
                 }
             }

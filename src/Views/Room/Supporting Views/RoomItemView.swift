@@ -16,7 +16,7 @@ struct RoomItemView: View {
         Text("Item ID: \(item.id)")
 
         Button {
-            let added = roomViewModel.addItemToRoomDraft(item: item)
+            let added = roomViewModel.addItemToRoom(item: item)
             if !added {
                 // toggle a warning sheet
             }

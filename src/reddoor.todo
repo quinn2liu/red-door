@@ -5,7 +5,7 @@ Installing List Todo:
         ✔ add button to pull list detail view to navigate to installing view @done(25-12-10 21:02)
         ☐ initial staging view
             ✔ create room list item view for each of the items in the room @started(25-12-11 21:08) @done(25-12-11 22:55) @lasted(1h47m15s)
-            ☐ add "selected" items to Room Model (when the list is turned into an installed list, this should be removed)
+            ✔ add "selected" items to Room Model (when the list is turned into an installed list, this should be removed) @done(25-12-12 22:43)
             ☐ allow items to be moved to other rooms
         ☐ update pulllist document view to filter between "staging" and "planning" pull lists
 
@@ -15,6 +15,8 @@ TODO: General:
         - pull list is created, but not installed
         - users can check items that are installed
         - then, create installed list from only checked items 
+    ☐ FEATURE: "restore" installed list function (resets all the items)
+    ☐ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images.
     ☐ VIEW: Create reusable button components (RedDoorButton, TransparentButton, SmallCTA, etc.)
 
 TODO: Address:
@@ -35,6 +37,7 @@ TODO: Pull Lists:
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
+        ☐ FEATURE: Remove item from room
 
 TODO: Installed Lists:
     ☐ FEATURE: add functionality to reset all items back to available
