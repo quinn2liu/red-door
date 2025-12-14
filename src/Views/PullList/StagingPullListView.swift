@@ -41,7 +41,6 @@ struct StagingPullListView: View {
         }
         .frameTop()
         .frameHorizontalPadding()
-        .frameVerticalPadding()
         .toolbar(.hidden)
         .ignoresSafeArea(.keyboard)
     }
@@ -66,7 +65,6 @@ struct StagingPullListView: View {
         }
         .task {
             await viewModel.loadRooms()
-            print("rooms: \(viewModel.rooms)")
         }
     }
 

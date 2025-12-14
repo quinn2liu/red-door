@@ -53,7 +53,7 @@ struct EditPullListDetailsSheet: View {
         .frameHorizontalPadding()
         .frameVerticalPadding()
         .sheet(isPresented: $showAddressSheet) {
-            AddressSheet(selectedAddress: $editingList.address)
+            AddressSheet(selectedAddress: $editingList.address, addressId: $editingList.addressId)
         }
     }
 

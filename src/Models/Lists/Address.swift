@@ -10,7 +10,7 @@ import Foundation
 import MapKit
 
 struct Address: Codable, Hashable {
-    var id: String // adderss string that's lowercased, trimmed, not punctuation
+    var id: String // address string that's lowercased, trimmed, not punctuation
     var warehouseNumber: String?
     var formattedAddress: String
 //    var coordinates: GeoPoint?

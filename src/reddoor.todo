@@ -6,7 +6,7 @@ Installing List Todo:
         ☐ initial staging view
             ✔ create room list item view for each of the items in the room @started(25-12-11 21:08) @done(25-12-11 22:55) @lasted(1h47m15s)
             ✔ add "selected" items to Room Model (when the list is turned into an installed list, this should be removed) @done(25-12-12 22:43)
-            ☐ allow items to be moved to other rooms
+            ✔ allow items to be moved to other rooms @done(25-12-13 17:30)
         ☐ update pulllist document view to filter between "staging" and "planning" pull lists
 
 TODO: General:

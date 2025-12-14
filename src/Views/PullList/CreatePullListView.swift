@@ -70,7 +70,7 @@ struct CreatePullListView: View {
                 }
         }
         .sheet(isPresented: $showAddressSheet) {
-            AddressSheet(selectedAddress: $viewModel.selectedList.address)
+            AddressSheet(selectedAddress: $viewModel.selectedList.address, addressId: $viewModel.selectedList.addressId)
         }
     }
 

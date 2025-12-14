@@ -18,7 +18,7 @@ struct ContentView: View {
                     .environment(coordinator)
             }
 
-            Tab("Pull Lists", systemImage: "list.bullet", value: NavigationCoordinator.Tab.pullList) {
+            Tab("Pull Lists", systemImage: "pencil.and.list.clipboard", value: NavigationCoordinator.Tab.pullList) {
                 PullListDocumentView(path: $coordinator.pullListPath)
                     .environment(coordinator)
             }

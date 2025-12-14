@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AddressSheet: View {
     @Binding var selectedAddress: Address
+    @Binding var addressId: String
     @State private var selectedAddressMode: String = "Search"
     let addressOptions = ["Search", "Entry"]
 
@@ -21,9 +22,9 @@ struct AddressSheet: View {
 
             Group {
                 if selectedAddressMode == "Search" {
-                    AddressSearchView($selectedAddress)
+                    AddressSearchView($selectedAddress, addressId: $addressId)
                 } else {
-                    AddressEntryView($selectedAddress)
+                    AddressEntryView($selectedAddress, addressId: $addressId)
                 }
             }
         }

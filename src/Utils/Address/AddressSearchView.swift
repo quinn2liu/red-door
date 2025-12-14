@@ -11,6 +11,7 @@ import SwiftUI
 struct AddressSearchView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedAddress: Address
+    @Binding var addressId: String
 
     @State private var unit: String = ""
 
@@ -22,8 +23,10 @@ struct AddressSearchView: View {
 
     // MARK: Init
     
-    init(_ selectedAddress: Binding<Address>) {
+    init(_ selectedAddress: Binding<Address>, addressId: Binding<String>) {
         _selectedAddress = selectedAddress
+        _addressId = addressId
+        unit = ""
         searchText = ""
         searchResults = []
         selectedItem = nil
@@ -93,6 +96,7 @@ struct AddressSearchView: View {
                     RedDoorButton(type: .green, text: "Use This Address", action: {
                         if let address = convertToAddress(item) {
                             selectedAddress = address
+                            addressId = address.id
                         }
                         dismiss()
                     })
