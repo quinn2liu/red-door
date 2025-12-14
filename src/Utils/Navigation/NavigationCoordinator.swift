@@ -14,13 +14,14 @@ class NavigationCoordinator {
         case inventory = 0
         case pullList = 1
         case installedList = 2
-        case account = 3
+        case options = 3
     }
 
     var selectedTab: Tab = .inventory
     var inventoryPath: NavigationPath = NavigationPath()
     var pullListPath: NavigationPath = NavigationPath()
     var installedListPath: NavigationPath = NavigationPath()
+    var optionsPath: NavigationPath = NavigationPath()
 
     var selectedPath: NavigationPath {
         switch selectedTab {
@@ -30,8 +31,8 @@ class NavigationCoordinator {
             return pullListPath
         case .installedList:
             return installedListPath
-        case .account:
-            return NavigationPath()
+        case .options:
+            return optionsPath
         }
     }
 
@@ -39,7 +40,7 @@ class NavigationCoordinator {
         selectedTab = tab
     }
 
-    func appendToSelectedPath(item: any Hashable) {
+    func appendToSelectedPath(_ item: any Hashable) {
         switch selectedTab {
         case .inventory:
             inventoryPath.append(item)
@@ -47,8 +48,8 @@ class NavigationCoordinator {
             pullListPath.append(item)
         case .installedList:
             installedListPath.append(item)
-        case .account:
-            break
+        case .options:
+            optionsPath.append(item)
         }
     }
 
@@ -60,8 +61,8 @@ class NavigationCoordinator {
             pullListPath = NavigationPath()
         case .installedList:
             installedListPath = NavigationPath()
-        case .account:
-            break
+        case .options:
+            optionsPath = NavigationPath()
         }
     }
 }

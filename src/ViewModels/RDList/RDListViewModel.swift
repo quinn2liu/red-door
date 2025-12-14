@@ -20,8 +20,8 @@ class RDListViewModel {
 
     // firebase
     let db: Firestore = Firestore.firestore()
-    let listDocumentRef: DocumentReference
-    let roomsDocumentRef: CollectionReference
+    let listRef: DocumentReference
+    let roomsRef: CollectionReference
 
     // MARK: init
     
@@ -29,8 +29,8 @@ class RDListViewModel {
         self.selectedList = selectedList
         self.rooms = rooms
 
-        listDocumentRef = db.collection(selectedList.listType.collectionString).document(selectedList.id)
-        roomsDocumentRef = listDocumentRef.collection("rooms")
+        listRef = db.collection(selectedList.listType.collectionString).document(selectedList.id)
+        roomsRef = listRef.collection("rooms")
     }
 
     var selectedListReference: DocumentReference {

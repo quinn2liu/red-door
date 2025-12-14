@@ -155,7 +155,7 @@ class PullListViewModel: RDListViewModel {
             let roomRef = selectedListReference.collection("rooms").document(newRoom.id)
             
             let result = try await db.runTransaction { transaction, _ in
-                transaction.updateData(["roomIds": FieldValue.arrayUnion([newRoom.id])], forDocument: self.listDocumentRef)
+                transaction.updateData(["roomIds": FieldValue.arrayUnion([newRoom.id])], forDocument: self.listRef)
                 
                 do {
                     try transaction.setData(from: newRoom, forDocument: roomRef)

@@ -13,7 +13,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $coordinator.selectedTab) {
-            Tab("Inventory", systemImage: "square.stack.fill", value: NavigationCoordinator.Tab.inventory) {
+            Tab("Inventory", systemImage: "chair.lounge.fill", value: NavigationCoordinator.Tab.inventory) {
             ModelInventoryView(path: $coordinator.inventoryPath)
                     .environment(coordinator)
             }
@@ -28,8 +28,9 @@ struct ContentView: View {
                     .environment(coordinator)
             }
 
-            Tab("Account", systemImage: "person", value: NavigationCoordinator.Tab.account) {
-                AccountView()
+            Tab("Options", systemImage: "ellipsis.circle", value: NavigationCoordinator.Tab.options) {
+                OptionsView()
+                    .environment(coordinator)
             }
         }.tint(.red)
     }

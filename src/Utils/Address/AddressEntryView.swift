@@ -52,7 +52,7 @@ struct AddressEntryView: View {
                 FormField(label: "Zipcode", text: $zipcode)
             }
 
-            HStack(spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("State")
                         .font(.subheadline)
@@ -63,7 +63,6 @@ struct AddressEntryView: View {
                         }
                     }
                     .pickerStyle(.menu)
-                    .padding(6)
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
                 }

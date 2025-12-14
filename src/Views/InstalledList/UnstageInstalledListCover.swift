@@ -10,11 +10,15 @@ import CachedAsyncImage
 
 struct UnstageInstalledListCover: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
     @Binding var viewModel: InstalledListViewModel
 
     @State private var unstagedItems: [Item] = []
     @State private var stagedItems: [Item] = []
     @State private var modelsById: [String: Model] = [:]
+
+    @State private var showUnstageSheet: Bool = false
+    @State private var selectedItemAndModel: (Item, Model)? = nil
 
     init(viewModel: Binding<InstalledListViewModel>) {
         _viewModel = viewModel
@@ -31,11 +35,26 @@ struct UnstageInstalledListCover: View {
 
                 UnstagedItemList()
             }
+            .refreshable {
+                stagedItems = []
+                unstagedItems = []
+                await loadItems()
+                await loadModels()
+            }
+            
+            Spacer()
+
+            Footer()
+        }
+        .sheet(isPresented: $showUnstageSheet) {
+            if let selectedItemAndModel {
+                UnstageItemSheet(selectedItemAndModel, stagedItems: $stagedItems, unstagedItems: $unstagedItems)
+            }
         }
         .frameTop()
         .frameHorizontalPadding()
         .task {
-            await loadStagedItems()
+            await loadItems()
             await loadModels()
         }
     }
@@ -55,7 +74,20 @@ struct UnstageInstalledListCover: View {
                     Text(viewModel.selectedList.address.getStreetAddress() ?? "")
                 )
             },
-            trailingIcon: { Spacer().frame(24) }
+            trailingIcon: { 
+                Button {
+                    Task {
+                        stagedItems = []
+                        unstagedItems = []
+                        await loadItems()
+                        await loadModels()
+                    }
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundColor(.red)
+                        .frame(24)
+                }
+            }
         )
     }
 
@@ -78,10 +110,17 @@ struct UnstageInstalledListCover: View {
     @ViewBuilder
     private func UnstagedItemList() -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Unstaged Items")
-            .font(.headline)
-            .foregroundColor(.red)
+            HStack(spacing: 0) {
+                Text("Items in Warehouse")
+                    .font(.headline)
+                    .foregroundColor(.red)
 
+                Spacer()
+
+                Text("(\(unstagedItems.count))")
+                    .foregroundColor(.secondary)
+            }
+            
             LazyVStack {
                 ForEach(unstagedItems, id: \.self) { item in
                     ItemListItem(item)
@@ -94,9 +133,16 @@ struct UnstageInstalledListCover: View {
     @ViewBuilder
     private func StagedItemList() -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Staged Items")
-            .font(.headline)
-            .foregroundColor(.secondary)
+            HStack(spacing: 0) {    
+                Text("Staged Items")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                Text("(\(stagedItems.count))")
+                    .foregroundColor(.secondary)
+            }
 
             LazyVStack(spacing: 12) {
                 ForEach(stagedItems, id: \.self) { item in
@@ -109,20 +155,22 @@ struct UnstageInstalledListCover: View {
     // MARK: Item List Item
     @ViewBuilder
     private func ItemListItem(_ item: Item) -> some View {
-        let model: Model? = modelsById[item.modelId]
-        HStack(spacing: 8) {
-            ItemPreviewImage(item: item, model: model)
+        if let model = modelsById[item.modelId] {
+            HStack(spacing: 8) {
+                ItemPreviewImage(item: item, model: model)
 
-            Text(model?.name ?? "No Model Name")
+                Text(model.name)
 
-            Spacer()
+                Spacer()
 
-            Button {
-                // TODO: Unstage Item
-            } label: {
-                Image(systemName:"shippingbox")
-                    .fontWeight(.bold)
-                    .frame(24)
+                Button {
+                    selectedItemAndModel = (item, model)
+                    showUnstageSheet = true
+                } label: {
+                    Image(systemName:"shippingbox")
+                        .fontWeight(.bold)
+                        .frame(24)
+                }
             }
         }
     }
@@ -130,7 +178,7 @@ struct UnstageInstalledListCover: View {
     // MARK: Item Preview Image
 
     @ViewBuilder
-    private func ItemPreviewImage(item: Item, model: Model? = nil) -> some View {
+    private func ItemPreviewImage(item: Item, model: Model?) -> some View {
         Group {
             if item.image.imageExists, let imageURL = item.image.imageURL {
                 ItemCachedAsyncImage(imageURL: imageURL)
@@ -177,15 +225,37 @@ struct UnstageInstalledListCover: View {
         }
     }
 
-    // MARK: Load Staged Items
+    // MARK: Footer
+
+    @ViewBuilder
+    private func Footer() -> some View {
+        if stagedItems.isEmpty {
+            HStack(spacing: 0) {
+                Button {
+                    Task {
+                        await viewModel.setListAsUnstaged()
+                        coordinator.resetSelectedPath()
+                    }
+                } label: {
+                    Text("Set List as Unstaged")
+                }
+            }
+        }
+    }
+
+    // MARK: Load Items
 
     @MainActor
-    private func loadStagedItems() async {
+    private func loadItems() async {
         for room in viewModel.rooms {
             for itemId in room.itemModelIdMap.keys {
                 do {
                     let item = try await Item.getItem(itemId: itemId)
-                    stagedItems.append(item)
+                    if !item.isAvailable {
+                        stagedItems.append(item)
+                    } else {
+                        unstagedItems.append(item)
+                    }
                 } catch {
                     print("Error loading item \(itemId): \(error)")
                 }
@@ -197,7 +267,7 @@ struct UnstageInstalledListCover: View {
 
     @MainActor
     private func loadModels() async {
-        for item in stagedItems {
+        for item in unstagedItems + stagedItems {
             if !modelsById.keys.contains(item.modelId) {
                 do {
                     let model = try await Model.getModel(modelId: item.modelId)

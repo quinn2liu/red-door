@@ -158,7 +158,7 @@ struct PullListDetailsView: View {
                     viewModel.updateSelectedList()
                     coordinator.resetSelectedPath()
                     try? await Task.sleep(for: .milliseconds(250))
-                    coordinator.appendToSelectedPath(item: viewModel.selectedList)
+                    coordinator.appendToSelectedPath(viewModel.selectedList)
                 }
             } label: {
                 HStack(spacing: 8) {

@@ -16,7 +16,7 @@ struct InstalledListDocumentView: View {
     )
 
     @State private var searchText: String = ""
-    @State private var showInstalledLists: Bool = false
+    @State private var showInstalledLists: Bool = true
     @State private var searchFocused: Bool = false
     @FocusState private var searchTextFocused: Bool
     
@@ -72,7 +72,14 @@ struct InstalledListDocumentView: View {
                         }
                     }
 
-                    ToolBarMenu()
+                    Button {
+                        Task {
+                            await viewModel.fetchPrimaryLists()
+                            await viewModel.fetchSecondaryLists(initial: true)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
                 }
             }
         ).tint(.red)
@@ -113,39 +120,13 @@ struct InstalledListDocumentView: View {
         .animation(.smooth(duration: 0.25), value: searchTextFocused)
     }
 
-    // MARK: Tool Bar Menu
-
-    @ViewBuilder 
-    private func ToolBarMenu() -> some View {
-        Menu {
-            NavigationLink(destination: CreatePullListView()) {
-                Text("From Scratch")
-                Image(systemName: "checklist")
-            }
-
-            NavigationLink(destination: InstalledToPullBrowseView()) {
-                Text("From Pull List")
-                Image(systemName: "document.on.document")
-            }
-        } label: {
-            Image(systemName: "plus")
-                .foregroundStyle(Color.red)
-        }
-    }
-
     // MARK: Normal Mode List (installed section + unstaged section)
     
     @ViewBuilder
     private func NormalModeList() -> some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                InstalledListSection()
-                UnstagedListSection()
-            }
-        }
-        .refreshable {
-            await viewModel.fetchPrimaryLists()
-            await viewModel.fetchSecondaryLists(initial: true)
+        VStack(spacing: 16) {
+            InstalledListSection()
+            UnstagedListSection()
         }
     }
     
@@ -181,23 +162,19 @@ struct InstalledListDocumentView: View {
             }
             .disabled(viewModel.primaryLists.isEmpty)
 
-            if showInstalledLists {
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    if viewModel.primaryLists.isEmpty {
-                        Text("No lists are currently installed.")
-                    } else {
+            if !viewModel.primaryLists.isEmpty && showInstalledLists {
+                if viewModel.isLoadingPrimary {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 8) {
                         ForEach(viewModel.primaryLists, id: \.self) { installedList in
                             NavigationLink(value: installedList) {
                                 Text(installedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
-                    }
-                    
-                    if viewModel.isLoadingPrimary {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
                     }
                 }
             }
@@ -225,28 +202,34 @@ struct InstalledListDocumentView: View {
             .cornerRadius(6)
             .frame(maxWidth: .infinity)
             
-            LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(viewModel.secondaryLists, id: \.self) { unstagedList in
-                    NavigationLink(value: unstagedList) {
-                        Text(unstagedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .onAppear {
-                        if unstagedList == viewModel.secondaryLists.last {
-                            Task {
-                                if !viewModel.isLoadingSecondary {
-                                    await viewModel.fetchSecondaryLists(initial: false)
-                                }
-                            }
-                        }
-                    }
-                }
-                
+            ScrollView {
                 if viewModel.isLoadingSecondary {
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding()
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(viewModel.secondaryLists, id: \.self) { unstagedList in
+                            NavigationLink(value: unstagedList) {
+                                Text(unstagedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onAppear {
+                                if unstagedList == viewModel.secondaryLists.last {
+                                    Task {
+                                        if !viewModel.isLoadingSecondary {
+                                            await viewModel.fetchSecondaryLists(initial: false)
+                                        }
+                                    }
+                                }
+                            }
+                        }  
+                    }
                 }
+            }
+            .refreshable {
+                await viewModel.fetchPrimaryLists()
+                await viewModel.fetchSecondaryLists(initial: true)
             }
         }
     }

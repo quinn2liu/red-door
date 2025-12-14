@@ -17,7 +17,7 @@ struct PullListDocumentView: View {
 
     @State private var searchText: String = ""
     @State private var showFromInstalledCover: Bool = false
-    @State private var showStagingLists: Bool = false
+    @State private var showStagingLists: Bool = true
     @State private var searchFocused: Bool = false
     @FocusState private var searchTextFocused: Bool
     
@@ -73,6 +73,15 @@ struct PullListDocumentView: View {
                         } label: {
                             Image(systemName: "magnifyingglass")
                         }
+                    }
+
+                    Button {
+                        Task {
+                            await viewModel.fetchPrimaryLists()
+                            await viewModel.fetchSecondaryLists(initial: true)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise")
                     }
 
                     ToolBarMenu()
@@ -141,15 +150,9 @@ struct PullListDocumentView: View {
     
     @ViewBuilder
     private func NormalModeList() -> some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                StagingListSection()
-                PlanningListSection()
-            }
-        }
-        .refreshable {
-            await viewModel.fetchPrimaryLists()
-            await viewModel.fetchSecondaryLists(initial: true)
+        VStack(spacing: 16) {
+            StagingListSection()
+            PlanningListSection()
         }
     }
     
@@ -185,23 +188,19 @@ struct PullListDocumentView: View {
             }
             .disabled(viewModel.primaryLists.isEmpty)
 
-            if showStagingLists {
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    if viewModel.primaryLists.isEmpty {
-                        Text("No lists are currently in staging.")
-                    } else {
+            if !viewModel.primaryLists.isEmpty && showStagingLists {
+                if viewModel.isLoadingPrimary {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 8) {
                         ForEach(viewModel.primaryLists, id: \.self) { pullList in
                             NavigationLink(value: pullList) {
                                 Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
                             }
                             .buttonStyle(PlainButtonStyle())
-                        }
-                    }
-                    
-                    if viewModel.isLoadingPrimary {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
+                        } 
                     }
                 }
             }
@@ -229,29 +228,35 @@ struct PullListDocumentView: View {
             .background(Color(.systemGray5))
             .cornerRadius(6)
             .frame(maxWidth: .infinity)
-            
-            LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(viewModel.secondaryLists, id: \.self) { pullList in
-                    NavigationLink(value: pullList) {
-                        Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .onAppear {
-                        if pullList == viewModel.secondaryLists.last {
-                            Task {
-                                if !viewModel.isLoadingSecondary {
-                                    await viewModel.fetchSecondaryLists(initial: false)
+
+            ScrollView {
+                if viewModel.isLoadingSecondary {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(viewModel.secondaryLists, id: \.self) { pullList in
+                            NavigationLink(value: pullList) {
+                                Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onAppear {
+                                if pullList == viewModel.secondaryLists.last {
+                                    Task {
+                                        if !viewModel.isLoadingSecondary {
+                                            await viewModel.fetchSecondaryLists(initial: false)
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                
-                if viewModel.isLoadingSecondary {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
-                }
+            }
+            .refreshable {
+                await viewModel.fetchPrimaryLists()
+                await viewModel.fetchSecondaryLists(initial: true)
             }
         }
     }

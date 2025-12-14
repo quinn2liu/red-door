@@ -1,11 +1,5 @@
-FEATURE: "unstage" installed list
-    ✔ FEATURE: create a new "unstaging" status @done(25-12-14 00:00)
-    ✔ FEATURE: create a new "unstaging" view @done(25-12-14 00:00)
-    ☐ FEATURE: create "unstage" function for each item
-
 TODO: General:
     ☐ FEATURE: Authentication
-    ☐ FEATURE: "restore" installed list function (resets all the items)
     ☐ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images.
     ☐ VIEW: Create reusable button components (RedDoorButton, TransparentButton, SmallCTA, etc.)
 
@@ -18,11 +12,8 @@ TODO: Pull Lists:
         ☐ VIEW: update room list item view
         ☐ VIEW: add option to add an image of the location
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
-        ☐ FEATURE: new "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
-            - from this view, they can create an installed list from the pull list (where only the items that have been installed are included).
         ☐ FEATURE: add "send to room" function to planning pull list
             - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
-        ☐ FEATURE: Add a "uninstall" button and view that allows users to specify where items in the pull list should be uninstalled to.
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
@@ -30,7 +21,6 @@ TODO: Pull Lists:
         ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
 
 TODO: Installed Lists:
-    ☐ FEATURE: add functionality to reset all items back to available (deleteRDList -> deleteInstalledList vs. deletePullList)
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
