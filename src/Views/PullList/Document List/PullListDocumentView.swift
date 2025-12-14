@@ -222,6 +222,8 @@ struct PullListDocumentView: View {
                 Image(systemName: "pencil.and.list.clipboard")
                     .font(.headline)
                     .foregroundColor(.primary)
+
+                Spacer()
             }
             .padding(8)
             .background(Color(.systemGray5))
