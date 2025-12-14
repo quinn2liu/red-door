@@ -12,6 +12,7 @@ enum InstallationStatus: String, Codable {
     case planning = "planning"
     case staging = "staging"
     case installed = "installed"
+    case unstaged = "unstaged"
 }
 
 struct RDList: Codable, Identifiable, Hashable {
@@ -42,32 +43,33 @@ struct RDList: Codable, Identifiable, Hashable {
         self.listType = listType
 
         self.address = address
-        addressId = address.id
+        self.addressId = address.id
 
-        createdDate = ISO8601DateFormatter().string(from: Date())
+        self.createdDate = ISO8601DateFormatter().string(from: Date())
         self.installDate = installDate
         self.status = status
         self.client = client
-        roomIds = roomNames
+        self.roomIds = roomNames
     }
 
     // MARK: - Init from Existing List
 
     init(
         list: RDList,
+        status: InstallationStatus,
         listType: DocumentType
     ) {
         id = list.id
         self.listType = listType
 
-        address = list.address
-        addressId = list.address.id
+        self.address = list.address
+        self.addressId = list.address.id
 
-        createdDate = list.createdDate
-        installDate = list.installDate
-        status = list.status
-        client = list.client
-        roomIds = list.roomIds
+        self.createdDate = list.createdDate
+        self.installDate = list.installDate
+        self.status = status
+        self.client = list.client
+        self.roomIds = list.roomIds
     }
 
     // MARK: - Init from blank
@@ -75,16 +77,16 @@ struct RDList: Codable, Identifiable, Hashable {
     init(
         listType: DocumentType = .pull_list
     ) {
-        id = UUID().uuidString
+        self.id = UUID().uuidString
         self.listType = listType
 
-        address = Warehouse.warehouse1.address
-        addressId = address.id
+        self.address = Warehouse.warehouse1.address
+        self.addressId = address.id
 
-        createdDate = ISO8601DateFormatter().string(from: Date())
-        installDate = ""
+        self.createdDate = ISO8601DateFormatter().string(from: Date())
+        self.installDate = ""
         status = .planning
-        client = ""
-        roomIds = []
+        self.client = ""
+        self.roomIds = []
     }
 }

@@ -11,8 +11,8 @@ import MapKit
 
 struct Address: Codable, Hashable {
     var id: String // address string that's lowercased, trimmed, not punctuation
-    var warehouseNumber: String?
     var formattedAddress: String
+    var isWarehouse: Bool?
 //    var coordinates: GeoPoint?
 
     // MARK: Init
@@ -24,7 +24,7 @@ struct Address: Codable, Hashable {
         zipcode: String = "",
         country: String = "",
         unit: String? = nil,
-        warehouseNumber: String? = nil
+        isWarehouse: Bool? = nil,
         //        coordinates: GeoPoint? = nil
     ) {
         // ID: concatenated, lowercased, trimmed, no punctuation or spaces
@@ -32,20 +32,20 @@ struct Address: Codable, Hashable {
 
         formattedAddress = Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
 
-        self.warehouseNumber = warehouseNumber
+        self.isWarehouse = isWarehouse
     }
 
     @available(iOS 26.0, *)
-    init(address: MKAddress, unit: String? = nil, warehouseNumber: String? = nil) {
+    init(address: MKAddress, unit: String? = nil, isWarehouse: Bool? = nil) {
         id = Address.normalize(address.fullAddress)
         formattedAddress = address.fullAddress
         if let unit = unit {
             formattedAddress += ", " + unit
         }
-        self.warehouseNumber = warehouseNumber
+        self.isWarehouse = isWarehouse
     }
 
-    init(placemark: MKPlacemark, unit: String? = nil, warehouseNumber: String? = nil) {
+    init(placemark: MKPlacemark, unit: String? = nil, isWarehouse: Bool? = nil) {
         let street = [
             placemark.subThoroughfare,
             placemark.thoroughfare,
@@ -61,14 +61,13 @@ struct Address: Codable, Hashable {
         id = Address.normalize([street, city, state, zipcode, country].joined())
 
         formattedAddress = Address.formattedAddress(street: street, city: city, state: state, zipcode: zipcode, country: country, unit: unit)
-
-        self.warehouseNumber = warehouseNumber
+        self.isWarehouse = isWarehouse
     }
 
     // MARK: isInitialized
 
     func isInitialized() -> Bool {
-        warehouseNumber == nil && !id.isEmpty && !formattedAddress.isEmpty
+        !id.isEmpty && !formattedAddress.isEmpty
     }
 
     // MARK: Formatted Address
@@ -100,5 +99,11 @@ struct Address: Codable, Hashable {
 
     func getStreetAddress() -> String? {
         return formattedAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: Get 
+
+    func getCityStateZipcode() -> String? {
+        return formattedAddress.split(separator: ",").dropFirst().dropLast().joined(separator: ", ")
     }
 }

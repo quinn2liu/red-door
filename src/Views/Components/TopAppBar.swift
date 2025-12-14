@@ -13,7 +13,7 @@ struct TopAppBar<LeadingIcon: View, Header: View, TrailingIcon: View>: View {
     @ViewBuilder var trailingIcon: TrailingIcon
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(alignment: .top,spacing: 0) {
             leadingIcon
 
             Spacer()

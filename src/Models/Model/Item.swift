@@ -26,9 +26,14 @@ struct Item: Identifiable, Codable, Hashable {
         self.image = image
     }
 
-    static func getItemModel(modelId: String) async throws -> Model {
-        let documentSnapshot = try await Firestore.firestore().collection("models").document(modelId).getDocument()
-        return try documentSnapshot.data(as: Model.self)
+    static func getItemModel(modelId: String) async -> Model {
+        do {
+            let documentSnapshot = try await Firestore.firestore().collection("models").document(modelId).getDocument()
+            return try documentSnapshot.data(as: Model.self)
+        } catch {
+            print("Error getting model: \(error)")
+            return Model()
+        }
     }
 
     static func getItem(itemId: String) async throws -> Item {

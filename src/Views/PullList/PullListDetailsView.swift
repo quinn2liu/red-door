@@ -12,8 +12,8 @@ struct PullListDetailsView: View {
     // MARK: Navigation
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
     @State private var viewModel: PullListViewModel
-    @Binding var path: NavigationPath
 
     // MARK: View State
 
@@ -25,22 +25,21 @@ struct PullListDetailsView: View {
 
     @State private var newRoomName: String = ""
 
-    init(pullList: RDList, path: Binding<NavigationPath>) {
+    init(pullList: RDList) {
         viewModel = PullListViewModel(selectedList: pullList)
-        _path = path
     }
 
     // MARK: Body
 
     var body: some View {
         VStack(spacing: 16) {
-            PullListTopBar(
+            RDListTopBar(
                 streetAddress: $viewModel.selectedList.address, 
                 trailingIcon: TopBarMenu,
                 status: viewModel.selectedList.status
             )
 
-            PullListDetails(installDate: $viewModel.selectedList.installDate, client: $viewModel.selectedList.client)
+            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
 
             RoomList()
 
@@ -155,15 +154,15 @@ struct PullListDetailsView: View {
 
             Button {
                 Task { @MainActor in
-                    path = NavigationPath()
                     viewModel.selectedList.status = .staging
                     viewModel.updateSelectedList()
-                    try? await Task.sleep(for: .milliseconds(500))
-                    path.append(viewModel.selectedList)
+                    coordinator.resetSelectedPath()
+                    try? await Task.sleep(for: .milliseconds(250))
+                    coordinator.appendToSelectedPath(viewModel.selectedList)
                 }
             } label: {
                 HStack(spacing: 8) {
-                    Image(systemName: "chair.lounge.fill")
+                    Image(systemName: "truck.box.badge.clock.fill")
                     Text("Begin Install")
                 }
             }

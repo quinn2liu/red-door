@@ -14,9 +14,11 @@ class ItemViewModel {
     let db = Firestore.firestore()
 
     var selectedItem: Item
+    let itemRef: DocumentReference
 
     init(selectedItem: Item) {
         self.selectedItem = selectedItem
+        self.itemRef = db.collection("items").document(selectedItem.id)
     }
 
     // MARK: if we have items as a subcollection, i'm not sure we need this...
@@ -47,7 +49,6 @@ class ItemViewModel {
     func deleteItem() async {
         let batch = db.batch()
 
-        let itemRef = db.collection("items").document(selectedItem.id)
         let modelRef = db.collection("models").document(selectedItem.modelId)
 
         batch.deleteDocument(itemRef)
@@ -61,5 +62,23 @@ class ItemViewModel {
         } catch {
             print("Error committing batch delete for item \(selectedItem.id): \(error)")
         }
+    }
+
+    func unstageItem(warehouseId: String) async -> Item {
+        let modelRef = db.collection("models").document(selectedItem.modelId)
+        let batch = db.batch()
+
+        selectedItem.listId = warehouseId
+        selectedItem.isAvailable = true
+        
+        batch.updateData(["listId": warehouseId, "isAvailable": true], forDocument: itemRef)
+        batch.updateData(["availableItemCount": FieldValue.increment(Int64(1))], forDocument: modelRef)
+        
+        do {
+            try await batch.commit()
+        } catch {
+            print("Error unstaging item: \(error.localizedDescription)")
+        }
+        return selectedItem
     }
 }

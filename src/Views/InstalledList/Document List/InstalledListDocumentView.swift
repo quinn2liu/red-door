@@ -9,31 +9,38 @@ import SwiftUI
 
 struct InstalledListDocumentView: View {
     @Binding var path: NavigationPath
-    @State private var viewModel = DocumentsListViewModel(.installed_list)
+    @State private var viewModel = RDListDocumentViewModel(
+        documentType: .installed_list,
+        primaryStatus: .installed,
+        secondaryStatus: .unstaged
+    )
 
     @State private var searchText: String = ""
-
-    // MARK: View Modifier Variables
-
-    @State private var isLoadingLists: Bool = false
+    @State private var showInstalledLists: Bool = true
     @State private var searchFocused: Bool = false
     @FocusState private var searchTextFocused: Bool
+    
+    private var isSearching: Bool {
+        !searchText.isEmpty
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 16) {
-                if !searchTextFocused {
+                if searchFocused {
+                    SearchBar()
+                } else {
                     TopBar()
                 }
 
-                if searchFocused {
-                    SearchBar()
+                if isSearching {
+                    SearchResultsList()
+                } else {
+                    NormalModeList()
                 }
-
-                InstalledListList()
             }
             .task {
-                await fetchInstalledLists(initial: true, searchText: nil)
+                await viewModel.fetchInitialData()
             }
             .frameTop()
             .frameHorizontalPadding()
@@ -65,7 +72,14 @@ struct InstalledListDocumentView: View {
                         }
                     }
 
-                    ToolBarMenu()
+                    Button {
+                        Task {
+                            await viewModel.fetchPrimaryLists()
+                            await viewModel.fetchSecondaryLists(initial: true)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
                 }
             }
         ).tint(.red)
@@ -85,99 +99,169 @@ struct InstalledListDocumentView: View {
                     .onSubmit {
                         if !searchText.isEmpty {
                             Task {
-                                await fetchInstalledLists(initial: true, searchText: searchText)
+                                await viewModel.fetchSearchResults(query: searchText.lowercased())
                             }
                         }
-                        searchTextFocused = false
-                        searchFocused = false
                     }
             }
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
 
-            if searchTextFocused {
+            if searchFocused {
                 Button("Cancel") {
                     searchText = ""
+                    viewModel.clearSearchResults()
                     searchTextFocused = false
                     searchFocused = false
                 }
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.bouncy(duration: 0.5), value: searchTextFocused)
+        .animation(.smooth(duration: 0.25), value: searchTextFocused)
     }
 
-    // MARK: Tool Bar Menu
-
-    @ViewBuilder 
-    private func ToolBarMenu() -> some View {
-        Menu {
-            NavigationLink(destination: CreatePullListView()) {
-                Text("From Scratch")
-                Image(systemName: "checklist")
-            }
-
-            NavigationLink(destination: InstalledToPullBrowseView()) {
-                Text("From Pull List")
-                Image(systemName: "document.on.document")
-            }
-        } label: {
-            Image(systemName: "plus")
-                .foregroundStyle(Color.red)
+    // MARK: Normal Mode List (installed section + unstaged section)
+    
+    @ViewBuilder
+    private func NormalModeList() -> some View {
+        VStack(spacing: 16) {
+            InstalledListSection()
+            UnstagedListSection()
         }
     }
+    
+    // MARK: Installed Lists Section
+    
+    @ViewBuilder
+    private func InstalledListSection() -> some View {
+        VStack(spacing: 8) {
+            Button {
+                withAnimation {
+                    showInstalledLists.toggle()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text("Installed")
+                        .font(.headline)
+                        .foregroundColor(.red)
 
-    // MARK: Installed List List
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.headline)
+                        .foregroundColor(.red)
 
-    @ViewBuilder 
-    private func InstalledListList() -> some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(viewModel.documentsArray.compactMap { $0 as? RDList }, id: \.self) { installedList in
-                    NavigationLink(value: installedList) {
-                        Text(installedList.id) // TODO: make a InstalledListView
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .onAppear {
-                        if installedList == viewModel.documentsArray.last as? RDList {
-                            Task {
-                                if !isLoadingLists {
-                                    await fetchInstalledLists(initial: false, searchText: !searchText.isEmpty ? searchText : nil)
-                                }
+                    Spacer()
+
+                    Text("(\(viewModel.primaryLists.count))")
+                        .foregroundColor(.secondary)
+
+                    Image(systemName: showInstalledLists ? "chevron.up" : "chevron.down")
+                }
+                .padding(8)
+                .background(Color(.systemGray5))
+                .cornerRadius(6)
+            }
+            .disabled(viewModel.primaryLists.isEmpty)
+
+            if !viewModel.primaryLists.isEmpty && showInstalledLists {
+                if viewModel.isLoadingPrimary {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(viewModel.primaryLists, id: \.self) { installedList in
+                            NavigationLink(value: installedList) {
+                                Text(installedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    // MARK: Unstaged Lists Section
+    
+    @ViewBuilder
+    private func UnstagedListSection() -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text("Unstaged")
+                    .font(.headline)
+                    .foregroundColor(.primary)
 
-                if isLoadingLists {
+                Image(systemName: "arrow.uturn.backward")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+
+                Spacer()
+            }
+            .padding(8)
+            .background(Color(.systemGray5))
+            .cornerRadius(6)
+            .frame(maxWidth: .infinity)
+            
+            ScrollView {
+                if viewModel.isLoadingSecondary {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(viewModel.secondaryLists, id: \.self) { unstagedList in
+                            NavigationLink(value: unstagedList) {
+                                Text(unstagedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onAppear {
+                                if unstagedList == viewModel.secondaryLists.last {
+                                    Task {
+                                        if !viewModel.isLoadingSecondary {
+                                            await viewModel.fetchSecondaryLists(initial: false)
+                                        }
+                                    }
+                                }
+                            }
+                        }  
+                    }
+                }
+            }
+            .refreshable {
+                await viewModel.fetchPrimaryLists()
+                await viewModel.fetchSecondaryLists(initial: true)
+            }
+        }
+    }
+    
+    // MARK: Search Results List
+    
+    @ViewBuilder
+    private func SearchResultsList() -> some View {
+        ScrollView {
+            LazyVStack(spacing: 8) {
+                ForEach(viewModel.searchResults, id: \.self) { installedList in
+                    NavigationLink(value: installedList) {
+                        HStack {
+                            Text(installedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
+                            Spacer()
+                            Text(installedList.status.rawValue.capitalized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                
+                if viewModel.isLoadingSearch {
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding()
                 }
             }
         }
-    }
-
-    // MARK: Fetch Installed Lists
-
-    private func fetchInstalledLists(initial isInitial: Bool, searchText: String?) async {
-        var filters: [String: Any] = [:]
-
-        if let searchText {
-            filters.updateValue(searchText, forKey: "id")
-        }
-        DispatchQueue.main.async {
-            isLoadingLists = true
-        }
-
-        if isInitial {
-            await viewModel.fetchInitialDocuments(filters: filters)
-        } else {
-            await viewModel.fetchMoreDocuments(filters: filters)
-        }
-
-        DispatchQueue.main.async {
-            isLoadingLists = false
+        .refreshable {
+            await viewModel.fetchSearchResults(query: searchText)
         }
     }
 }

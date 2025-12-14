@@ -9,29 +9,28 @@ import SwiftUI
 
 struct StagingPullListView: View {
     @State private var viewModel: PullListViewModel
-    @Binding var path: NavigationPath
     @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
 
+    @State private var showPDFPreview: Bool = false
     @State private var errorMessage: String?
 
     // MARK: Init
 
-    init(pullList: RDList, path: Binding<NavigationPath>) {
-        viewModel = PullListViewModel(selectedList: pullList)
-        _path = path
+    init(pullList: RDList) {
+        viewModel = PullListViewModel(selectedList: pullList)   
     }
 
     // MARK: Body
 
     var body: some View {
         VStack(spacing: 16) {
-            PullListTopBar(
+            RDListTopBar(
                 streetAddress: $viewModel.selectedList.address, 
-                trailingIcon: Spacer().frame(24),
+                trailingIcon: RefreshButton,
                 status: viewModel.selectedList.status
             )
 
-            PullListDetails(installDate: $viewModel.selectedList.installDate, client: $viewModel.selectedList.client)
+            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
 
             RoomList()
 
@@ -43,6 +42,9 @@ struct StagingPullListView: View {
         .frameHorizontalPadding()
         .toolbar(.hidden)
         .ignoresSafeArea(.keyboard)
+        .fullScreenCover(isPresented: $showPDFPreview) {
+            PullListPDFView(pullList: viewModel.selectedList, rooms: viewModel.rooms)
+        }
     }
 
     // MARK: Room List
@@ -73,21 +75,23 @@ struct StagingPullListView: View {
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 0) {
+
             Button {
-                Task {
-                    await viewModel.refreshRDList()
-                }
+                showPDFPreview = true
             } label: {
-                Image(systemName: "arrow.counterclockwise")
+                HStack(spacing: 8) {
+                    Image(systemName: "richtext.page.fill")
+                    Text("PDF")
+                }
             }
 
             Button {
                 Task { @MainActor in
                     viewModel.selectedList.status = .planning
                     viewModel.updateSelectedList()
-                    path = NavigationPath()
+                    coordinator.resetSelectedPath()
                     try? await Task.sleep(for: .milliseconds(500))
-                    path.append(viewModel.selectedList)
+                    coordinator.appendToSelectedPath(viewModel.selectedList)
                 }
             } label: {
                 Text("Change to planning")
@@ -103,7 +107,7 @@ struct StagingPullListView: View {
                         try? await Task.sleep(for: .milliseconds(250))
                         coordinator.setSelectedTab(to:.installedList)
                         try? await Task.sleep(for: .milliseconds(250))
-                        coordinator.appendToSelectedPath(item: installedlist)
+                        coordinator.appendToSelectedPath(installedlist)
                     } catch let PullListValidationError.itemDoesNotExist(id) {
                         errorMessage = "Item \(id) does not exist."
                     } catch let PullListValidationError.itemNotAvailable(id) {
@@ -121,6 +125,21 @@ struct StagingPullListView: View {
             } label: {
                 Text("Create Installed List")
             }
+        }
+    }
+
+    // MARK: Refresh Button
+
+    @ViewBuilder
+    private var RefreshButton: some View {
+        Button {
+            Task {
+                await viewModel.refreshRDList()
+            }
+        } label: {
+            Image(systemName: "arrow.counterclockwise")
+                .frame(24)
+                .foregroundColor(.red)
         }
     }
 }

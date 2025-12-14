@@ -13,7 +13,7 @@ class PullListViewModel: RDListViewModel {
     // MARK: Create Installed List from Pull List
 
     func createInstalledFromPull() async throws -> RDList {
-        let installedList = RDList(list: selectedList, listType: .installed_list)
+        let installedList = RDList(list: selectedList, status: .installed, listType: .installed_list)
         let installedListRef = db.collection("installed_lists").document(installedList.id)
         let roomsRef = installedListRef.collection("rooms")
 
@@ -155,7 +155,7 @@ class PullListViewModel: RDListViewModel {
             let roomRef = selectedListReference.collection("rooms").document(newRoom.id)
             
             let result = try await db.runTransaction { transaction, _ in
-                transaction.updateData(["roomIds": FieldValue.arrayUnion([newRoom.id])], forDocument: self.listDocumentRef)
+                transaction.updateData(["roomIds": FieldValue.arrayUnion([newRoom.id])], forDocument: self.listRef)
                 
                 do {
                     try transaction.setData(from: newRoom, forDocument: roomRef)

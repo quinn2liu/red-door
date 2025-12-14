@@ -6,6 +6,11 @@ struct AddressSheet: View {
     @State private var selectedAddressMode: String = "Search"
     let addressOptions = ["Search", "Entry"]
 
+    init(selectedAddress: Binding<Address>, addressId: Binding<String>) {
+        _selectedAddress = selectedAddress
+        _addressId = addressId
+    }
+
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
             Capsule()

@@ -100,6 +100,8 @@ struct StagingRoomListItemView: View {
                 Text(model?.name ?? "No Model Name")
             }
             .opacity(isSelected ? 1.0 : 0.5)
+
+            Spacer()
         }
     }
 

@@ -7,37 +7,20 @@
 
 import Foundation
 
-enum Warehouse: String, Codable, CaseIterable {
-    case warehouse1 = "warehouse-1"
-    case warehouse2 = "warehouse-2"
+struct Warehouse: Codable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var address: Address
 
-    var name: String {
-        switch self {
-        case .warehouse1: return "Main Warehouse"
-        case .warehouse2: return "Secondary Warehouse"
-        }
+    init(name: String, address: Address) {
+        self.id = name.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
+        self.name = name
+        self.address = address
     }
 
-    var address: Address {
-        switch self {
-        case .warehouse1:
-            return Address(
-                street: "123 Distribution Way",
-                city: "Boston",
-                state: "MA",
-                zipcode: "02118",
-                country: "USA",
-                warehouseNumber: "1"
-            )
-        case .warehouse2:
-            return Address(
-                street: "42 Storage Blvd",
-                city: "Cambridge",
-                state: "MA",
-                zipcode: "02139",
-                country: "USA",
-                warehouseNumber: "2"
-            )
-        }
-    }
+}
+
+extension Warehouse {
+    static let warehouse1 = Warehouse(name: "Warehouse 1", address: Address(street: "123 Main St", city: "Anytown", state: "CA", zipcode: "12345", isWarehouse: true))
+    static let warehouse2 = Warehouse(name: "Warehouse 2", address: Address(street: "456 Main St", city: "Anytown", state: "CA", zipcode: "12345", isWarehouse: true))
 }

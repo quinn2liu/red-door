@@ -41,12 +41,16 @@ struct PullListPDFView: View {
                         ProgressView()
                         Text("Generating PDF")
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                     Spacer()
                 } else {
                     PDFKitView(document: pdfDocument!)
-                        .border(.gray)
-                        .cornerRadius(6)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray, lineWidth: 1)
+                        )
 
                     if isGeneratingPDF {
                         ProgressView("Preparing PDF for export...")
@@ -162,6 +166,8 @@ struct PDFKitView: UIViewRepresentable {
         pdfView.autoScales = true
         pdfView.displayMode = .singlePageContinuous
         pdfView.displayDirection = .vertical
+        pdfView.layer.cornerRadius = 12
+        pdfView.layer.masksToBounds = true
         return pdfView
     }
 

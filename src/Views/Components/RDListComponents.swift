@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PullListTopBar<TrailingIcon: View>: View {
+struct RDListTopBar<TrailingIcon: View>: View {
     @Binding var streetAddress: Address
     @ViewBuilder var trailingIcon: TrailingIcon
 
@@ -36,9 +36,9 @@ struct PullListTopBar<TrailingIcon: View>: View {
     }
 }
 
-struct PullListDetails: View {
-    @Binding var installDate: String
-    @Binding var client: String
+struct RDListDetails: View {
+    let installDate: String
+    let client: String
 
     var body: some View {
         HStack(spacing: 0) {
