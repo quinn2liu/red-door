@@ -13,33 +13,24 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $coordinator.selectedTab) {
-            Group {
-                ModelInventoryView(path: $coordinator.inventoryPath)
-                    .tabItem {
-                        Label("Inventory", systemImage: "square.stack.fill")
-                    }
-                    .tag(NavigationCoordinator.Tab.inventory)
+            Tab("Inventory", systemImage: "square.stack.fill", value: NavigationCoordinator.Tab.inventory) {
+            ModelInventoryView(path: $coordinator.inventoryPath)
                     .environment(coordinator)
+            }
 
+            Tab("Pull Lists", systemImage: "pencil.and.list.clipboard", value: NavigationCoordinator.Tab.pullList) {
                 PullListDocumentView(path: $coordinator.pullListPath)
-                    .tabItem {
-                        Label("Pull Lists", systemImage: "list.bullet")
-                    }
-                    .tag(NavigationCoordinator.Tab.pullList)
                     .environment(coordinator)
+            }
 
+            Tab("Installed Lists", systemImage: "list.bullet.clipboard", value: NavigationCoordinator.Tab.installedList) {
                 InstalledListDocumentView(path: $coordinator.installedListPath)
-                    .tabItem {
-                        Label("Installed Lists", systemImage: "list.bullet.clipboard")
-                    }
-                    .tag(NavigationCoordinator.Tab.installedList)
                     .environment(coordinator)
+            }
 
+            Tab("Account", systemImage: "person", value: NavigationCoordinator.Tab.account) {
                 AccountView()
-                    .tabItem {
-                        Label("Account", systemImage: "person")
-                    }
-            }.tint(.blue)
+            }
         }.tint(.red)
     }
 }

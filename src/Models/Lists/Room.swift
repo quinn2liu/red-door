@@ -8,18 +8,20 @@
 import Foundation
 
 struct Room: Codable, Identifiable, Hashable {
-    // TODO: don't love coupling meaning into the ID
+    // TODO: don't give the room an ID, it's not needed
     var id: String // listId + roomName(spaces replaced by -, lowercased), separated by ";" ex: (adslkfasdflkjasdkl;living-room)
 
     var roomName: String
     var listId: String // Id of parent list (pull list or installed list)
-    var itemModelMap: [String: String] = [:]
+    var itemModelIdMap: [String: String] = [:]
+    var selectedItemIdSet: Set<String> = []
 
-    init(roomName: String, listId: String, itemToModelIds: [String: String] = [:]) {
+    init(roomName: String, listId: String, itemModelIdMap: [String: String] = [:], selectedItemIdSet: Set<String> = []) {
         id = listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
         self.roomName = roomName
         self.listId = listId
-        itemModelMap = itemToModelIds
+        self.itemModelIdMap = itemModelIdMap
+        self.selectedItemIdSet = selectedItemIdSet
     }
 }
 

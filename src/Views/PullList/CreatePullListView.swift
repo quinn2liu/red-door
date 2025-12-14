@@ -70,7 +70,7 @@ struct CreatePullListView: View {
                 }
         }
         .sheet(isPresented: $showAddressSheet) {
-            AddressSheet()
+            AddressSheet(selectedAddress: $viewModel.selectedList.address, addressId: $viewModel.selectedList.addressId)
         }
     }
 
@@ -101,36 +101,6 @@ struct CreatePullListView: View {
             }
             .tint(.red)
         })
-    }
-
-    // MARK: Address Sheet
-
-    @ViewBuilder
-    private func AddressSheet() -> some View {
-        VStack(alignment: .center, spacing: 12) {
-            Capsule()
-                .fill(Color(.systemGray3))
-                .frame(width: 40, height: 5)
-                .padding(.top, 8)
-
-            Picker("Address Mode", selection: $selectedAddressMode) {
-                ForEach(addressOptions, id: \.self) { mode in
-                    Text(mode).tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
-
-            Group {
-                if selectedAddressMode == "Search" {
-                    AddressSearchView($viewModel.selectedList.address)
-                } else {
-                    AddressEntryView($viewModel.selectedList.address)
-                }
-            }
-        }
-        .frameTop()
-        .frameVerticalPadding()
-        .frameHorizontalPadding()
     }
 
     // MARK: Create Empty Room Sheet ()

@@ -10,6 +10,7 @@ import SwiftUI
 struct AddressEntryView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedAddress: Address
+    @Binding var addressId: String
 
     @State private var street: String
     @State private var town: String
@@ -18,8 +19,9 @@ struct AddressEntryView: View {
     @State private var country: String
     @State private var unit: String
 
-    init(_ selectedAddress: Binding<Address>) {
+    init(_ selectedAddress: Binding<Address>, addressId: Binding<String>) {
         _selectedAddress = selectedAddress
+        _addressId = addressId
         let address = selectedAddress.wrappedValue
         if address.isInitialized() {
             let components = address.formattedAddress.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -93,6 +95,7 @@ struct AddressEntryView: View {
 
     private func updateSelectedAddress() {
         selectedAddress = Address(street: street, city: town, state: state, zipcode: zipcode, country: country, unit: unit)
+        addressId = selectedAddress.id
     }
 
     let states: [String] = [

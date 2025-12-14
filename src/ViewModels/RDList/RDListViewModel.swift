@@ -39,7 +39,7 @@ class RDListViewModel {
 
     // MARK: Update RDList
 
-    func updateRDList() {
+    func updateSelectedList() {
         do {
             try selectedListReference.setData(from: selectedList, merge: true)
         } catch {
@@ -71,6 +71,8 @@ class RDListViewModel {
 
     // MARK: Delete RDList
 
+    // TODO: UPDATE THE LOCATIONS OF ITEMS IF THIS HAPPENS
+
     func deleteRDList() async {
         do {
             let roomsSnapshot = try await selectedListReference.collection("rooms").getDocuments()
@@ -95,7 +97,7 @@ class RDListViewModel {
 
 extension RDListViewModel {
 
-    // MARK: Create Empty Room
+    // MARK: Create Empty Room (doesn't exist in firebase)
 
     func createEmptyRoom(_ roomName: String) -> Bool {
         if roomExists(newRoomName: roomName, roomNames: selectedList.roomIds) {

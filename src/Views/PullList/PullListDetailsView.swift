@@ -12,33 +12,35 @@ struct PullListDetailsView: View {
     // MARK: Navigation
 
     @Environment(\.dismiss) private var dismiss
+    @State private var viewModel: PullListViewModel
     @Binding var path: NavigationPath
 
     // MARK: View State
 
     @FocusState private var keyboardFocused: Bool
-    @State private var isEditing: Bool = false
-    @State private var showSheet: Bool = false
+    @State private var showEditSheet: Bool = false
     @State private var showCreateRoom: Bool = false
     @State private var errorMessage: String?
     @State private var showPDF: Bool = false
+
     @State private var newRoomName: String = ""
-    @State private var existingRoomAlert: Bool = false
-    
-    @State private var address: String = ""
-    @State private var date: Date = .init()
-    @State private var viewModel: PullListViewModel
 
     init(pullList: RDList, path: Binding<NavigationPath>) {
         viewModel = PullListViewModel(selectedList: pullList)
         _path = path
     }
 
+    // MARK: Body
+
     var body: some View {
         VStack(spacing: 16) {
-            TopBar()
+            PullListTopBar(
+                streetAddress: $viewModel.selectedList.address, 
+                trailingIcon: TopBarMenu,
+                status: viewModel.selectedList.status
+            )
 
-            PullListDetails()
+            PullListDetails(installDate: $viewModel.selectedList.installDate, client: $viewModel.selectedList.client)
 
             RoomList()
 
@@ -46,14 +48,13 @@ struct PullListDetailsView: View {
 
             Footer()
         }
-        .onAppear {
-            Task {
-                await viewModel.loadRooms()
-            }
-        }
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
+        .frameTop()
         .frameHorizontalPadding()
+        .sheet(isPresented: $showEditSheet) {
+            EditPullListDetailsSheet(viewModel: $viewModel)
+        }
         .fullScreenCover(isPresented: $showPDF) {
             PullListPDFView(pullList: viewModel.selectedList, rooms: viewModel.rooms)
         }
@@ -68,9 +69,6 @@ struct PullListDetailsView: View {
                 }
             }
         )
-        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
-            Button("Ok", role: .cancel) {}
-        }
         .sheet(isPresented: $showCreateRoom) {
             CreateEmptyRoomSheet()
                 .onAppear {
@@ -80,72 +78,27 @@ struct PullListDetailsView: View {
         }
     }
 
-    // MARK: Top Bar
+    // MARK: Top Bar Menu
 
     @ViewBuilder
-    private func TopBar() -> some View {
-        TopAppBar(leadingIcon: {
-            if isEditing {
-                Button {
-                    isEditing = false
-                } label: {
-                    Text("Cancel")
-                        .foregroundStyle(.blue)
+    private var TopBarMenu: some View {
+        Menu {
+            Button("Add Room", systemImage: "plus") {
+                showCreateRoom = true
+            }
+
+            Button("Edit List Details", systemImage: "pencil") {
+                showEditSheet = true
+            }
+
+            Button("Delete Pull List", systemImage: "trash") {
+                Task {
+                    await viewModel.deleteRDList()
+                    dismiss()
                 }
-            } else {
-                BackButton()
             }
-        }, header: {
-            if isEditing { // TODO: address searching should be a sheet
-                TextField(viewModel.selectedList.address.formattedAddress, text: $address)
-                    .onChange(of: address) { _, _ in
-                        viewModel.selectedList.id = address
-                    }
-            } else {
-                Text(viewModel.selectedList.address.formattedAddress)
-            }
-
-        }, trailingIcon: {
-            Button {
-                if isEditing {
-                    let dateString = date.formatted(.dateTime.year().month().day())
-                    if dateString != viewModel.selectedList.installDate {
-                        viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
-                    }
-                    viewModel.updateRDList()
-                }
-                isEditing.toggle()
-            } label: {
-                Text(isEditing ? "Save" : "Edit")
-                    .foregroundStyle(isEditing ? .blue : .red)
-                    .fontWeight(isEditing ? .semibold : .regular)
-            }
-        })
-    }
-
-    // MARK: Pull List Details
-
-    @ViewBuilder
-    private func PullListDetails() -> some View {
-        VStack(spacing: 12) {
-            if isEditing {
-                DatePicker(
-                    "Install Date:",
-                    selection: $date,
-                    displayedComponents: [.date]
-                )
-
-                HStack {
-                    Text("Client:")
-                    TextField("", text: $viewModel.selectedList.client)
-                        .padding(6)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                }
-            } else {
-                Text("Install Date: \(viewModel.selectedList.installDate)")
-                Text("Client: \(viewModel.selectedList.client)")
-            }
+        } label: {
+            Image(systemName: "ellipsis")
         }
     }
 
@@ -157,7 +110,7 @@ struct PullListDetailsView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomListItemView(room: room)
+                        RoomPreviewListItemView(room: room)
                     }
                 }
             }
@@ -166,11 +119,10 @@ struct PullListDetailsView: View {
                     await viewModel.refreshRDList()
                 }
             }
-
-            if isEditing {
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
-                    showCreateRoom = true
-                }
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadRooms()
             }
         }
     }
@@ -179,53 +131,40 @@ struct PullListDetailsView: View {
 
     @ViewBuilder
     private func Footer() -> some View {
-        if isEditing {
-            HStack(spacing: 12) {
-                Button("Delete Pull List") {
-                    Task {
-                        await viewModel.deleteRDList()
-                        dismiss()
-                    }
+        HStack(spacing: 0) {
+            Button {
+                Task {
+                    await viewModel.refreshRDList()
                 }
+            } label: {
+                Image(systemName: "arrow.counterclockwise")
+            }
+            
+            Spacer()
 
-                Button("Save Pull List") {
-                    viewModel.updateRDList()
-                    dismiss()
+            Button {
+                showPDF = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "richtext.page.fill")
+                    Text("PDF")
                 }
             }
-        } else {
-            HStack(spacing: 12) {
-                Button("Show PDF") {
-                    showPDF = true
-                }
 
-                Button {
-                    Task { // TODO: consider wrapping this in some error-handling function
-                        do {
-                            let installedlist = try await viewModel.createInstalledFromPull()
-                            path.append(installedlist)
-                        } catch let PullListValidationError.itemDoesNotExist(id) {
-                            errorMessage = "Item \(id) does not exist."
-                        } catch let PullListValidationError.itemNotAvailable(id) {
-                            errorMessage = "Item \(id) is not available."
-                        } catch let PullListValidationError.modelDoesNotExist(id) {
-                            errorMessage = "Model \(id) does not exist."
-                        } catch let PullListValidationError.modelAvailableCountInvalid(id) {
-                            errorMessage = "Model \(id) has insufficient available items."
-                        } catch InstalledFromPullError.creationFailed {
-                            errorMessage = "Unable to create Installed list."
-                        } catch {
-                            errorMessage = "Unexpected error: \(error.localizedDescription)"
-                        }
-                    }
-                } label: {
-                    Text("Create Installed List")
-                }
+            Spacer()
 
-                RedDoorButton(type: .blue, text: "Refresh Contents") {
-                    Task {
-                        await viewModel.refreshRDList()
-                    }
+            Button {
+                Task { @MainActor in
+                    path = NavigationPath()
+                    viewModel.selectedList.status = .staging
+                    viewModel.updateSelectedList()
+                    try? await Task.sleep(for: .milliseconds(500))
+                    path.append(viewModel.selectedList)
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "chair.lounge.fill")
+                    Text("Begin Install")
                 }
             }
         }
@@ -251,18 +190,16 @@ struct PullListDetailsView: View {
                 Spacer()
 
                 Button {
-                    existingRoomAlert = !viewModel.createEmptyRoom(newRoomName)
-                    print("selectedList.roomIds: \(viewModel.selectedList.roomIds)")
-                    if !existingRoomAlert { showCreateRoom = false }
+                    Task {
+                        let added = await viewModel.createEmptyRoomExists(roomName: newRoomName)
+                        if added { showCreateRoom = false }
+                    }
                 } label: {
                     Text("Add Room")
                         .fontWeight(.semibold)
                         .foregroundStyle(.blue)
                 }
             }
-        }
-        .alert("Room with that name already exists.", isPresented: $existingRoomAlert) {
-            Button("Ok", role: .cancel) {}
         }
         .frameTop()
         .frameHorizontalPadding()

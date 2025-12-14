@@ -1,9 +1,23 @@
+Installing List Todo:
+    ☐ FEATURE: Add a "staging" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
+    
+        ✔ update rdlist model to include installation status @started(25-12-09 22:08) @done(25-12-09 22:22) @lasted(14m12s)
+        ✔ add button to pull list detail view to navigate to installing view @done(25-12-10 21:02)
+        ☐ initial staging view
+            ✔ create room list item view for each of the items in the room @started(25-12-11 21:08) @done(25-12-11 22:55) @lasted(1h47m15s)
+            ✔ add "selected" items to Room Model (when the list is turned into an installed list, this should be removed) @done(25-12-12 22:43)
+            ✔ allow items to be moved to other rooms @done(25-12-13 17:30)
+        ☐ update pulllist document view to filter between "staging" and "planning" pull lists
+
 TODO: General:
     ☐ FEATURE: Authentication
     ☐ FEATURE: "Staging" view 
         - pull list is created, but not installed
         - users can check items that are installed
         - then, create installed list from only checked items 
+    ☐ FEATURE: "restore" installed list function (resets all the items)
+    ☐ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images.
+    ☐ VIEW: Create reusable button components (RedDoorButton, TransparentButton, SmallCTA, etc.)
 
 TODO: Address:
 
@@ -16,11 +30,17 @@ TODO: Pull Lists:
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
         ☐ FEATURE: new "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
             - from this view, they can create an installed list from the pull list (where only the items that have been installed are included).
+        ☐ FEATURE: when viewing a room, implement a "send to room" function that allows users to send items from one room to another.
+            - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
+        ☐ FEATURE: Add a "uninstall" button and view that allows users to specify where items in the pull list should be uninstalled to.
+
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
+        ☐ FEATURE: Remove item from room
 
 TODO: Installed Lists:
+    ☐ FEATURE: add functionality to reset all items back to available (deleteRDList -> deleteInstalledList vs. deletePullList)
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
@@ -40,6 +60,7 @@ TODO: Item:
         ☐ FEATURE: Flag for attention (like repairs)
         ☐ VIEW: Better Item View
         ☐ VIEW: Navigate to pull list button (if not in storage)
+        ☐ FEATURE: QR Code should generate a LABEL (image, name, etc) instead of just the QR Code
 
 TODO: Major Changes:
     ☐ VIEW: Update all Edit views to be a sheet instead of "isEditing" state variable

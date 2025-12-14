@@ -32,10 +32,8 @@ struct InstalledListDocumentView: View {
 
                 InstalledListList()
             }
-            .onAppear {
-                Task {
-                    await fetchInstalledLists(initial: true, searchText: nil)
-                }
+            .task {
+                await fetchInstalledLists(initial: true, searchText: nil)
             }
             .frameTop()
             .frameHorizontalPadding()

@@ -1,5 +1,5 @@
 //
-//  RoomListItemView.swift
+//  RoomPreviewListItemView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/1/25.
@@ -8,7 +8,7 @@
 import CachedAsyncImage
 import SwiftUI
 
-struct RoomListItemView: View {
+struct RoomPreviewListItemView: View {
     // MARK: init Variables
 
     @State private var viewModel: RoomViewModel
@@ -29,7 +29,7 @@ struct RoomListItemView: View {
 
                 Spacer()
 
-                Text("Items \(viewModel.selectedRoom.itemModelMap.count)")
+                Text("Items \(viewModel.selectedRoom.itemModelIdMap.count)")
 
                 Image(systemName: showRoomPreview ? "minus" : "plus")
             }
@@ -66,7 +66,7 @@ struct RoomListItemView: View {
             .padding()
         }
         .task {
-            if !viewModel.selectedRoom.itemModelMap.isEmpty {
+            if !viewModel.selectedRoom.itemModelIdMap.isEmpty {
                 await viewModel.getRoomModels()
             }
         }

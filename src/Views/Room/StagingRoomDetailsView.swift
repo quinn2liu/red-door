@@ -1,5 +1,5 @@
 //
-//  RoomDetailsView.swift
+//  StagingRoomDetailsView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 10/4/25.
@@ -8,13 +8,17 @@
 import CachedAsyncImage
 import SwiftUI
 
-struct RoomDetailsView: View {
+struct StagingRoomDetailsView: View {
     // MARK: init Variables
     
-    @Binding var viewModel: RoomViewModel
+    private var parentList: RDList
+    private var rooms: [Room]
+    @Binding var roomViewModel: RoomViewModel
 
-    init(viewModel: Binding<RoomViewModel>) {
-        _viewModel = viewModel
+    init(parentList: RDList, rooms: [Room], roomViewModel: Binding<RoomViewModel>) {
+        self.parentList = parentList
+        self.rooms = rooms
+        _roomViewModel = roomViewModel
     }
 
     // MARK: State Variables
@@ -30,18 +34,18 @@ struct RoomDetailsView: View {
             RoomItemList()
         }
         .sheet(isPresented: $showSheet) {
-            RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showSheet)
+            RoomAddItemsSheet(roomViewModel: $roomViewModel, showSheet: $showSheet)
         }
         .onAppear {
-            if !viewModel.items.isEmpty {
+            if !roomViewModel.items.isEmpty {
                 Task {
-                    await viewModel.loadItemsAndModels()
+                    await roomViewModel.loadItemsAndModels()
                 }
             }
         }
-        .onChange(of: viewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
+        .onChange(of: roomViewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
             Task {
-                await viewModel.loadItemsAndModels()
+                await roomViewModel.loadItemsAndModels()
             }
         }
         .toolbar(.hidden)
@@ -58,7 +62,7 @@ struct RoomDetailsView: View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            Text(viewModel.selectedRoom.roomName)
+            Text(roomViewModel.selectedRoom.roomName)
         }, trailingIcon: {
             Menu("Edit") {
                 EditRoomMenu()
@@ -71,8 +75,8 @@ struct RoomDetailsView: View {
     @ViewBuilder
     private func RoomItemList() -> some View {
         LazyVStack(spacing: 12) {
-            ForEach(viewModel.items, id: \.self) { item in
-                NavigationLink(destination: RoomItemView(item: item, roomViewModel: $viewModel)) { // MARK: RoomItemView should take in a viewmodel
+            ForEach(roomViewModel.items, id: \.self) { item in
+                NavigationLink(destination: StagingRoomItemView(roomViewModel: $roomViewModel, parentList: parentList, rooms: rooms, item: item)) {
                     RoomItemListItem(item)
                 }
             }
@@ -84,7 +88,7 @@ struct RoomDetailsView: View {
     @ViewBuilder
     private func RoomItemListItem(_ item: Item) -> some View {
         HStack(spacing: 12) {
-            if let model = viewModel.getModelForItem(item) {
+            if let model = roomViewModel.getModelForItem(item) {
                 if let uiImage = model.primaryImage.uiImage {
                     Image(uiImage: uiImage)
                         .resizable()

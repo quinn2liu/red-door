@@ -21,8 +21,10 @@ struct NavigationDestinationsModifier: ViewModifier {
                 ItemDetailView(item: item)
             }
             .navigationDestination(for: RDList.self) { list in
-                if list.listType == .pull_list {
+                if list.listType == .pull_list && list.status == .planning {
                     PullListDetailsView(pullList: list, path: $path)
+                } else if list.listType == .pull_list && list.status == .staging {
+                    StagingPullListView(pullList: list, path: $path)
                 } else if list.listType == .installed_list {
                     InstalledListDetailView(installedList: list, path: $path)
                 }
