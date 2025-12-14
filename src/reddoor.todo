@@ -1,9 +1,5 @@
 TODO: General:
     ☐ FEATURE: Authentication
-    ☐ FEATURE: "Staging" view 
-        - pull list is created, but not installed
-        - users can check items that are installed
-        - then, create installed list from only checked items 
     ☐ FEATURE: "restore" installed list function (resets all the items)
     ☐ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images.
     ☐ VIEW: Create reusable button components (RedDoorButton, TransparentButton, SmallCTA, etc.)
@@ -11,9 +7,9 @@ TODO: General:
 TODO: Address:
 
 TODO: Pull Lists:
-    ☐ FEATURE: filtering via address formatted string
 
     Pull List View / Create Pull List View:
+        ☐ VIEW: PullListListItemView in PullListDocumentView
         ☐ VIEW: update room list item view
         ☐ VIEW: add option to add an image of the location
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
@@ -23,10 +19,10 @@ TODO: Pull Lists:
             - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
         ☐ FEATURE: Add a "uninstall" button and view that allows users to specify where items in the pull list should be uninstalled to.
 
-
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
         ☐ FEATURE: Remove item from room
+        ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
 
 TODO: Installed Lists:
     ☐ FEATURE: add functionality to reset all items back to available (deleteRDList -> deleteInstalledList vs. deletePullList)
@@ -44,18 +40,15 @@ TODO: Model:
     ☐ DEBUG: CreateModelView: when creating a new model and selecting an image, the item picker overflows
 
 TODO: Item:
-        ✔ FEATURE: Barcode/QR Code Generation @started(25-11-18 21:06) @done(25-11-18 21:34) @lasted(28m33s)
-        ✔ FEATURE: Barcode/QR Code Scanning @started(25-12-06 16:48) @done(25-12-06 16:48) @lasted(16s)
-        ☐ FEATURE: Flag for attention (like repairs)
-        ☐ VIEW: Better Item View
-        ☐ VIEW: Navigate to pull list button (if not in storage)
-        ☐ FEATURE: QR Code should generate a LABEL (image, name, etc) instead of just the QR Code
+    ☐ FEATURE: Flag for attention (like repairs)
+    ☐ VIEW: Better Item View
+    ☐ VIEW: Navigate to pull list button (if not in storage)
+    ☐ FEATURE: QR Code should generate a LABEL (image, name, etc) instead of just the QR Code
 
 TODO: Major Changes:
     ☐ VIEW: Update all Edit views to be a sheet instead of "isEditing" state variable
         ☐ FEATURE: ^^^ When editing, create a copy of the original object, i.e. changes only applied to copy and then saved to original if confirmed.
 
     Architecture:
-        ✔ FEATURE: Navigation Coordinator @started(25-11-16 20:35) @done(25-11-16 21:43) @lasted(1h8m39s)
         ☐ FEATURE: Kingfisher
         ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)

@@ -9,29 +9,27 @@ import SwiftUI
 
 struct StagingPullListView: View {
     @State private var viewModel: PullListViewModel
-    @Binding var path: NavigationPath
     @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
 
     @State private var errorMessage: String?
 
     // MARK: Init
 
-    init(pullList: RDList, path: Binding<NavigationPath>) {
-        viewModel = PullListViewModel(selectedList: pullList)
-        _path = path
+    init(pullList: RDList) {
+        viewModel = PullListViewModel(selectedList: pullList)   
     }
 
     // MARK: Body
 
     var body: some View {
         VStack(spacing: 16) {
-            PullListTopBar(
+            RDListTopBar(
                 streetAddress: $viewModel.selectedList.address, 
                 trailingIcon: Spacer().frame(24),
                 status: viewModel.selectedList.status
             )
 
-            PullListDetails(installDate: $viewModel.selectedList.installDate, client: $viewModel.selectedList.client)
+            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
 
             RoomList()
 
@@ -85,9 +83,9 @@ struct StagingPullListView: View {
                 Task { @MainActor in
                     viewModel.selectedList.status = .planning
                     viewModel.updateSelectedList()
-                    path = NavigationPath()
+                    coordinator.resetSelectedPath()
                     try? await Task.sleep(for: .milliseconds(500))
-                    path.append(viewModel.selectedList)
+                    coordinator.appendToSelectedPath(item: viewModel.selectedList)
                 }
             } label: {
                 Text("Change to planning")

@@ -152,6 +152,10 @@ class DocumentsListViewModel {
             } else if key == "itemsAvailable" {
                 updatedQuery = updatedQuery
                     .whereField("availableItemCount", isNotEqualTo: 0)
+            }  else if key == "addressId", let searchText: String = value as? String {
+                updatedQuery = updatedQuery
+                    .whereField("addressId", isGreaterThanOrEqualTo: searchText)
+                    .whereField("addressId", isLessThan: searchText + "\u{f8ff}")            
             } else {
                 updatedQuery = updatedQuery.whereField(key, isEqualTo: value)
             }

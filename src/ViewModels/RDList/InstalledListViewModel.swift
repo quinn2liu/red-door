@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 @Observable
 class InstalledListViewModel: RDListViewModel {
@@ -47,5 +48,18 @@ class InstalledListViewModel: RDListViewModel {
         }
         print("pullList copy from installed: \(pullList)")
         return pullList
+    }
+
+    func restoreItemToStorage(item: Item, storageLocation: Address) async throws {
+        let itemRef = db.collection("items").document(item.id)
+        try await itemRef.updateData([
+            "listId": storageLocation.id,
+            "isAvailable": true,
+        ])
+
+        let modelRef = db.collection("models").document(item.modelId)
+        try await modelRef.updateData([
+            "availableItemCount": FieldValue.increment(Int64(1)),
+        ])
     }
 }

@@ -22,11 +22,11 @@ struct NavigationDestinationsModifier: ViewModifier {
             }
             .navigationDestination(for: RDList.self) { list in
                 if list.listType == .pull_list && list.status == .planning {
-                    PullListDetailsView(pullList: list, path: $path)
+                    PullListDetailsView(pullList: list)
                 } else if list.listType == .pull_list && list.status == .staging {
-                    StagingPullListView(pullList: list, path: $path)
+                    StagingPullListView(pullList: list)
                 } else if list.listType == .installed_list {
-                    InstalledListDetailView(installedList: list, path: $path)
+                    InstalledListDetailView(installedList: list)
                 }
             }
             .navigationDestination(for: String.self) { string in

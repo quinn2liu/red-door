@@ -9,7 +9,11 @@ import SwiftUI
 
 struct PullListDocumentView: View {
     @Binding var path: NavigationPath
-    @State private var viewModel = PullListDocumentViewModel()
+    @State private var viewModel = RDListDocumentViewModel(
+        documentType: .pull_list,
+        primaryStatus: .staging,
+        secondaryStatus: .planning
+    )
 
     @State private var searchText: String = ""
     @State private var showFromInstalledCover: Bool = false
@@ -26,12 +30,10 @@ struct PullListDocumentView: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 16) {
-                if !searchTextFocused {
-                    TopBar()
-                }
-
                 if searchFocused {
                     SearchBar()
+                } else {
+                    TopBar()
                 }
 
                 if isSearching {
@@ -92,17 +94,15 @@ struct PullListDocumentView: View {
                     .onSubmit {
                         if !searchText.isEmpty {
                             Task {
-                                await viewModel.fetchSearchResults(query: searchText)
+                                await viewModel.fetchSearchResults(query: searchText.lowercased())
                             }
                         }
-                        searchTextFocused = false
-                        searchFocused = false
                     }
             }
             .padding(8)
             .clipShape(.rect(cornerRadius: 8))
 
-            if searchTextFocused {
+            if searchFocused {
                 Button("Cancel") {
                     searchText = ""
                     viewModel.clearSearchResults()
@@ -148,8 +148,8 @@ struct PullListDocumentView: View {
             }
         }
         .refreshable {
-            await viewModel.fetchStagingLists()
-            await viewModel.fetchPlanningLists(initial: true)
+            await viewModel.fetchPrimaryLists()
+            await viewModel.fetchSecondaryLists(initial: true)
         }
     }
     
@@ -168,13 +168,13 @@ struct PullListDocumentView: View {
                         .font(.headline)
                         .foregroundColor(.red)
 
-                    Image(systemName: "hammer.fill")
+                    Image(systemName: "truck.box.badge.clock.fill")
                         .font(.headline)
                         .foregroundColor(.red)
 
                     Spacer()
 
-                    Text("(\(viewModel.stagingLists.count))")
+                    Text("(\(viewModel.primaryLists.count))")
                         .foregroundColor(.secondary)
 
                     Image(systemName: showStagingLists ? "chevron.up" : "chevron.down")
@@ -183,22 +183,22 @@ struct PullListDocumentView: View {
                 .background(Color(.systemGray5))
                 .cornerRadius(6)
             }
-            .disabled(viewModel.stagingLists.isEmpty)
+            .disabled(viewModel.primaryLists.isEmpty)
 
             if showStagingLists {
                 LazyVStack(alignment: .leading, spacing: 8) {
-                    if viewModel.stagingLists.isEmpty {
+                    if viewModel.primaryLists.isEmpty {
                         Text("No lists are currently in staging.")
                     } else {
-                        ForEach(viewModel.stagingLists, id: \.self) { pullList in
+                        ForEach(viewModel.primaryLists, id: \.self) { pullList in
                             NavigationLink(value: pullList) {
-                                Text(pullList.id) // TODO: make a PL list item
+                                Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
                     }
                     
-                    if viewModel.isLoadingStaging {
+                    if viewModel.isLoadingPrimary {
                         ProgressView()
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding()
@@ -231,23 +231,23 @@ struct PullListDocumentView: View {
             .frame(maxWidth: .infinity)
             
             LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(viewModel.planningLists, id: \.self) { pullList in
+                ForEach(viewModel.secondaryLists, id: \.self) { pullList in
                     NavigationLink(value: pullList) {
-                        Text(pullList.id) // TODO: make a PL list item
+                        Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
                     }
                     .buttonStyle(PlainButtonStyle())
                     .onAppear {
-                        if pullList == viewModel.planningLists.last {
+                        if pullList == viewModel.secondaryLists.last {
                             Task {
-                                if !viewModel.isLoadingPlanning {
-                                    await viewModel.fetchPlanningLists(initial: false)
+                                if !viewModel.isLoadingSecondary {
+                                    await viewModel.fetchSecondaryLists(initial: false)
                                 }
                             }
                         }
                     }
                 }
                 
-                if viewModel.isLoadingPlanning {
+                if viewModel.isLoadingSecondary {
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding()
@@ -265,7 +265,7 @@ struct PullListDocumentView: View {
                 ForEach(viewModel.searchResults, id: \.self) { pullList in
                     NavigationLink(value: pullList) {
                         HStack {
-                            Text(pullList.id) // TODO: make a PL list item
+                            Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
                             Spacer()
                             Text(pullList.status.rawValue.capitalized)
                                 .font(.caption)

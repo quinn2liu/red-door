@@ -9,87 +9,36 @@ import SwiftUI
 
 struct InstalledListDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
+    
     @State private var viewModel: InstalledListViewModel
-    @Binding var path: NavigationPath
 
-    init(installedList: RDList, path: Binding<NavigationPath>) {
+    init(installedList: RDList) {
         viewModel = InstalledListViewModel(selectedList: installedList)
-        _path = path
     }
 
-    @FocusState private var keyboardFocused: Bool
-    @State private var isEditing: Bool = false
-    @State private var showSheet: Bool = false
-    @State private var showCreateRoom: Bool = false
-
-    @State private var address: String = ""
-    @State private var date: Date = .init()
+    @State private var showUnstageCover: Bool = false
 
     // MARK: Body
     var body: some View {
         VStack(spacing: 16) {
-            TopBar()
+            RDListTopBar(
+                streetAddress: $viewModel.selectedList.address, 
+                trailingIcon: InstalledListMenu,
+                status: viewModel.selectedList.status
+            )
 
-            InstalledListDetails()
+            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
 
             RoomList()
-
-            Spacer()
-
-            Footer()
         }
-        .task {
-            await viewModel.loadRooms()
+        .fullScreenCover(isPresented: $showUnstageCover) {
+            UnstageInstalledListCover(viewModel: $viewModel)
         }
         .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
+        .frameTop()
         .frameHorizontalPadding()
-    }
-
-    // MARK: Top Bar
-
-    @ViewBuilder 
-    private func TopBar() -> some View {
-        TopAppBar(leadingIcon: {
-            if isEditing {
-                Button {
-                    isEditing = false
-                } label: {
-                    Text("Cancel")
-                        .foregroundStyle(.blue)
-                }
-            } else {
-                BackButton(path: $path)
-            }
-        }, header: {
-            if isEditing {
-                TextField(viewModel.selectedList.address.formattedAddress, text: $address)
-                    .onChange(of: address) { _, _ in
-                        viewModel.selectedList.id = address
-                    }
-            } else {
-                Text(viewModel.selectedList.address.formattedAddress)
-            }
-
-        }, trailingIcon: {
-            Button {
-                if isEditing {
-                    let dateString = date.formatted(.dateTime.year().month().day())
-                    if dateString != viewModel.selectedList.installDate {
-                        viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
-                    }
-                    viewModel.updateSelectedList()
-                }
-                isEditing.toggle()
-            } label: {
-                if isEditing {
-                    Text("Save")
-                        .foregroundStyle(.blue)
-                } else {
-                    Image(systemName: "square.and.pencil")
-                }
-            }
-        })
     }
 
     // MARK: Installed List Details
@@ -97,24 +46,8 @@ struct InstalledListDetailView: View {
     @ViewBuilder 
     private func InstalledListDetails() -> some View {
         VStack(spacing: 12) {
-            if isEditing {
-                DatePicker(
-                    "Install Date:",
-                    selection: $date,
-                    displayedComponents: [.date]
-                )
-
-                HStack {
-                    Text("Client:")
-                    TextField("", text: $viewModel.selectedList.client)
-                        .padding(6)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                }
-            } else {
-                Text("Install Date: \(viewModel.selectedList.installDate)")
-                Text("Client: \(viewModel.selectedList.client)")
-            }
+            Text("Install Date: \(viewModel.selectedList.installDate)")
+            Text("Client: \(viewModel.selectedList.client)")
         }
     }
 
@@ -126,51 +59,41 @@ struct InstalledListDetailView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomPreviewListItemView(room: room)
+                        InstalledRoomListItemView(room: room)
                     }
                 }
             }
-            .refreshable {
-                Task {
-                    await viewModel.refreshRDList()
-                }
-            }
-
-            if isEditing {
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, leadingIcon: "square.and.pencil", text: "Add Room", fullWidth: true) {
-                    showCreateRoom = true
-                }
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadRooms()
             }
         }
     }
 
-        // MARK: Footer
+    // MARK: Installed List Menu
 
     @ViewBuilder 
-    private func Footer() -> some View {
-        if isEditing {
-            HStack {
-                Button("Delete Installed List") {
-                    Task {
-                        await viewModel.deleteRDList()
-                        dismiss()
-                    }
-                }
-
-                Button("Save Installed List") {
-                    viewModel.updateSelectedList()
-                    dismiss()
-                }
-
-                Button {
-                    Task {
-                        let pullList = try await viewModel.createPullFromInstalled()
-                        path.append(pullList)
-                    }
-                } label: {
-                    Text("Create Pull List")
-                }                
+    private var InstalledListMenu: some View {
+        Menu {
+            Button("Unstage List", systemImage: "arrow.trianglehead.2.clockwise.rotate.90.page.on.clipboard") {
+                showUnstageCover = true
             }
+
+            Button("Create Pull List", systemImage: "pencil.and.list.clipboard") {
+                Task {
+                    let pullList = try await viewModel.createPullFromInstalled()
+                    coordinator.resetSelectedPath()
+                    try? await Task.sleep(for: .milliseconds(250))
+                    coordinator.setSelectedTab(to:.pullList)
+                    try? await Task.sleep(for: .milliseconds(250))
+                    coordinator.pullListPath.append(pullList)
+                }
+            }
+
+        } label: {
+            Image(systemName: "ellipsis")
+                .frame(24)
         }
     }
 }
