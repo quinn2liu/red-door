@@ -20,7 +20,7 @@ TODO: Pull Lists:
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
         ☐ FEATURE: new "installing" view. Meant to represent when a pull list has been created is being installed. If the employees end up installing the item, they select it. If they haven't installed it, they leave it unchecked. 
             - from this view, they can create an installed list from the pull list (where only the items that have been installed are included).
-        ☐ FEATURE: when viewing a room, implement a "send to room" function that allows users to send items from one room to another.
+        ☐ FEATURE: add "send to room" function to planning pull list
             - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
         ☐ FEATURE: Add a "uninstall" button and view that allows users to specify where items in the pull list should be uninstalled to.
 
