@@ -1,3 +1,8 @@
+FEATURE: "unstage" installed list
+    ✔ FEATURE: create a new "unstaging" status @done(25-12-14 00:00)
+    ✔ FEATURE: create a new "unstaging" view @done(25-12-14 00:00)
+    ☐ FEATURE: create "unstage" function for each item
+
 TODO: General:
     ☐ FEATURE: Authentication
     ☐ FEATURE: "restore" installed list function (resets all the items)
