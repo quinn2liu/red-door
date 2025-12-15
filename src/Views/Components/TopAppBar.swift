@@ -13,7 +13,7 @@ struct TopAppBar<LeadingIcon: View, Header: View, TrailingIcon: View>: View {
     @ViewBuilder var trailingIcon: TrailingIcon
 
     var body: some View {
-        HStack(alignment: .top,spacing: 0) {
+        HStack(alignment: .center, spacing: 0) {
             leadingIcon
 
             Spacer()
@@ -33,16 +33,13 @@ struct BackButton: View {
     var path: Binding<NavigationPath>? = nil
 
     var body: some View {
-        Button {
+        RDButton(variant: .red, size: .icon, leadingIcon: "chevron.left", iconBold: true, fullWidth: false) {
             if path != nil {
                 self.path?.wrappedValue = NavigationPath()
             } else {
                 dismiss()
             }
-        } label: {
-            Image(systemName: "chevron.left")
-                .fontWeight(.bold)
-                .frame(24)
-        }.tint(.red)
+        }
+        .clipShape(Circle())
     }
 }

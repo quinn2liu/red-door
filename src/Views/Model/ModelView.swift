@@ -45,29 +45,25 @@ struct ModelView: View {
 
                 ItemListView()
 
-                HStack {
-                    if isEditing {
-                        Button("Delete Model") {
-                            showDeleteAlert = true
-                        }
-                        .foregroundColor(.red)
-                        .alert(
-                            "Confirm Delete",
-                            isPresented: $showDeleteAlert
-                        ) {
-                            Button(role: .destructive) {
-                                deleteModel()
-                            } label: {
-                                Text("Delete")
-                            }
-
-                            Button(role: .cancel) {} label: {
-                                Text("Cancel")
-                            }
-                        }
-                    } else {
-                        Button("Add Item to Pull List") {}
+                if isEditing {
+                    RDButton(variant: .red, size: .default, leadingIcon: "trash", text: "Delete Model", fullWidth: false) {
+                        showDeleteAlert = true
                     }
+                    .alert(
+                        "Confirm Delete",
+                        isPresented: $showDeleteAlert
+                    ) {
+                        Button(role: .destructive) {
+                            deleteModel()
+                        } label: {
+                            Text("Delete")
+                        }
+
+                        Button(role: .cancel) {} label: {
+                            Text("Cancel")
+                        }
+                    }
+                    
                 }
             }
             .frameTop()
@@ -120,14 +116,13 @@ struct ModelView: View {
         TopAppBar(
             leadingIcon: {
                 if isEditing {
-                    Button {
+                    RDButton(variant: .red, size: .icon, leadingIcon: "xmark", iconBold: true, fullWidth: false) {
                         if let backup = backupModel {
                             viewModel.selectedModel = backup
                         }
                         isEditing = false
-                    } label: {
-                        Text("Cancel")
                     }
+                    .clipShape(Circle())
                 } else {
                     BackButton()
                 }
@@ -136,7 +131,7 @@ struct ModelView: View {
                 ModelNameView()
             },
             trailingIcon: {
-                Button {
+                RDButton(variant: .red, size: .icon, leadingIcon: isEditing ? "checkmark" : "square.and.pencil", iconBold: true, fullWidth: false) {
                     if isEditing {
                         saveModel()
                         isEditing = false
@@ -144,14 +139,8 @@ struct ModelView: View {
                         backupModel = viewModel.selectedModel
                         isEditing = true
                     }
-                } label: {
-                    if isEditing {
-                        Text("Save")
-                            .foregroundStyle(.blue)
-                    } else {
-                        Image(systemName: "square.and.pencil")
-                    }                
                 }
+                .clipShape(Circle())
             }
         )
     }

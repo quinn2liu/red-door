@@ -26,12 +26,7 @@ struct PullListPDFView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .foregroundStyle(.red)
-            }
+            BackButton()
 
             VStack(alignment: .center, spacing: 0) {
                 if pdfDocument == nil {

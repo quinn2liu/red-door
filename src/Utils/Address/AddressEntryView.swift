@@ -72,7 +72,8 @@ struct AddressEntryView: View {
 
             Spacer()
 
-            TransparentButton(backgroundColor: .green, foregroundColor: .green, text: "Save Address", fullWidth: true) {
+
+            RDButton(variant: .default, text: "Save Address", fullWidth: true) {
                 updateSelectedAddress()
                 dismiss()
             }

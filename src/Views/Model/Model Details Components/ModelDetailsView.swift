@@ -27,7 +27,6 @@ struct ModelDetailsView: View {
                     }
                 }
             }
-            .pickerStyle(.navigationLink)
 
             Picker("Item Type", selection: $viewModel.selectedModel.type) {
                 ForEach(Array(ModelViewModel.typeMap), id: \.key) { option, iconName in

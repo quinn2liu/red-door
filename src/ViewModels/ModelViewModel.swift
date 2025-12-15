@@ -25,7 +25,11 @@ final class ModelViewModel {
 
     init(model: Model = Model(), imageManager: FirebaseImageManager = FirebaseImageManager.shared) {
         selectedModel = model
-        itemCount = model.itemIds.count
+        if model.itemIds.isEmpty {
+            itemCount = 1
+        } else {
+            itemCount = model.itemIds.count
+        }
 
         modelDocumentRef = db.collection("models").document(model.id)
         storageRef = Storage.storage().reference().child("model_images").child(model.id)

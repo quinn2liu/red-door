@@ -21,6 +21,7 @@ TODO: Pull Lists:
         ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
 
 TODO: Installed Lists:
+    ☐ VIEW: "unstaged" installed list view
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
@@ -32,7 +33,7 @@ TODO: Model:
     ☐ FEATURE: search by description?
     ☐ FEATURE: add essentials v custom
     ☐ DEBUG: CreateModelView: Item count stepper (create model view, item stepper goes from 0 -> 2)
-    ☐ DEBUG: CreateModelView: when creating a new model and selecting an image, the item picker overflows
+    ✔ DEBUG: CreateModelView: when creating a new model and selecting an image, the item picker overflows @done(25-12-14 20:40)
 
 TODO: Item:
     ☐ FEATURE: Flag for attention (like repairs)

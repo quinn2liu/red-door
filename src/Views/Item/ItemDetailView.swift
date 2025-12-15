@@ -30,7 +30,9 @@ struct ItemDetailView: View {
 
             Text("Item ID: \(viewModel.selectedItem.id)")
 
-            Button("Delete Item") {
+            Spacer()
+
+            RDButton(variant: .red, size: .default, leadingIcon: "trash", fullWidth: false) {
                 Task {
                     await viewModel.deleteItem()
                 }
@@ -41,7 +43,6 @@ struct ItemDetailView: View {
             ItemQRCodeView()
         }
         .frameTop()
-        .frameVerticalPadding()
         .frameHorizontalPadding()
         .toolbar(.hidden)
         .sheet(isPresented: $showEditSheet) {
@@ -58,19 +59,17 @@ struct ItemDetailView: View {
         }, header: {
             Text(viewModel.selectedItem.id)
         }, trailingIcon: {
-            HStack(spacing: 12) {
-                Button {
+            HStack(spacing: 8) {
+                RDButton(variant: .red, size: .icon, leadingIcon: "qrcode", fullWidth: false) {
                     showQRCode = true
-                } label: {
-                    Image(systemName: "qrcode")
                 }
+                .clipShape(Circle())
 
-                Button {
+                RDButton(variant: .red, size: .icon, leadingIcon: "square.and.pencil", fullWidth: false) {
                     showEditSheet = true
                     backupItem = viewModel.selectedItem
-                } label: {
-                    Image(systemName: "square.and.pencil")
                 }
+                .clipShape(Circle())
             }
         })
     }
@@ -126,10 +125,8 @@ struct ItemDetailView: View {
     @ViewBuilder
     private func ItemEditSheet() -> some View {
         VStack(spacing: 16) {
-            Button {
+            RDButton(variant: .red, size: .default, leadingIcon: "xmark", fullWidth: false) {
                 showEditSheet = false
-            } label: {
-                Text("Exit")
             }
             Text("Edit Item")
             Text("Item ID: \(viewModel.selectedItem.id)")

@@ -79,7 +79,7 @@ struct AddressSearchView: View {
             if let item: MKMapItem = selectedItem {
                 TextField("Specify Unit", text: $unit)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color(.systemGray6), lineWidth: 2)
@@ -87,19 +87,12 @@ struct AddressSearchView: View {
 
                 Spacer()
 
-                Button {
+                RDButton(variant: .default, text: "Use This Address", fullWidth: true) {
                     if let address = convertToAddress(item) {
                         selectedAddress = address
+                        addressId = address.id
                     }
                     dismiss()
-                } label: {
-                    RedDoorButton(type: .green, text: "Use This Address", action: {
-                        if let address = convertToAddress(item) {
-                            selectedAddress = address
-                            addressId = address.id
-                        }
-                        dismiss()
-                    })
                 }
             }
         }

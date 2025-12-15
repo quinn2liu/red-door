@@ -126,36 +126,16 @@ struct RoomAddItemsSheet: View {
     // MARK: Search Bar
 
     @ViewBuilder private func SearchBar() -> some View {
-        HStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-
-                TextField("", text: $searchText, prompt: Text("Search..."))
-                    .submitLabel(.search)
-                    .focused($searchTextFocused)
-                    .onSubmit {
-                        if !searchText.isEmpty {
-                            Task {
-                                await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
-                            }
-                        }
-                        searchTextFocused = false
-                        searchFocused = false
-                    }
-            }
-            .padding(8)
-            .clipShape(.rect(cornerRadius: 8))
-
-            if searchTextFocused {
-                Button("Cancel") {
-                    searchText = ""
-                    searchTextFocused = false
-                    searchFocused = false
+        SearchBarComponent(
+            searchText: $searchText,
+            searchFocused: $searchFocused,
+            searchTextFocused: $searchTextFocused,
+            onSubmit: {
+                Task {
+                    await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
                 }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-        }
-        .animation(.bouncy(duration: 0.5), value: searchTextFocused)
+        )
     }
 
     // MARK: ToolBarMenu

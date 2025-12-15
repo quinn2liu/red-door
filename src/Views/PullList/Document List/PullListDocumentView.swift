@@ -93,35 +93,19 @@ struct PullListDocumentView: View {
     // MARK: Search Bar
 
     @ViewBuilder private func SearchBar() -> some View {
-        HStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-
-                TextField("", text: $searchText, prompt: Text("Search..."))
-                    .submitLabel(.search)
-                    .focused($searchTextFocused)
-                    .onSubmit {
-                        if !searchText.isEmpty {
-                            Task {
-                                await viewModel.fetchSearchResults(query: searchText.lowercased())
-                            }
-                        }
-                    }
-            }
-            .padding(8)
-            .clipShape(.rect(cornerRadius: 8))
-
-            if searchFocused {
-                Button("Cancel") {
-                    searchText = ""
-                    viewModel.clearSearchResults()
-                    searchTextFocused = false
-                    searchFocused = false
+        SearchBarComponent(
+            searchText: $searchText,
+            searchFocused: $searchFocused,
+            searchTextFocused: $searchTextFocused,
+            onSubmit: {
+                Task {
+                    await viewModel.fetchSearchResults(query: searchText.lowercased())
                 }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+            },
+            onCancel: {
+                viewModel.clearSearchResults()
             }
-        }
-        .animation(.smooth(duration: 0.25), value: searchTextFocused)
+        )
     }
 
     // MARK: Tool Bar Menu
