@@ -41,10 +41,8 @@ struct SearchBarComponent: View {
                     searchTextFocused = false
                     searchFocused = false
                 }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.smooth(duration: 0.25), value: searchTextFocused)
     }
 }
 

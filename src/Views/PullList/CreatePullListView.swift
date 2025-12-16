@@ -42,6 +42,19 @@ struct CreatePullListView: View {
             }
 
             VStack(spacing: 0) {
+
+                HStack(spacing: 0) {
+                    Text("Rooms:")
+                        .font(.headline)
+                        .foregroundColor(.red)
+
+                    Spacer()
+
+                    SmallCTA(type: .red, leadingIcon: "plus", text: "Add Room") {
+                        showCreateRoom = true
+                    } 
+                }
+
                 ScrollView {
                     LazyVStack {
                         ForEach(viewModel.selectedList.roomIds, id: \.self) { roomId in
@@ -50,16 +63,14 @@ struct CreatePullListView: View {
                     }
                 }
 
-                TransparentButton(backgroundColor: .green, foregroundColor: .green, text: "Save", fullWidth: true) {
+                RDButton(variant: .default, size: .default, text: "Create Pull List", fullWidth: true) {
                     viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
                     viewModel.createPullList()
                     dismiss()
                 }
+                .padding(.bottom, 16)
             }
-
-            Spacer()
         }
-        .ignoresSafeArea(.keyboard)
         .toolbar(.hidden)
         .frameHorizontalPadding()
         .sheet(isPresented: $showCreateRoom) {
@@ -80,26 +91,11 @@ struct CreatePullListView: View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            Button {
+            RDButton(variant: .outline, size: .default, text: viewModel.selectedList.address.isInitialized() ? viewModel.selectedList.address.getStreetAddress() ?? "" : "Enter Address") {
                 showAddressSheet = true
-            } label: {
-                if viewModel.selectedList.address.isInitialized() {
-                    Text(viewModel.selectedList.address.getStreetAddress() ?? "")
-                } else {
-                    Text("Enter Address")
-                }
             }
         }, trailingIcon: {
-            Button {
-                showCreateRoom = true
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "plus")
-                    Text("Room")
-                        .fontWeight(.semibold)
-                }
-            }
-            .tint(.red)
+            Spacer().frame(width: 32)
         })
     }
 
@@ -141,8 +137,7 @@ struct CreatePullListView: View {
             Button("Ok", role: .cancel) {}
         }
         .frameTop()
-        .frameHorizontalPadding()
-        .frameVerticalPadding()
+        .padding(24)
         .presentationDetents([.fraction(0.125)])
     }
 

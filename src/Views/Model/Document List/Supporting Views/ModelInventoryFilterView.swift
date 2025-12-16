@@ -14,7 +14,7 @@ struct ModelInventoryFilterView: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 ForEach(ModelType.allCases, id: \.rawValue) { type in
                     Button(action: {
                         withAnimation(.snappy) {
@@ -27,7 +27,7 @@ struct ModelInventoryFilterView: View {
                     }) {
                         Text(type.rawValue)
                             .font(.callout)
-                            .foregroundStyle(foregroundColor(for: type))
+                            .foregroundColor(foregroundColor(for: type))
                             .padding(.vertical, 8)
                             .padding(.horizontal, 15)
                             .background(backgroundView(for: type))

@@ -64,23 +64,19 @@ struct InstalledListDocumentView: View {
             trailingIcon: {
                 HStack(spacing: 12) {
                     if !searchFocused {
-                        Button {
-                            searchTextFocused = true
-                            searchFocused = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundStyle(.red)
+                        RDButton(variant: .outline, size: .icon, leadingIcon: "magnifyingglass", iconBold: true, fullWidth: false) {
+                            withAnimation {
+                                searchTextFocused = true
+                                searchFocused = true
+                            }
                         }
                     }
 
-                    Button {
+                    RDButton(variant: .outline, size: .icon, leadingIcon: "arrow.counterclockwise", iconBold: true, fullWidth: false) {
                         Task {
                             await viewModel.fetchPrimaryLists()
                             await viewModel.fetchSecondaryLists(initial: true)
                         }
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
-                            .foregroundStyle(.red)
                     }
                 }
             }

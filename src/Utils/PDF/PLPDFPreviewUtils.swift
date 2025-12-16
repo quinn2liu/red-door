@@ -59,10 +59,25 @@ struct PullListPDFView: View {
                             preview: SharePreview(
                                 "PullList.pdf",
                                 image: Image(systemName: "doc.fill")
-                            )
-                        ) {
-                            Label("Share / Export PDF", systemImage: "square.and.arrow.up")
-                        }
+                            ),
+                            label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 16))
+                                        .fontWeight(.bold)
+                                    
+                                    Text("Share / Export PDF")
+                                        .font(.body)
+                                        .fontWeight(.medium)
+                                }
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.red))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+                        )
                         .padding()
                     }
                 }

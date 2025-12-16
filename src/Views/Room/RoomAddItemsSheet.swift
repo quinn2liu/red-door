@@ -41,13 +41,11 @@ struct RoomAddItemsSheet: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 16) {
-                if !searchTextFocused {
-                    TopBar()
-                }
-
+            VStack(spacing: 12) {
                 if searchFocused {
                     SearchBar()
+                } else {
+                    TopBar()
                 }
 
                 ModelInventoryFilterView(selectedType: $selectedType)
@@ -60,28 +58,18 @@ struct RoomAddItemsSheet: View {
             .frameTopPadding()
             .frameHorizontalPadding()
             .onAppear {
-                Task {
-                    if !isLoadingModels {
-                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                    }
-                }
+                emptyQuerySearch()
             }
             .onChange(of: path) {
                 searchFocused = false
             }
             .onChange(of: selectedType) {
                 searchText = ""
-                Task {
-                    await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                }
+                emptyQuerySearch()
             }
             .onChange(of: searchText) {
                 if searchText.isEmpty {
-                    Task {
-                        isLoadingModels = true
-                        await fetchModels(initial: true, searchText: nil, modelType: selectedType)
-                        isLoadingModels = false
-                    }
+                    emptyQuerySearch()
                 }
             }
             .navigationDestination(for: Model.self) { model in
@@ -95,7 +83,8 @@ struct RoomAddItemsSheet: View {
 
     // MARK: Top Bar
 
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder
+    private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
                 Text("Available Inventory")
@@ -107,17 +96,11 @@ struct RoomAddItemsSheet: View {
                 EmptyView()
             },
             trailingIcon: {
-                HStack(spacing: 12) {
-                    if !searchFocused {
-                        Button {
-                            searchTextFocused = true
-                            searchFocused = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
-                        }
+                if !searchFocused {
+                    RDButton(variant: .outline, size: .icon, leadingIcon: "magnifyingglass", iconBold: true, fullWidth: false) {
+                        searchFocused = true
+                        searchTextFocused = true
                     }
-
-                    ToolBarMenu()
                 }
             }
         ).tint(.red)
@@ -125,7 +108,8 @@ struct RoomAddItemsSheet: View {
 
     // MARK: Search Bar
 
-    @ViewBuilder private func SearchBar() -> some View {
+    @ViewBuilder
+    private func SearchBar() -> some View {
         SearchBarComponent(
             searchText: $searchText,
             searchFocused: $searchFocused,
@@ -138,24 +122,10 @@ struct RoomAddItemsSheet: View {
         )
     }
 
-    // MARK: ToolBarMenu
-
-    @ViewBuilder private func ToolBarMenu() -> some View {
-        Menu {
-            NavigationLink(destination: CreateModelView()) {
-                Label("Add Item", systemImage: "plus")
-            }
-
-            Label("Scan Item", systemImage: "qrcode.viewfinder")
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(.red)
-        }
-    }
-
     // MARK: InventoryList
 
-    @ViewBuilder private func InventoryList() -> some View {
+    @ViewBuilder 
+    private func InventoryList() -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(inventoryViewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
@@ -185,26 +155,36 @@ struct RoomAddItemsSheet: View {
 
     @MainActor
     private func fetchModels(initial isInitial: Bool, searchText: String?, modelType: ModelType?) async {
-        isLoadingModels = true
-
         var filters: [String: Any] = [:]
         filters["itemsAvailable"] = true
 
         if let modelType {
-            filters["type"] = modelType.rawValue
+            filters.updateValue(modelType.rawValue, forKey: "type")
         }
 
         if let searchText {
-            filters["nameLowercased"] = searchText.lowercased()
+            filters.updateValue(searchText.lowercased(), forKey: "nameLowercased")
         }
 
+        isLoadingModels = true
         if isInitial {
             await inventoryViewModel.fetchInitialDocuments(filters: filters)
         } else {
             await inventoryViewModel.fetchMoreDocuments(filters: filters)
         }
-
         isLoadingModels = false
+    }
+
+    // MARK: Handlers/Helpers
+
+    private func emptyQuerySearch() {
+        if !isLoadingModels {
+            isLoadingModels = true
+            Task {
+                await fetchModels(initial: true, searchText: nil, modelType: selectedType)
+            }
+            isLoadingModels = false
+        }
     }
 }
 

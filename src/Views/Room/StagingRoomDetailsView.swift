@@ -64,10 +64,14 @@ struct StagingRoomDetailsView: View {
         }, header: {
             Text(roomViewModel.selectedRoom.roomName)
         }, trailingIcon: {
-            Menu("Edit") {
-                EditRoomMenu()
+            RDButton(variant: .red, size: .icon, leadingIcon: "arrow.counterclockwise", iconBold: true, fullWidth: false) { 
+                Task {
+                    await roomViewModel.loadItemsAndModels()
+                    }
+                }
+                .clipShape(Circle())
             }
-        })
+        )
     }
 
     // MARK: RoomItemList()
@@ -136,33 +140,6 @@ struct StagingRoomDetailsView: View {
 
                 Image(systemName: "wrench.fill")
                     .foregroundStyle(Color.yellow)
-            }
-        }
-    }
-
-    // MARK: EditRoomMenu()
-
-    @ViewBuilder
-    private func EditRoomMenu() -> some View {
-        Group {
-            Button {
-
-            } label: {
-                HStack(spacing: 0) { // TODO: replace with label item
-                    Text("Delete Room")
-
-                    Spacer()
-                }
-            }
-
-            Button {
-                showSheet = true
-            } label: {
-                HStack(spacing: 0) {
-                    Text("Add Items")
-
-                    Spacer()
-                }
             }
         }
     }

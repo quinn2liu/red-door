@@ -9,7 +9,7 @@ import SwiftUI
 
 enum SmallCTAType {
     case `default`
-    case destructive
+    case red
     case outline
     case secondary
     case ghost
@@ -19,7 +19,7 @@ enum SmallCTAType {
         switch self {
         case .default:
             return Color(.black)
-        case .destructive:
+        case .red:
             return Color(.red)
         case .outline:
             return Color.clear
@@ -36,7 +36,7 @@ enum SmallCTAType {
         switch self {
         case .default:
             return .white
-        case .destructive:
+        case .red:
             return .white
         case .outline:
             return Color(red: 0.09, green: 0.09, blue: 0.09)
@@ -81,8 +81,6 @@ struct SmallCTA: View {
 
     var buttonColor: Color?
 
-    var fullWidth: Bool = false
-    var alignment: Alignment = .center
     var semibold: Bool = true
     var action: () -> Void = {}
 
@@ -98,29 +96,30 @@ struct SmallCTA: View {
 
     @ViewBuilder
     private func SmallCTAView() -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 0) {
             if let leadingIcon {
                 Image(systemName: leadingIcon)
                     .foregroundStyle(leadingIconColor ?? textColor ?? type.foregroundColor)
-                    .font(.caption2)
+                    .font(.caption.bold())
+                    .padding(.trailing, 4)
             }
 
             if text != "" {
                 Text(text)
-                    .font(.caption2)
+                    .font(.caption)
                     .if(semibold) { view in
                         view.fontWeight(.semibold)
                     }
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(textColor ?? type.foregroundColor)
+                    .foregroundColor(textColor ?? type.foregroundColor)
+                    .if(leadingIcon == nil) { view in
+                        view.frame(maxWidth: .infinity)
+                    }
             }
         }
         .padding(.horizontal, 12)
         .padding(.top, 8)
         .padding(.bottom, 7)
-        .if(fullWidth) { view in
-            view.frame(maxWidth: .infinity, alignment: alignment)
-        }
         .background(buttonColor ?? type.buttonColor)
         .overlay(
             Capsule()
@@ -133,12 +132,11 @@ struct SmallCTA: View {
 #Preview {
     VStack(spacing: 12) {
         SmallCTA(type: .default, leadingIcon: "plus", text: "Default", action: {})
-        SmallCTA(type: .destructive, leadingIcon: "trash", text: "Destructive", action: {})
+        SmallCTA(type: .red, leadingIcon: "trash", text: "Destructive", action: {})
         SmallCTA(type: .outline, leadingIcon: "plus", text: "Outline", action: {})
         SmallCTA(type: .secondary, leadingIcon: "plus", text: "Secondary", action: {})
         SmallCTA(type: .ghost, leadingIcon: "plus", text: "Ghost", action: {})
         SmallCTA(type: .secondary, leadingIcon: "plus", text: "Custom Color", buttonColor: .blue, action: {})
-        SmallCTA(type: .secondary, leadingIcon: "plus", text: "Full Width", fullWidth: true, action: {})
         SmallCTA(type: .secondary, leadingIcon: "plus", text: "Not Semibold", semibold: false, action: {})
         SmallCTA(type: .secondary, leadingIcon: "checkmark", leadingIconColor: .green, text: "Custom Icon Color", action: {})
     }

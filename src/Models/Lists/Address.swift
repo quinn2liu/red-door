@@ -104,6 +104,6 @@ struct Address: Codable, Hashable {
     // MARK: Get 
 
     func getCityStateZipcode() -> String? {
-        return formattedAddress.split(separator: ",").dropFirst().dropLast().joined(separator: ", ")
+        return formattedAddress.split(separator: ", ").dropFirst().dropLast().joined(separator: ", ")
     }
 }

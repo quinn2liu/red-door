@@ -86,7 +86,7 @@ struct OptionsView: View {
     // MARK: Warehouse Section
     @ViewBuilder
     private func StorageSection() -> some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             HStack(spacing: 8) {
                 Text("Warehouse Locations")
                     .font(.headline)
@@ -95,27 +95,23 @@ struct OptionsView: View {
                 Spacer()
 
                 if showWarehouseSection {
-                    Button {
+                    RDButton(variant: editingWarehouses ? .red : .outline, size: .icon, leadingIcon: "square.and.pencil", iconBold: true, fullWidth: false) {
                         editingWarehouses.toggle()
-                    } label: {
-                        Image(systemName: "square.and.pencil")
-                            .foregroundColor(.red)
                     }
                 }
 
-                Button {
+                RDButton(variant: .outline, size: .icon, leadingIcon: showWarehouseSection ? "chevron.up" : "chevron.down", iconBold: true, fullWidth: false) {
                     withAnimation {
                         showWarehouseSection.toggle()
                         editingWarehouses = false
                     }
-                } label: {
-                    Image(systemName: showWarehouseSection ? "chevron.up" : "chevron.down")
-                        .foregroundColor(.red)
                 }
             }
             .padding(8)
-            .background(Color(.systemGray5))
-            .cornerRadius(6)
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.gray, lineWidth: 1)
+            )
             .frame(maxWidth: .infinity)
 
             if showWarehouseSection {
@@ -123,15 +119,12 @@ struct OptionsView: View {
                     ForEach(warehouseViewModel.warehouses, id: \.self) { warehouse in
                         WarehouseListItem(warehouse: warehouse)
                     }
-                }
 
-                if editingWarehouses {
-                    Button {
-                        newWarehouse = Warehouse(name: "", address: Address())
-                        showAddressSheet = true
-                    } label: {
-                        Text("Add Warehouse")
-                            .foregroundColor(.red)
+                    if editingWarehouses {
+                        RDButton(variant: .secondary, size: .default, leadingIcon: "plus", text: "Add Warehouse", fullWidth: true) {
+                            newWarehouse = Warehouse(name: "", address: Address())
+                            showAddressSheet = true
+                        }
                     }
                 }
             }
@@ -144,7 +137,7 @@ struct OptionsView: View {
     @ViewBuilder
     private func WarehouseNameAlertContent() -> some View {
         if warehouseAddressExists {
-            Button("Cancel", role: .cancel) {
+            Button("Cancel", role: .destructive) {
                 showWarehouseNameAlert = false
                 newWarehouse = Warehouse(name: "", address: Address())
             }
@@ -158,7 +151,7 @@ struct OptionsView: View {
                 newWarehouse = Warehouse(name: warehouseName, address: newWarehouse.address)
             }.tint(.blue)
 
-            Button("Cancel", role: .cancel) {
+            Button("Cancel", role: .destructive) {
                 showWarehouseNameAlert = false
                 newWarehouse = Warehouse(name: "", address: Address())
             }
@@ -169,18 +162,19 @@ struct OptionsView: View {
 
     @ViewBuilder
     private func WarehouseListItem(warehouse: Warehouse) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 12) {
             Text(warehouse.name)
                 .foregroundColor(.primary)
 
             (
                 Text(warehouse.address.getStreetAddress() ?? "")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 +
-                Text(", " + (warehouse.address.getCityStateZipcode() ?? ""))
+                Text((warehouse.address.getCityStateZipcode() ?? ""))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             )
-            .font(.caption)
-            .foregroundColor(.secondary)
-            
 
             Spacer()
 
@@ -193,7 +187,8 @@ struct OptionsView: View {
                 }
             }
         }
-        .padding(8)
+        .padding()
+        .background(Color.gray.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .overlay(
             RoundedRectangle(cornerRadius: 8)

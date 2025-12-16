@@ -53,7 +53,8 @@ struct PullListDocumentView: View {
 
     // MARK: Top Bar
 
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder 
+    private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
                 Text("Pull Lists")
@@ -65,23 +66,19 @@ struct PullListDocumentView: View {
                 EmptyView()
             },
             trailingIcon: {
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     if !searchFocused {
-                        Button {
+                        RDButton(variant: .outline, size: .icon, leadingIcon: "magnifyingglass", iconBold: true, fullWidth: false) {
                             searchTextFocused = true
                             searchFocused = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
                         }
                     }
 
-                    Button {
+                    RDButton(variant: .outline, size: .icon, leadingIcon: "arrow.counterclockwise", iconBold: true, fullWidth: false) {
                         Task {
                             await viewModel.fetchPrimaryLists()
                             await viewModel.fetchSecondaryLists(initial: true)
                         }
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
                     }
 
                     ToolBarMenu()
@@ -92,7 +89,8 @@ struct PullListDocumentView: View {
 
     // MARK: Search Bar
 
-    @ViewBuilder private func SearchBar() -> some View {
+    @ViewBuilder 
+    private func SearchBar() -> some View {
         SearchBarComponent(
             searchText: $searchText,
             searchFocused: $searchFocused,
@@ -110,7 +108,8 @@ struct PullListDocumentView: View {
 
     // MARK: Tool Bar Menu
 
-    @ViewBuilder private func ToolBarMenu() -> some View {
+    @ViewBuilder 
+    private func ToolBarMenu() -> some View {
         Menu {
             NavigationLink(destination: CreatePullListView()) {
                 Text("From Scratch")
@@ -124,8 +123,7 @@ struct PullListDocumentView: View {
                 Image(systemName: "document.on.document")
             }
         } label: {
-            Image(systemName: "plus")
-                .foregroundStyle(Color.red)
+            RDButton(variant: .outline, size: .icon, leadingIcon: "plus", iconBold: true, fullWidth: false, action: { }) 
         }
     }
 

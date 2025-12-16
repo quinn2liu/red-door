@@ -141,9 +141,17 @@ extension RoomViewModel {
 
     @MainActor
     func getRoomItems() async {
+        // Check if itemModelIdMap is empty before querying
+        let itemIds = Array(selectedRoom.itemModelIdMap.keys)
+        
+        // If no items, set items to empty and return early
+        guard !itemIds.isEmpty else {
+            items = []
+            return
+        }
+        
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
-            let itemIds = Array(selectedRoom.itemModelIdMap.keys)
             let itemsRef = Self.db.collection("items")
                 .whereField("id", in: itemIds)
 
@@ -166,6 +174,12 @@ extension RoomViewModel {
     func getRoomModels(reloadModels: Bool = false) async {
         if !modelsLoaded || reloadModels {
             let modelIds = Set(selectedRoom.itemModelIdMap.values)
+            
+            guard !modelIds.isEmpty else {
+                modelsById = [:]
+                modelsLoaded = true
+                return
+            }
 
             do {
                 // Fetch models with those IDs
@@ -204,6 +218,11 @@ extension RoomViewModel {
         do {
             // Query items where listId matches the room's listId and is in the room's itemIds array
             let itemIds = Array(room.itemModelIdMap.keys)
+            
+            guard !itemIds.isEmpty else {
+                return []
+            }
+            
             let itemsRef = db.collection("items")
                 .whereField("id", in: itemIds)
 

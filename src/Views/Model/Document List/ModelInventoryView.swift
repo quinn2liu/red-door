@@ -24,7 +24,7 @@ struct ModelInventoryView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 if searchFocused {
                     SearchBar()
                 } else {
