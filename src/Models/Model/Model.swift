@@ -33,6 +33,7 @@ struct Model: Identifiable, Codable, Hashable {
         name: String = "",
 
         itemIds: [String] = [],
+        availableItemCount: Int = 0,
 
         type: String = "No Selection",
         primaryColor: String = "No Selection",
@@ -50,7 +51,7 @@ struct Model: Identifiable, Codable, Hashable {
         self.primaryMaterial = primaryMaterial
 
         self.itemIds = itemIds
-        availableItemCount = itemIds.count
+        self.availableItemCount = availableItemCount
 
         self.primaryImage = primaryImage
         self.secondaryImages = secondaryImages

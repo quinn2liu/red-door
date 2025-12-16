@@ -24,13 +24,11 @@ struct ModelInventoryView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 16) {
-                if !searchTextFocused {
-                    TopBar()
-                }
-
+            VStack(spacing: 12) {
                 if searchFocused {
                     SearchBar()
+                } else {
+                    TopBar()
                 }
 
                 ModelInventoryFilterView(selectedType: $selectedType)
@@ -85,27 +83,24 @@ struct ModelInventoryView: View {
                 EmptyView()
             },
             trailingIcon: {
-                HStack(spacing: 12) {
-                    if !searchFocused {
-                        Button {
-                            searchFocused = true
-                            searchTextFocused = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
+                HStack(spacing: 8) {
+                    Group {
+                        if !searchFocused {
+                            RDButton(variant: .outline, size: .icon, leadingIcon: "magnifyingglass", iconBold: true, fullWidth: false) {
+                                searchFocused = true
+                                searchTextFocused = true
+                            }
+                        }
+
+                        RDButton(variant: .outline, size: .icon, leadingIcon: "qrcode.viewfinder", iconBold: true, fullWidth: false) {
+                            showScannerSheet = true
+                        }
+
+                        RDButton(variant: .outline, size: .icon, leadingIcon: "plus", iconBold: true, fullWidth: false) {
+                            showCreateModelCover = true
                         }
                     }
-
-                    Button {
-                        showScannerSheet = true
-                    } label: {
-                        Image(systemName: "qrcode.viewfinder")
-                    }
-
-                    Button {
-                        showCreateModelCover = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
+                    .foregroundColor(.red)
                 }
             }
         ).tint(.red)
@@ -115,37 +110,16 @@ struct ModelInventoryView: View {
 
     @ViewBuilder 
     private func SearchBar() -> some View {
-        HStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-
-                TextField("", text: $searchText, prompt: Text("Search..."))
-                    .submitLabel(.search)
-                    .focused($searchTextFocused)
-                    .onSubmit {
-                        if !searchText.isEmpty {
-                            Task {
-                                await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
-                            }
-                        }
-                        searchTextFocused = false
-                        searchFocused = false
-                    }
-            }
-            .transition(.move(edge: .leading).combined(with: .opacity))
-            .padding(8)
-            .clipShape(.rect(cornerRadius: 8))
-
-            if searchTextFocused {
-                Button("Cancel") {
-                    searchText = ""
-                    searchTextFocused = false
-                    searchFocused = false
+        SearchBarComponent(
+            searchText: $searchText,
+            searchFocused: $searchFocused,
+            searchTextFocused: $searchTextFocused,
+            onSubmit: {
+                Task {
+                    await fetchModels(initial: true, searchText: searchText, modelType: selectedType)
                 }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-        }
-        .animation(.bouncy(duration: 0.25), value: searchTextFocused)
+        )
     }
 
     // MARK: Inventory List

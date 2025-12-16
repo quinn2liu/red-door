@@ -46,6 +46,10 @@ extension View {
         padding(.top, 16)
     }
 
+    func frameBottomPadding() -> some View {
+        padding(.bottom, 16)
+    }
+
     func frame(_ size: CGFloat) -> some View {
         frame(width: size, height: size)
     }

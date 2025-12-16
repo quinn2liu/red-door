@@ -80,7 +80,7 @@ struct RDList: Codable, Identifiable, Hashable {
         self.id = UUID().uuidString
         self.listType = listType
 
-        self.address = Warehouse.warehouse1.address
+        self.address = Address()
         self.addressId = address.id
 
         self.createdDate = ISO8601DateFormatter().string(from: Date())

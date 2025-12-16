@@ -67,7 +67,7 @@ struct UnstageInstalledListCover: View {
             leadingIcon: { ExitButton() },
             header: {
                 (
-                    Text("Unstaging ")
+                    Text("Unstaging: ")
                         .foregroundColor(.red)
                         .bold()
                     +
@@ -75,18 +75,15 @@ struct UnstageInstalledListCover: View {
                 )
             },
             trailingIcon: { 
-                Button {
+                RDButton(variant: .red, size: .icon, leadingIcon: "arrow.counterclockwise", fullWidth: false) {
                     Task {
                         stagedItems = []
                         unstagedItems = []
                         await loadItems()
                         await loadModels()
                     }
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                        .foregroundColor(.red)
-                        .frame(24)
                 }
+                .clipShape(Circle())
             }
         )
     }
@@ -95,13 +92,8 @@ struct UnstageInstalledListCover: View {
 
     @ViewBuilder
     private func ExitButton() -> some View {
-        Button{
+        RDButton(variant: .red, size: .icon, leadingIcon: "xmark", iconBold: true, fullWidth: false) {
             dismiss()
-        } label: {
-            Image(systemName: "xmark")
-                .fontWeight(.bold)
-                .frame(24)
-                .foregroundColor(.red)
         }
     }
 
@@ -163,13 +155,9 @@ struct UnstageInstalledListCover: View {
 
                 Spacer()
 
-                Button {
+                RDLinkButton(leadingIcon: "shippingbox") {
                     selectedItemAndModel = (item, model)
                     showUnstageSheet = true
-                } label: {
-                    Image(systemName:"shippingbox")
-                        .fontWeight(.bold)
-                        .frame(24)
                 }
             }
         }
@@ -231,13 +219,11 @@ struct UnstageInstalledListCover: View {
     private func Footer() -> some View {
         if stagedItems.isEmpty {
             HStack(spacing: 0) {
-                Button {
+                RDButton(variant: .default, text: "Set List as Unstaged", fullWidth: true) {
                     Task {
                         await viewModel.setListAsUnstaged()
                         coordinator.resetSelectedPath()
                     }
-                } label: {
-                    Text("Set List as Unstaged")
                 }
             }
         }

@@ -32,21 +32,21 @@ struct CreateModelView: View {
             VStack(spacing: 12) {
                 TopBar()
 
-                ScrollView(.vertical) {
-                    ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
 
-                    ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
 
-                    Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1 ... 100, step: 1)
+                Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1 ... 100, step: 1)
 
-                    RedDoorButton(type: .green, leadingIcon: "plus", text: "Add Model to Inventory", semibold: true) {
-                        saveModel()
-                    }
+                RDButton(variant: .default, size: .default, leadingIcon: "plus", text: "Add Model to Inventory") {
+                    saveModel()
                 }
+            }
+            .onAppear {
+                print("viewModel.selectedModel.availableItemCount: \(viewModel.selectedModel.availableItemCount)")
             }
             .toolbar(.hidden)
             .frameTop()
-            .frameTopPadding()
             .frameHorizontalPadding()
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
@@ -80,14 +80,10 @@ struct CreateModelView: View {
     private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                Button {
+                RDButton(variant: .red, size: .icon, leadingIcon: "xmark", iconBold: true, fullWidth: false) {
                     dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .fontWeight(.bold)
-                        .frame(width: 24, height: 24)
-                        .foregroundStyle(.red)
                 }
+                .clipShape(Circle())
             },
             header: {
                 ModelNameEntry()

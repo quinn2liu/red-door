@@ -23,7 +23,7 @@ struct StagingPullListView: View {
     // MARK: Body
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             RDListTopBar(
                 streetAddress: $viewModel.selectedList.address, 
                 trailingIcon: RefreshButton,
@@ -31,6 +31,24 @@ struct StagingPullListView: View {
             )
 
             RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
+
+            HStack(spacing: 0) {
+                SmallCTA(type: .secondary, leadingIcon: "arrow.counterclockwise", text: "Set as planning") {
+                    Task { @MainActor in
+                        viewModel.selectedList.status = .planning
+                        viewModel.updateSelectedList()
+                        coordinator.resetSelectedPath()
+                        try? await Task.sleep(for: .milliseconds(500))
+                        coordinator.appendToSelectedPath(viewModel.selectedList)
+                    }
+                }
+
+                Spacer()
+
+                SmallCTA(type: .secondary, leadingIcon: "richtext.page.fill", text: "Show PDF") {
+                    showPDFPreview = true
+                }
+            }
 
             RoomList()
 
@@ -51,7 +69,15 @@ struct StagingPullListView: View {
 
     @ViewBuilder
     private func RoomList() -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
+            HStack(spacing: 0) {
+                Text("Rooms:")
+                    .font(.headline)
+                    .foregroundColor(.red)
+
+                Spacer()
+            }
+
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
@@ -74,72 +100,42 @@ struct StagingPullListView: View {
 
     @ViewBuilder
     private func Footer() -> some View {
-        HStack(spacing: 0) {
-
-            Button {
-                showPDFPreview = true
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "richtext.page.fill")
-                    Text("PDF")
-                }
-            }
-
-            Button {
-                Task { @MainActor in
-                    viewModel.selectedList.status = .planning
-                    viewModel.updateSelectedList()
+        RDButton(variant: .default, size: .default, leadingIcon: "truck.box.badge.clock.fill", text: "Create Installed List", fullWidth: true) {
+            Task { // TODO: consider wrapping this in some error-handling function
+                do {
+                    let installedlist = try await viewModel.createInstalledFromPull()
                     coordinator.resetSelectedPath()
-                    try? await Task.sleep(for: .milliseconds(500))
-                    coordinator.appendToSelectedPath(viewModel.selectedList)
+                    try? await Task.sleep(for: .milliseconds(250))
+                    coordinator.setSelectedTab(to:.installedList)
+                    try? await Task.sleep(for: .milliseconds(250))
+                    coordinator.appendToSelectedPath(installedlist)
+                } catch let PullListValidationError.itemDoesNotExist(id) {
+                    errorMessage = "Item \(id) does not exist."
+                } catch let PullListValidationError.itemNotAvailable(id) {
+                    errorMessage = "Item \(id) is not available."
+                } catch let PullListValidationError.modelDoesNotExist(id) {
+                    errorMessage = "Model \(id) does not exist."
+                } catch let PullListValidationError.modelAvailableCountInvalid(id) {
+                    errorMessage = "Model \(id) has insufficient available items."
+                } catch InstalledFromPullError.creationFailed {
+                    errorMessage = "Unable to create Installed list."
+                } catch {
+                    errorMessage = "Unexpected error: \(error.localizedDescription)"
                 }
-            } label: {
-                Text("Change to planning")
-            }
-
-            Spacer()
-
-            Button {
-                Task { // TODO: consider wrapping this in some error-handling function
-                    do {
-                        let installedlist = try await viewModel.createInstalledFromPull()
-                        coordinator.resetSelectedPath()
-                        try? await Task.sleep(for: .milliseconds(250))
-                        coordinator.setSelectedTab(to:.installedList)
-                        try? await Task.sleep(for: .milliseconds(250))
-                        coordinator.appendToSelectedPath(installedlist)
-                    } catch let PullListValidationError.itemDoesNotExist(id) {
-                        errorMessage = "Item \(id) does not exist."
-                    } catch let PullListValidationError.itemNotAvailable(id) {
-                        errorMessage = "Item \(id) is not available."
-                    } catch let PullListValidationError.modelDoesNotExist(id) {
-                        errorMessage = "Model \(id) does not exist."
-                    } catch let PullListValidationError.modelAvailableCountInvalid(id) {
-                        errorMessage = "Model \(id) has insufficient available items."
-                    } catch InstalledFromPullError.creationFailed {
-                        errorMessage = "Unable to create Installed list."
-                    } catch {
-                        errorMessage = "Unexpected error: \(error.localizedDescription)"
-                    }
-                }
-            } label: {
-                Text("Create Installed List")
-            }
+            }            
         }
+        .padding(.bottom, 12)
     }
 
     // MARK: Refresh Button
 
     @ViewBuilder
     private var RefreshButton: some View {
-        Button {
+        RDButton(variant: .red, size: .icon, leadingIcon: "arrow.counterclockwise", iconBold: true, fullWidth: false) {
             Task {
                 await viewModel.refreshRDList()
             }
-        } label: {
-            Image(systemName: "arrow.counterclockwise")
-                .frame(24)
-                .foregroundColor(.red)
         }
+        .clipShape(Circle())
     }
 }

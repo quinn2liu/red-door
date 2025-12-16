@@ -47,8 +47,14 @@ struct ModelPrimaryImage: View {
                     .resizable()
                     .scaledToFill()
             } else { // no image selected
-                Rectangle()
-                    .foregroundStyle(.blue)
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(Color(.systemGray6))
+                    .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
+                    .overlay(Image(systemName: "photo.badge.plus")
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(.secondary)
+                    )
             }
         }
         .alert(

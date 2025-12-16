@@ -64,21 +64,19 @@ struct InstalledListDocumentView: View {
             trailingIcon: {
                 HStack(spacing: 12) {
                     if !searchFocused {
-                        Button {
-                            searchTextFocused = true
-                            searchFocused = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
+                        RDButton(variant: .outline, size: .icon, leadingIcon: "magnifyingglass", iconBold: true, fullWidth: false) {
+                            withAnimation {
+                                searchTextFocused = true
+                                searchFocused = true
+                            }
                         }
                     }
 
-                    Button {
+                    RDButton(variant: .outline, size: .icon, leadingIcon: "arrow.counterclockwise", iconBold: true, fullWidth: false) {
                         Task {
                             await viewModel.fetchPrimaryLists()
                             await viewModel.fetchSecondaryLists(initial: true)
                         }
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
                     }
                 }
             }
@@ -89,35 +87,19 @@ struct InstalledListDocumentView: View {
 
     @ViewBuilder 
     private func SearchBar() -> some View {
-        HStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-
-                TextField("", text: $searchText, prompt: Text("Search..."))
-                    .submitLabel(.search)
-                    .focused($searchTextFocused)
-                    .onSubmit {
-                        if !searchText.isEmpty {
-                            Task {
-                                await viewModel.fetchSearchResults(query: searchText.lowercased())
-                            }
-                        }
-                    }
-            }
-            .padding(8)
-            .clipShape(.rect(cornerRadius: 8))
-
-            if searchFocused {
-                Button("Cancel") {
-                    searchText = ""
-                    viewModel.clearSearchResults()
-                    searchTextFocused = false
-                    searchFocused = false
+        SearchBarComponent(
+            searchText: $searchText,
+            searchFocused: $searchFocused,
+            searchTextFocused: $searchTextFocused,
+            onSubmit: {
+                Task {
+                    await viewModel.fetchSearchResults(query: searchText.lowercased())
                 }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+            },
+            onCancel: {
+                viewModel.clearSearchResults()
             }
-        }
-        .animation(.smooth(duration: 0.25), value: searchTextFocused)
+        )
     }
 
     // MARK: Normal Mode List (installed section + unstaged section)
@@ -143,11 +125,9 @@ struct InstalledListDocumentView: View {
                 HStack(spacing: 8) {
                     Text("Installed")
                         .font(.headline)
-                        .foregroundColor(.red)
 
                     Image(systemName: "checkmark.circle.fill")
                         .font(.headline)
-                        .foregroundColor(.red)
 
                     Spacer()
 
@@ -156,6 +136,7 @@ struct InstalledListDocumentView: View {
 
                     Image(systemName: showInstalledLists ? "chevron.up" : "chevron.down")
                 }
+                .foregroundColor(.red)
                 .padding(8)
                 .background(Color(.systemGray5))
                 .cornerRadius(6)

@@ -57,6 +57,7 @@ struct UnstageItemSheet: View {
         }
         .frameTop()
         .frameHorizontalPadding()
+        .frameBottomPadding()
         .presentationDetents([.medium])
         .toolbar(.hidden)
     }

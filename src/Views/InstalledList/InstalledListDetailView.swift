@@ -92,8 +92,8 @@ struct InstalledListDetailView: View {
             }
 
         } label: {
-            Image(systemName: "ellipsis")
-                .frame(24)
+            RDButton(variant: .red, size: .icon, leadingIcon: "ellipsis", iconBold: true, fullWidth: false, action: { })
+                .clipShape(Circle())
         }
     }
 }

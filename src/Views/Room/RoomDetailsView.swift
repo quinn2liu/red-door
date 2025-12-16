@@ -60,9 +60,7 @@ struct RoomDetailsView: View {
         }, header: {
             Text(viewModel.selectedRoom.roomName)
         }, trailingIcon: {
-            Menu("Edit") {
-                EditRoomMenu()
-            }
+            EditRoomMenu()
         })
     }
 
@@ -140,26 +138,24 @@ struct RoomDetailsView: View {
 
     @ViewBuilder
     private func EditRoomMenu() -> some View {
-        Group {
+
+        Menu {
             Button {
-
+                // TODO: delete room
             } label: {
-                HStack(spacing: 0) { // TODO: replace with label item
-                    Text("Delete Room")
-
-                    Spacer()
-                }
+                Image(systemName: "trash")
+                Text("Delete Room")
             }
 
             Button {
                 showSheet = true
             } label: {
-                HStack(spacing: 0) {
-                    Text("Add Items")
-
-                    Spacer()
-                }
+                Image(systemName: "plus")
+                Text("Add Items")
             }
-        }
+        } label: {
+                RDButton(variant: .red, size: .icon, leadingIcon: "ellipsis", iconBold: true, fullWidth: false) { }
+                .clipShape(Circle())
+        }.tint(.red)
     }
 }

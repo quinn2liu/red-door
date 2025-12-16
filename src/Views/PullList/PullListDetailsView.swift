@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// TODO: make the edit view a sheet (should only be editing the metadata of the pull list)
 struct PullListDetailsView: View {
     // MARK: Navigation
 
@@ -32,7 +31,7 @@ struct PullListDetailsView: View {
     // MARK: Body
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             RDListTopBar(
                 streetAddress: $viewModel.selectedList.address, 
                 trailingIcon: TopBarMenu,
@@ -40,6 +39,20 @@ struct PullListDetailsView: View {
             )
 
             RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
+
+            HStack(spacing: 0) {
+                SmallCTA(type: .red, leadingIcon: "arrow.counterclockwise", text: "Refresh") {
+                    Task {
+                        await viewModel.refreshRDList()
+                    }
+                }
+                
+                Spacer()
+
+                SmallCTA(type: .secondary, leadingIcon: "richtext.page.fill", text: "Show PDF") {
+                    showPDF = true
+                }  
+            }
 
             RoomList()
 
@@ -82,22 +95,25 @@ struct PullListDetailsView: View {
     @ViewBuilder
     private var TopBarMenu: some View {
         Menu {
-            Button("Add Room", systemImage: "plus") {
-                showCreateRoom = true
-            }
-
-            Button("Edit List Details", systemImage: "pencil") {
-                showEditSheet = true
-            }
-
-            Button("Delete Pull List", systemImage: "trash") {
-                Task {
-                    await viewModel.deleteRDList()
-                    dismiss()
+            Group {
+                Button("Add Room", systemImage: "plus") {
+                    showCreateRoom = true
                 }
-            }
+
+                Button("Edit List Details", systemImage: "pencil") {
+                    showEditSheet = true
+                }
+
+                Button("Delete Pull List", systemImage: "trash") {
+                    Task {
+                        await viewModel.deleteRDList()
+                        dismiss()
+                    }
+                }
+            }.tint(.red)
         } label: {
-            Image(systemName: "ellipsis")
+            RDButton(variant: .red, size: .icon, leadingIcon: "ellipsis", iconBold: true, fullWidth: false, action: { })
+                .clipShape(Circle())
         }
     }
 
@@ -105,7 +121,15 @@ struct PullListDetailsView: View {
 
     @ViewBuilder
     private func RoomList() -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
+            HStack(spacing: 0) {
+                Text("Rooms:")
+                    .font(.headline)
+                    .foregroundColor(.red)
+
+                Spacer()
+            }
+
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
@@ -130,43 +154,16 @@ struct PullListDetailsView: View {
 
     @ViewBuilder
     private func Footer() -> some View {
-        HStack(spacing: 0) {
-            Button {
-                Task {
-                    await viewModel.refreshRDList()
-                }
-            } label: {
-                Image(systemName: "arrow.counterclockwise")
-            }
-            
-            Spacer()
-
-            Button {
-                showPDF = true
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "richtext.page.fill")
-                    Text("PDF")
-                }
-            }
-
-            Spacer()
-
-            Button {
-                Task { @MainActor in
-                    viewModel.selectedList.status = .staging
-                    viewModel.updateSelectedList()
-                    coordinator.resetSelectedPath()
-                    try? await Task.sleep(for: .milliseconds(250))
-                    coordinator.appendToSelectedPath(viewModel.selectedList)
-                }
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "truck.box.badge.clock.fill")
-                    Text("Begin Install")
-                }
+        RDButton(variant: .default, size: .default, leadingIcon: "truck.box.badge.clock.fill", text: "Begin Install", fullWidth: true) {
+            Task { @MainActor in
+                viewModel.selectedList.status = .staging
+                viewModel.updateSelectedList()
+                coordinator.resetSelectedPath()
+                try? await Task.sleep(for: .milliseconds(250))
+                coordinator.appendToSelectedPath(viewModel.selectedList)
             }
         }
+        .padding(.bottom, 12)
     }
 
     // MARK: Create Empty Room Sheet
