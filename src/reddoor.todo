@@ -1,7 +1,6 @@
 TODO: General:
     ☐ FEATURE: Authentication
     ☐ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images.
-    ☐ VIEW: Create reusable button components (RedDoorButton, TransparentButton, SmallCTA, etc.)
 
 TODO: Address:
 
@@ -19,6 +18,8 @@ TODO: Pull Lists:
         ☐ FEATURE: update room ID (what would the best format be?)
         ☐ FEATURE: Remove item from room
         ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
+        ☐ VIEW: General Room Views
+        ☐ FEATURE: Remove room
 
 TODO: Installed Lists:
     ☐ VIEW: "unstaged" installed list view
@@ -32,8 +33,6 @@ TODO: Model:
     ☐ FEATURE: add model description
     ☐ FEATURE: search by description?
     ☐ FEATURE: add essentials v custom
-    ☐ DEBUG: CreateModelView: Item count stepper (create model view, item stepper goes from 0 -> 2)
-    ✔ DEBUG: CreateModelView: when creating a new model and selecting an image, the item picker overflows @done(25-12-14 20:40)
 
 TODO: Item:
     ☐ FEATURE: Flag for attention (like repairs)
