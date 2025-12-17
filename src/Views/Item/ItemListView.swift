@@ -16,7 +16,7 @@ struct ModelItemListView: View {
         HStack {
             Text("Item Count: \(viewModel.itemCount)")
             Spacer()
-            Image(systemName: listExpanded ? "minus" : "plus")
+            Image(systemName: listExpanded ? SFSymbols.minus : SFSymbols.plus)
         }
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
@@ -43,7 +43,7 @@ struct ModelItemListView: View {
             if item.image.imageExists {
                 CachedAsyncImage(url: item.image.imageURL)
             } else {
-                Image(systemName: "photo.badge.plus")
+                Image(systemName: SFSymbols.photoBadgePlus)
             }
             Text(item.id)
             Text(model.type)

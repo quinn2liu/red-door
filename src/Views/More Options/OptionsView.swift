@@ -78,7 +78,7 @@ struct OptionsView: View {
     // MARK: Profile Image
     @ViewBuilder
     private func ProfileImage() -> some View {
-        Image(systemName: "person.circle")
+        Image(systemName: SFSymbols.personCircle)
             .foregroundColor(.red)
             .font(.system(size: 24))
     }
@@ -182,7 +182,7 @@ struct OptionsView: View {
                 Button {
                     showWarehouseDeleteAlert = true
                 } label: {
-                    Image(systemName: "trash")
+                    Image(systemName: SFSymbols.trash)
                         .foregroundColor(.red)
                 }
             }

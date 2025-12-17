@@ -18,7 +18,7 @@ struct SearchBarComponent: View {
     var body: some View {
         HStack(spacing: 16) {
             HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
+                Image(systemName: SFSymbols.magnifyingglass)
                     .bold()
                     .foregroundColor(.red)
                 

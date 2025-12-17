@@ -35,7 +35,7 @@ struct StagingRoomListItemView: View {
 
                 Text("Items \(viewModel.items.count)")
 
-                Image(systemName: showRoomPreview ? "minus" : "plus")
+                Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
             }
 
             if showRoomPreview {
@@ -89,7 +89,7 @@ struct StagingRoomListItemView: View {
                     await toggleItemSelection(item.id)
                 }
             } label: {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                Image(systemName: isSelected ? SFSymbols.checkmarkCircleFill : SFSymbols.circle)
                     .foregroundColor(isSelected ? .blue : .gray)
                     .font(.system(size: 20))
             }
@@ -119,7 +119,7 @@ struct StagingRoomListItemView: View {
             } else {
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             }
@@ -144,13 +144,13 @@ struct StagingRoomListItemView: View {
             case .failure:
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             @unknown default:
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             }

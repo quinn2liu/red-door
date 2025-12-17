@@ -58,7 +58,7 @@ struct ModelItemListDetailView: View {
             if item.image.imageExists {
                 CachedAsyncImage(url: item.image.imageURL)
             } else {
-                Image(systemName: "photo.badge.plus")
+                Image(systemName: SFSymbols.photoBadgePlus)
             }
             Text(item.id)
             Text(model.type)

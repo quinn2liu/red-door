@@ -50,7 +50,7 @@ struct ModelPrimaryImage: View {
                 RoundedRectangle(cornerRadius: 12)
                     .foregroundColor(Color(.systemGray6))
                     .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
-                    .overlay(Image(systemName: "photo.badge.plus")
+                    .overlay(Image(systemName: SFSymbols.photoBadgePlus)
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.secondary)

@@ -42,14 +42,14 @@ struct ModelListItemView: View {
                 case let .success(image):
                     image.resizable().frame(50)
                 case .failure:
-                    Image(systemName: "photo.badge.plus")
+                    Image(systemName: SFSymbols.photoBadgePlus)
                         .frame(50) // Fallback image
                 @unknown default:
                     EmptyView()
                 }
             }
         } else {
-            Image(systemName: "photo")
+            Image(systemName: SFSymbols.photo)
                 .frame(50) // Fallback image
         }
     }

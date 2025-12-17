@@ -99,7 +99,7 @@ struct RoomDetailsView: View {
                         Color.gray
                     }
                 } else {
-                    Image(systemName: "photo.badge.exclamationmark")
+                    Image(systemName: SFSymbols.photoBadgeExclamationmark)
                         .foregroundStyle(.gray)
                         .frame(width: 40, height: 40)
                 }
@@ -128,7 +128,7 @@ struct RoomDetailsView: View {
             if item.attention {
                 Spacer()
 
-                Image(systemName: "wrench.fill")
+                Image(systemName: SFSymbols.wrenchFill)
                     .foregroundStyle(Color.yellow)
             }
         }
@@ -143,14 +143,14 @@ struct RoomDetailsView: View {
             Button {
                 // TODO: delete room
             } label: {
-                Image(systemName: "trash")
+                Image(systemName: SFSymbols.trash)
                 Text("Delete Room")
             }
 
             Button {
                 showSheet = true
             } label: {
-                Image(systemName: "plus")
+                Image(systemName: SFSymbols.plus)
                 Text("Add Items")
             }
         } label: {

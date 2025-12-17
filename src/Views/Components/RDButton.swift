@@ -19,7 +19,7 @@ enum RDButtonVariant {
     var backgroundColor: Color {
         switch self {
         case .default:
-            return Color.primary
+            return Color.secondary
         case .destructive, .red:
             return Color(.red)
         case .outline:

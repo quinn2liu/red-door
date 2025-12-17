@@ -94,7 +94,7 @@ struct ItemDetailView: View {
                                 image: Image(uiImage: qrCode)
                             )
                         ) {
-                            Image(systemName: "square.and.arrow.up")
+                            Image(systemName: SFSymbols.squareAndArrowUp)
                         }
                     }
                 }

@@ -132,7 +132,7 @@ struct ModelSecondaryImages: View {
                 ZStack(alignment: .center) {
                     PlaceholderRectangle()
 
-                    Image(systemName: isEditing ? "plus" : "photo")
+                    Image(systemName: isEditing ? SFSymbols.plus : SFSymbols.photo)
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.secondary)

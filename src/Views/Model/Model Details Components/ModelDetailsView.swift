@@ -18,10 +18,10 @@ struct ModelDetailsView: View {
                     HStack(spacing: 0) {
                         Text(option)
 
-                        Image(systemName: "circle.fill")
+                        Image(systemName: SFSymbols.circleFill)
                             .foregroundStyle(color)
                             .overlay(
-                                Image(systemName: "circle")
+                                Image(systemName: SFSymbols.circle)
                                     .foregroundColor(.black.opacity(0.5))
                             )
                     }
@@ -46,10 +46,10 @@ struct ModelDetailsView: View {
         } else {
             HStack {
                 Text("Primary Color: \(viewModel.selectedModel.primaryColor)")
-                Image(systemName: "circle.fill")
+                Image(systemName: SFSymbols.circleFill)
                     .foregroundStyle(ModelViewModel.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
                     .overlay(
-                        Image(systemName: "circle")
+                        Image(systemName: SFSymbols.circle)
                             .foregroundColor(.black.opacity(0.5))
                     )
             }

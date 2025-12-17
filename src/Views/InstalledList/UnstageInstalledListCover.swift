@@ -175,7 +175,7 @@ struct UnstageInstalledListCover: View {
             } else {
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             }
@@ -200,13 +200,13 @@ struct UnstageInstalledListCover: View {
             case .failure:
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             @unknown default:
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             }

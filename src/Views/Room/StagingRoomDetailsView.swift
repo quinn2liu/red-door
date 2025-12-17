@@ -109,7 +109,7 @@ struct StagingRoomDetailsView: View {
                         Color.gray
                     }
                 } else {
-                    Image(systemName: "photo.badge.exclamationmark")
+                    Image(systemName: SFSymbols.photoBadgeExclamationmark)
                         .foregroundStyle(.gray)
                         .frame(width: 40, height: 40)
                 }
@@ -138,7 +138,7 @@ struct StagingRoomDetailsView: View {
             if item.attention {
                 Spacer()
 
-                Image(systemName: "wrench.fill")
+                Image(systemName: SFSymbols.wrenchFill)
                     .foregroundStyle(Color.yellow)
             }
         }

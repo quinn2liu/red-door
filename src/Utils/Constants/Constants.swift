@@ -14,3 +14,32 @@ enum Constants {
 
     static let screenWidth: CGFloat = UIScreen.width
 }
+
+enum SFSymbols {
+    static let docFill = "doc.fill"
+    static let squareAndArrowUp = "square.and.arrow.up"
+    static let qrcode = "qrcode"
+    static let magnifyingglass = "magnifyingglass"
+    static let photoBadgeExclamationmarkFill = "photo.badge.exclamationmark.fill"
+    static let checkmarkCircleFill = "checkmark.circle.fill"
+    static let squareAndPencil = "square.and.pencil"
+    static let chevronUp = "chevron.up"
+    static let chevronDown = "chevron.down"
+    static let arrowCounterclockwise = "arrow.counterclockwise"
+    static let arrowUturnBackward = "arrow.uturn.backward"
+    static let minus = "minus"
+    static let plus = "plus"
+    static let xmarkOctagon = "xmark.octagon"
+    static let photoBadgePlus = "photo.badge.plus"
+    static let photo = "photo"
+    static let circleFill = "circle.fill"
+    static let circle = "circle"
+    static let personCircle = "person.circle"
+    static let trash = "trash"
+    static let checklist = "checklist"
+    static let documentOnDocument = "document.on.document"
+    static let truckBoxBadgeClockFill = "truck.box.badge.clock.fill"
+    static let pencilAndListClipboard = "pencil.and.list.clipboard"
+    static let photoBadgeExclamationmark = "photo.badge.exclamationmark"
+    static let wrenchFill = "wrench.fill"
+}

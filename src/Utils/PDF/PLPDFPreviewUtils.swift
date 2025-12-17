@@ -58,11 +58,11 @@ struct PullListPDFView: View {
                             item: PDFFile(data: pdfData),
                             preview: SharePreview(
                                 "PullList.pdf",
-                                image: Image(systemName: "doc.fill")
+                                image: Image(systemName: SFSymbols.docFill)
                             ),
                             label: {
                                 HStack(spacing: 8) {
-                                    Image(systemName: "square.and.arrow.up")
+                                    Image(systemName: SFSymbols.squareAndArrowUp)
                                         .font(.system(size: 16))
                                         .fontWeight(.bold)
                                     

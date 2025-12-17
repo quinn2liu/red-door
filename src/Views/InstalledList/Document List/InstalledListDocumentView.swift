@@ -126,7 +126,7 @@ struct InstalledListDocumentView: View {
                     Text("Installed")
                         .font(.headline)
 
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: SFSymbols.checkmarkCircleFill)
                         .font(.headline)
 
                     Spacer()
@@ -134,7 +134,7 @@ struct InstalledListDocumentView: View {
                     Text("(\(viewModel.primaryLists.count))")
                         .foregroundColor(.secondary)
 
-                    Image(systemName: showInstalledLists ? "chevron.up" : "chevron.down")
+                    Image(systemName: showInstalledLists ? SFSymbols.chevronUp : SFSymbols.chevronDown)
                 }
                 .foregroundColor(.red)
                 .padding(8)
@@ -172,7 +172,7 @@ struct InstalledListDocumentView: View {
                     .font(.headline)
                     .foregroundColor(.primary)
 
-                Image(systemName: "arrow.uturn.backward")
+                Image(systemName: SFSymbols.arrowUturnBackward)
                     .font(.headline)
                     .foregroundColor(.primary)
 

@@ -31,7 +31,7 @@ struct InstalledRoomListItemView: View {
 
                 Text("Items \(viewModel.selectedRoom.itemModelIdMap.count)")
 
-                Image(systemName: showRoomPreview ? "minus" : "plus")
+                Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
             }
 
             if showRoomPreview {
@@ -91,7 +91,7 @@ struct InstalledRoomListItemView: View {
             case .failure:
                 Color.gray
                     .overlay(
-                        Image(systemName: "xmark.octagon")
+                        Image(systemName: SFSymbols.xmarkOctagon)
                             .foregroundColor(.white)
                     )
                     .aspectRatio(1, contentMode: .fill)

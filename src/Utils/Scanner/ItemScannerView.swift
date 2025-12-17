@@ -21,7 +21,7 @@ struct ItemScannerView: View {
 
             HStack {
                 Text("Scan Item")
-                Image(systemName: "qrcode")
+                Image(systemName: SFSymbols.qrcode)
             }
             .font(.system(.title2, design: .default))
             .bold()

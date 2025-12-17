@@ -107,7 +107,7 @@ struct UnstageItemSheet: View {
             } else {
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             }
@@ -132,13 +132,13 @@ struct UnstageItemSheet: View {
             case .failure:
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             @unknown default:
                 Color.gray
                     .overlay(
-                        Image(systemName: "photo.badge.exclamationmark.fill")
+                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
                             .foregroundColor(.white)
                     )
             }

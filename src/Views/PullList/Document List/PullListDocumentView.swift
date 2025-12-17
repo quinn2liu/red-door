@@ -113,14 +113,14 @@ struct PullListDocumentView: View {
         Menu {
             NavigationLink(destination: CreatePullListView()) {
                 Text("From Scratch")
-                Image(systemName: "checklist")
+                Image(systemName: SFSymbols.checklist)
             }
             // TODO: add functionatliy to this
             Button {
                 showFromInstalledCover = true
             } label: {
                 Text("From Installed List")
-                Image(systemName: "document.on.document")
+                Image(systemName: SFSymbols.documentOnDocument)
             }
         } label: {
             RDButton(variant: .outline, size: .icon, leadingIcon: "plus", iconBold: true, fullWidth: false, action: { }) 
@@ -153,7 +153,7 @@ struct PullListDocumentView: View {
                         .font(.headline)
                         .foregroundColor(.red)
 
-                    Image(systemName: "truck.box.badge.clock.fill")
+                    Image(systemName: SFSymbols.truckBoxBadgeClockFill)
                         .font(.headline)
                         .foregroundColor(.red)
 
@@ -162,7 +162,7 @@ struct PullListDocumentView: View {
                     Text("(\(viewModel.primaryLists.count))")
                         .foregroundColor(.secondary)
 
-                    Image(systemName: showStagingLists ? "chevron.up" : "chevron.down")
+                    Image(systemName: showStagingLists ? SFSymbols.chevronUp : SFSymbols.chevronDown)
                 }
                 .padding(8)
                 .background(Color(.systemGray5))
@@ -200,7 +200,7 @@ struct PullListDocumentView: View {
                     .font(.headline)
                     .foregroundColor(.primary)
 
-                Image(systemName: "pencil.and.list.clipboard")
+                Image(systemName: SFSymbols.pencilAndListClipboard)
                     .font(.headline)
                     .foregroundColor(.primary)
 
