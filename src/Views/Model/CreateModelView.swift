@@ -34,17 +34,14 @@ struct CreateModelView: View {
 
                 ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
 
-                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                EditingModelDetailsView(viewModel: $viewModel)
 
                 Spacer()
 
                 RDButton(variant: .default, size: .default, leadingIcon: "plus", text: "Add Model to Inventory") {
                     saveModel()
                 }
-            }
-            .onAppear {
-                print("viewModel.selectedModel.availableItemCount: \(viewModel.selectedModel.availableItemCount)")
-            }
+            }   
             .toolbar(.hidden)
             .frameTop()
             .frameHorizontalPadding()

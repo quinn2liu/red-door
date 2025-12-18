@@ -75,13 +75,20 @@ final class ModelViewModel {
         let batch = db.batch()
         let collectionRef = db.collection("items")
 
-        for _ in 1 ... itemCount {
+        var itemToCreate = 0
+        if itemCount > selectedModel.itemIds.count {
+            itemToCreate = itemCount - selectedModel.itemIds.count
+        } else {
+            itemToCreate = 0
+        }
+
+        for _ in 0 ..< itemToCreate {
             let item = Item(modelId: selectedModel.id)
             selectedModel.itemIds.append(item.id)
             selectedModel.availableItemCount += 1
 
-            let documentRef = collectionRef.document(item.id)
-            try batch.setData(from: item, forDocument: documentRef)
+            let itemRef = collectionRef.document(item.id)
+            try batch.setData(from: item, forDocument: itemRef)
         }
 
         try await batch.commit()
@@ -130,7 +137,6 @@ final class ModelViewModel {
             )
 
             // update secondary images
-
             for index in selectedModel.secondaryImages.indices {
                 selectedModel.secondaryImages[index].objectId = selectedModel.id
             }
@@ -141,7 +147,7 @@ final class ModelViewModel {
 
             // create items
             let itemIdCount = selectedModel.itemIds.count
-            if itemCount != itemIdCount, itemIdCount == 0 { // create items if none exist
+            if itemCount != itemIdCount && itemIdCount == 0 { // create items if none exist
                 try await createModelItems()
             }
 
@@ -199,82 +205,4 @@ final class ModelViewModel {
             print("Error deleting model: \(error)")
         }
     }
-}
-
-// MARK: - Model Options
-
-extension ModelViewModel {
-    static var colorMap: [String: Color] = [
-        "N/A": .primary.opacity(0.5),
-        "Black": .black,
-        "White": .white,
-        "Brown": .brown,
-        "Gray": .gray,
-        "Pink": .pink,
-        "Red": .red,
-        "Orange": .orange,
-        "Yellow": .yellow,
-        "Green": .green,
-        "Mint": .mint,
-        "Teal": .teal,
-        "Cyan": .cyan,
-        "Blue": .blue,
-        "Purple": .purple,
-        "Indigo": .indigo,
-    ]
-    
-    static var colorGroups: [(String, [String])] = [
-        ("Neutrals", ["N/A", "Black", "White", "Brown", "Gray"]),
-        ("Warm", ["Pink", "Red", "Orange", "Yellow"]),
-        ("Cool", ["Green", "Mint", "Teal", "Cyan", "Blue", "Purple", "Indigo"])
-    ]
-
-    static var typeOptions: [String] = [
-        "Chair",
-        "Desk",
-        "Table",
-        "Couch",
-        "Lamp",
-        "Art",
-        "Decor",
-        "Miscellaneous",
-        "N/A",
-    ]
-
-    static var typeMap: [String: String] = [
-        "Chair": "chair.fill",
-        "Desk": "table.furniture.fill",
-        "Table": "table.furniture.fill",
-        "Couch": "sofa.fill",
-        "Lamp": "lamp.floor.fill",
-        "Art": "photo.artframe",
-        "Misc": "ellipsis.circle",
-        "N/A": "nosign",
-    ]
-
-    // TODO: convert model type to an enum, and then have these fields as computed property
-    static var materialOptions: [String] = [
-        "Acrylic",
-        "Bamboo",
-        "Cane",
-        "Concrete",
-        "Engineered Wood",
-        "Fabric",
-        "Glass",
-        "Laminates",
-        "Leather",
-        "Marble",
-        "Metal",
-        "None",
-        "Plastic",
-        "Rattan",
-        "Resin",
-        "Stainless Steel",
-        "Stone",
-        "Veneer",
-        "Vinyl",
-        "Wicker",
-        "Wood",
-        "N/A",
-    ]
 }

@@ -14,7 +14,7 @@ struct ModelItemListView: View {
 
     var body: some View {
         HStack {
-            Text("Item Count: \(viewModel.itemCount)")
+            Text("Item Count: \(viewModel.selectedModel.itemIds.count)")
             Spacer()
             Image(systemName: listExpanded ? SFSymbols.minus : SFSymbols.plus)
         }

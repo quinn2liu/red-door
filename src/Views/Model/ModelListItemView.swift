@@ -10,47 +10,111 @@ import SwiftUI
 
 struct ModelListItemView: View {
     var model: Model
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ModelImage()
-
-            Spacer()
-
-            Text(model.name)
-
-            Spacer()
-
-            Text(model.type)
-
-            Spacer()
-
-            Text(model.primaryMaterial)
-
-            Spacer()
-
-            Text(model.primaryColor)
-        }
+    let imageWidth: CGFloat = Constants.screenWidth / 7
+    
+    private var typeIconName: String {
+        // Handle "Miscellaneous" -> "Misc" mapping
+        let lookupType = model.type == "Miscellaneous" ? "Misc" : model.type
+        return Model.typeMap[lookupType] ?? "camera.metering.unknown"
     }
 
-    @ViewBuilder private func ModelImage() -> some View {
+    // MARK: Body
+    var body: some View {
+        HStack(spacing: 12) {
+            ModelImage()
+            
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    Text(model.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Text("(\(model.itemIds.count))")
+                        .foregroundColor(.red)
+                }
+                
+                HStack(spacing: 4) {
+                    // Type icon
+                    Image(systemName: typeIconName)
+                        .font(.footnote)
+                        .foregroundColor(.primary)
+                    
+                    Text("•")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+
+                    // Primary material
+                    Text(model.primaryMaterial)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    
+                    Text("•")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+
+                    // Color icon
+                    Image(systemName: SFSymbols.circleFill)
+                        .font(.footnote)
+                        .foregroundStyle(Model.colorMap[model.primaryColor] ?? .black)
+
+                    Text("•")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    
+                    // Available item count
+                    HStack(spacing: 0) {
+                        Text("Available: ")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        
+                        Text("\(model.availableItemCount)")
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                    }
+                }
+            }
+            
+            Spacer()
+
+            if model.isEssential {
+                Image(systemName: SFSymbols.starCircleFill)
+                    .foregroundColor(.yellow)
+                    .padding(.trailing, 6)
+            }
+        }
+        .padding(8)
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
+    }
+
+
+    // MARK: Model Image
+    @ViewBuilder 
+    private func ModelImage() -> some View {
         if let imageURL = model.primaryImage.imageURL {
             CachedAsyncImage(url: imageURL) { phase in
                 switch phase {
                 case .empty:
-                    ProgressView() // Placeholder while loading
+                    ProgressView()
+                        .frame(imageWidth)
                 case let .success(image):
-                    image.resizable().frame(50)
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(imageWidth)
+                        .cornerRadius(6)
                 case .failure:
                     Image(systemName: SFSymbols.photoBadgePlus)
-                        .frame(50) // Fallback image
+                        .frame(imageWidth)
+                        .foregroundColor(.secondary)
                 @unknown default:
                     EmptyView()
                 }
             }
         } else {
             Image(systemName: SFSymbols.photo)
-                .frame(50) // Fallback image
+                .frame(width: 60, height: 60)
+                .foregroundColor(.secondary)
         }
     }
 }

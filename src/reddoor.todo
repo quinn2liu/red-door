@@ -34,6 +34,7 @@ TODO: Model:
     ☐ FEATURE: search by description?
     ☐ FEATURE: add essentials v custom
     ☐ FEATURE: essential vs custom filtering
+    ☐ FEATURE: when editing or creating a model, need to validate that the model is okay (you can't have no primary image, name must exist, etc.)
 
 TODO: Item:
     ☐ FEATURE: Flag for attention (like repairs)

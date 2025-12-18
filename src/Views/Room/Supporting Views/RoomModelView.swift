@@ -37,7 +37,7 @@ struct RoomModelView: View {
         VStack(spacing: 0) {
             ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
 
-            ModelDetailsView(isEditing: false, viewModel: $modelViewModel)
+            ModelDetailsView(viewModel: $modelViewModel)
 
             // TODO: rename this
             ModelItemList()
@@ -70,7 +70,7 @@ struct RoomModelView: View {
     private func ModelItemList() -> some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Item Count: \(modelViewModel.itemCount)")
+                Text("Item Count: \(modelViewModel.selectedModel.itemIds.count)")
                 Spacer()
             }
             .frame(maxWidth: .infinity)

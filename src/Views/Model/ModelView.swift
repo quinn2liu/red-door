@@ -15,13 +15,12 @@ struct ModelView: View {
 
     // Data
     @State private var viewModel: ModelViewModel
-    @State private var backupModel: Model?
 
     // Presented variables
-    @State private var showDeleteAlert: Bool = false
     @State private var isLoading: Bool = false
-    @State private var isEditing: Bool = false
+    @State private var showEditSheet: Bool = false
     @State private var showEditingItems: Bool = false
+    @State private var showDetails: Bool = false
 
     // Image selected variables
     @State private var selectedRDImage: RDImage?
@@ -38,37 +37,47 @@ struct ModelView: View {
         ZStack {
             VStack(spacing: 12) {
                 TopBar()
+                ScrollView {
+                    ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
 
-                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                    ItemListView()
 
-                ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
+                    VStack(spacing: 12) {
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                showDetails.toggle()
+                            }
+                        }) {
+                            HStack(spacing: 0) {
+                                Text("Details")
+                                .foregroundColor(.white)
+                                .bold()
 
-                ItemListView()
-
-                if isEditing {
-                    RDButton(variant: .red, size: .default, leadingIcon: "trash", text: "Delete Model", fullWidth: false) {
-                        showDeleteAlert = true
-                    }
-                    .alert(
-                        "Confirm Delete",
-                        isPresented: $showDeleteAlert
-                    ) {
-                        Button(role: .destructive) {
-                            deleteModel()
-                        } label: {
-                            Text("Delete")
+                                Spacer()
+                                
+                                Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                                    .foregroundColor(.white)
+                            }
+                            .padding(8)
+                            .background(.red)
+                            .cornerRadius(6)
                         }
 
-                        Button(role: .cancel) {} label: {
-                            Text("Cancel")
+                        if showDetails {
+                            ModelDetailsView(viewModel: $viewModel)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                     }
-                    
                 }
             }
             .frameTop()
             .frameHorizontalPadding()
             .toolbar(.hidden)
+            .sheet(isPresented: $showEditSheet) {
+                EditModelDetailsSheet(viewModel: $viewModel, onDelete: {
+                    dismiss()
+                })
+            }
             .sheet(isPresented: $showEditingItems) {
                 EditItemsSheet()
             }
@@ -93,19 +102,10 @@ struct ModelView: View {
 
     @ViewBuilder
     private func ModelNameView() -> some View {
-        if isEditing {
-            HStack {
-                TextField("", text: $viewModel.selectedModel.name)
-                    .padding(6)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-            }
-        } else {
-            HStack {
-                Text("Name:")
-                    .font(.headline)
-                Text(viewModel.selectedModel.name)
-            }
+        HStack {
+            Text("Name:")
+                .font(.headline)
+            Text(viewModel.selectedModel.name)
         }
     }
 
@@ -115,30 +115,14 @@ struct ModelView: View {
     private func TopBar() -> some View {
         TopAppBar(
             leadingIcon: {
-                if isEditing {
-                    RDButton(variant: .red, size: .icon, leadingIcon: "xmark", iconBold: true, fullWidth: false) {
-                        if let backup = backupModel {
-                            viewModel.selectedModel = backup
-                        }
-                        isEditing = false
-                    }
-                    .clipShape(Circle())
-                } else {
-                    BackButton()
-                }
+                BackButton()
             },
             header: {
                 ModelNameView()
             },
             trailingIcon: {
-                RDButton(variant: .red, size: .icon, leadingIcon: isEditing ? "checkmark" : "square.and.pencil", iconBold: true, fullWidth: false) {
-                    if isEditing {
-                        saveModel()
-                        isEditing = false
-                    } else {
-                        backupModel = viewModel.selectedModel
-                        isEditing = true
-                    }
+                RDButton(variant: .red, size: .icon, leadingIcon: "square.and.pencil", iconBold: true, fullWidth: false) {
+                    showEditSheet = true
                 }
                 .clipShape(Circle())
             }
@@ -150,7 +134,14 @@ struct ModelView: View {
     @ViewBuilder
     private func ItemListView() -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Item Count: \(viewModel.itemCount)")
+            HStack(spacing: 0) {
+                Text("Item Count: ")
+                    .foregroundColor(.red)
+                    .bold()
+                
+                Text("\(viewModel.selectedModel.itemIds.count)")
+                    .bold()
+            }
 
             if !viewModel.items.isEmpty {
                 VStack(spacing: 0) {
@@ -193,23 +184,6 @@ struct ModelView: View {
     }
 
     // MARK: - Helper Functions
-
-    private func saveModel() {
-        isLoading = true
-        Task {
-            await viewModel.updateModel()
-            isLoading = false
-        }
-    }
-
-    private func deleteModel() {
-        isLoading = true
-        Task {
-            await viewModel.deleteModel()
-            isLoading = false
-            dismiss()
-        }
-    }
 
     private func loadItems() async {
         do {

@@ -80,6 +80,8 @@ struct ModelPrimaryImage: View {
         .cornerRadius(12)
     }
 
+    // MARK: Edit Photo Alert
+
     @ViewBuilder
     private func EditPhotoAlert() -> some View {
         Group {
@@ -93,12 +95,6 @@ struct ModelPrimaryImage: View {
                 activeSheet = .camera
             } label: {
                 Text("Camera")
-            }
-
-            if isEditing {
-                Button(role: .destructive) {} label: {
-                    Text("Delete")
-                }
             }
 
             Button(role: .cancel) {} label: {

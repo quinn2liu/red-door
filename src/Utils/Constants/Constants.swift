@@ -11,7 +11,6 @@ import SwiftUI
 enum Constants {
     // the width of the screen with padding removed
     static let screenWidthPadding: CGFloat = UIScreen.width - 32
-
     static let screenWidth: CGFloat = UIScreen.width
 }
 
@@ -42,4 +41,5 @@ enum SFSymbols {
     static let pencilAndListClipboard = "pencil.and.list.clipboard"
     static let photoBadgeExclamationmark = "photo.badge.exclamationmark"
     static let wrenchFill = "wrench.fill"
+    static let starCircleFill = "star.circle.fill"
 }

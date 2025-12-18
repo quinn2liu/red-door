@@ -95,3 +95,75 @@ extension Model {
         return try documentSnapshot.data(as: Model.self)
     }
 }
+
+
+// MARK: - Model Options
+
+extension Model {
+    static var colorMap: [String: Color] = [
+        "N/A": .primary.opacity(0.5),
+        "Black": .black,
+        "White": .white,
+        "Brown": .brown,
+        "Gray": .gray,
+        "Pink": .pink,
+        "Red": .red,
+        "Orange": .orange,
+        "Yellow": .yellow,
+        "Green": .green,
+        "Mint": .mint,
+        "Teal": .teal,
+        "Cyan": .cyan,
+        "Blue": .blue,
+        "Purple": .purple,
+        "Indigo": .indigo,
+    ]
+
+    static var typeOptions: [String] = [
+        "Chair",
+        "Desk",
+        "Table",
+        "Couch",
+        "Lamp",
+        "Art",
+        "Decor",
+        "Miscellaneous",
+        "N/A",
+    ]
+
+    static var typeMap: [String: String] = [
+        "Chair": "chair.fill",
+        "Desk": "table.furniture.fill",
+        "Table": "table.furniture.fill",
+        "Couch": "sofa.fill",
+        "Lamp": "lamp.floor.fill",
+        "Art": "photo.artframe",
+        "Misc": "ellipsis.circle",
+        "N/A": "nosign",
+    ]
+    
+    static var materialOptions: [String] = [
+        "Acrylic",
+        "Bamboo",
+        "Cane",
+        "Concrete",
+        "Engineered Wood",
+        "Fabric",
+        "Glass",
+        "Laminates",
+        "Leather",
+        "Marble",
+        "Metal",
+        "None",
+        "Plastic",
+        "Rattan",
+        "Resin",
+        "Stainless Steel",
+        "Stone",
+        "Veneer",
+        "Vinyl",
+        "Wicker",
+        "Wood",
+        "Other",
+    ]
+}
