@@ -30,11 +30,11 @@ TODO: RDList:
     ☐ VIEW: RDList List Item
 
 TODO: Model:
-    ☐ FEATURE: add model description
     ☐ FEATURE: search by description?
-    ☐ FEATURE: add essentials v custom
     ☐ FEATURE: essential vs custom filtering
     ☐ FEATURE: when editing or creating a model, need to validate that the model is okay (you can't have no primary image, name must exist, etc.)
+
+    ☐ DEBUG: investigate deleting an item and deleting the images
 
 TODO: Item:
     ☐ FEATURE: Flag for attention (like repairs)

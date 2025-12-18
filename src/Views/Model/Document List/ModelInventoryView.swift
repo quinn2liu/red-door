@@ -127,7 +127,7 @@ struct ModelInventoryView: View {
     @ViewBuilder 
     private func InventoryList() -> some View {
         ScrollView {
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: 8) {
                 ForEach(viewModel.documentsArray.compactMap { $0 as? Model }, id: \.self) { model in
                     NavigationLink(value: model) {
                         ModelListItemView(model: model)

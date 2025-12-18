@@ -40,20 +40,20 @@ enum RDButtonVariant {
         case .destructive, .red:
             return .white
         case .outline:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         case .secondary:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         case .ghost:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         case .link:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         }
     }
     
     var borderColor: Color? {
         switch self {
         case .outline:
-            return Color(red: 0.89, green: 0.89, blue: 0.89) // hsl(0 0% 89%)
+            return Color(.separator)
         default:
             return nil
         }
@@ -225,14 +225,14 @@ struct RDLinkButton: View {
                     Image(systemName: leadingIcon)
                         .font(.system(size: size.iconSize))
                         .fontWeight(.medium)
-                        .foregroundStyle(disabled ? Color.gray : Color(red: 0.09, green: 0.09, blue: 0.09))
+                        .foregroundStyle(disabled ? Color.gray : Color.primary)
                 }
                 
                 if let buttonText = text {
                     Text(buttonText)
                         .font(size.fontSize)
                         .fontWeight(.medium)
-                        .foregroundStyle(disabled ? Color.gray : Color(red: 0.09, green: 0.09, blue: 0.09))
+                        .foregroundStyle(disabled ? Color.gray : Color.primary)
                         .underline()
                 }
             }

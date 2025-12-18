@@ -18,7 +18,7 @@ enum SmallCTAType {
     var buttonColor: Color {
         switch self {
         case .default:
-            return Color(.black)
+            return Color.primary
         case .red:
             return Color(.red)
         case .outline:
@@ -35,24 +35,24 @@ enum SmallCTAType {
     var foregroundColor: Color {
         switch self {
         case .default:
-            return .white
+            return Color(.systemBackground)
         case .red:
             return .white
         case .outline:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         case .secondary:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         case .ghost:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         case .link:
-            return Color(red: 0.09, green: 0.09, blue: 0.09)
+            return Color.primary
         }
     }
     
     var borderColor: Color? {
         switch self {
         case .outline:
-            return Color(red: 0.89, green: 0.89, blue: 0.89) // hsl(0 0% 89%)
+            return Color(.separator)
         default:
             return nil
         }
