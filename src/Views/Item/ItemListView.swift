@@ -40,8 +40,8 @@ struct ModelItemListView: View {
         let model = viewModel.selectedModel
 
         HStack {
-            if item.image.imageExists {
-                CachedAsyncImage(url: item.image.imageURL)
+            if let itemImage = item.image, itemImage.imageExists, let imageURL = itemImage.imageURL {
+                CachedAsyncImage(url: imageURL)
             } else {
                 Image(systemName: SFSymbols.photoBadgePlus)
             }

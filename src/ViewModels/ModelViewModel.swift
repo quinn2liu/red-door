@@ -205,7 +205,7 @@ final class ModelViewModel {
 
 extension ModelViewModel {
     static var colorMap: [String: Color] = [
-        "No Selection": .primary.opacity(0.5),
+        "N/A": .primary.opacity(0.5),
         "Black": .black,
         "White": .white,
         "Brown": .brown,
@@ -222,6 +222,12 @@ extension ModelViewModel {
         "Purple": .purple,
         "Indigo": .indigo,
     ]
+    
+    static var colorGroups: [(String, [String])] = [
+        ("Neutrals", ["N/A", "Black", "White", "Brown", "Gray"]),
+        ("Warm", ["Pink", "Red", "Orange", "Yellow"]),
+        ("Cool", ["Green", "Mint", "Teal", "Cyan", "Blue", "Purple", "Indigo"])
+    ]
 
     static var typeOptions: [String] = [
         "Chair",
@@ -232,7 +238,7 @@ extension ModelViewModel {
         "Art",
         "Decor",
         "Miscellaneous",
-        "No Selection",
+        "N/A",
     ]
 
     static var typeMap: [String: String] = [
@@ -242,33 +248,33 @@ extension ModelViewModel {
         "Couch": "sofa.fill",
         "Lamp": "lamp.floor.fill",
         "Art": "photo.artframe",
-        "Miscellaneous": "ellipsis.circle",
-        "No Selection": "nosign",
+        "Misc": "ellipsis.circle",
+        "N/A": "nosign",
     ]
 
     // TODO: convert model type to an enum, and then have these fields as computed property
     static var materialOptions: [String] = [
-        "Wood",
-        "Metal",
-        "Glass",
-        "Plastic",
-        "Leather",
-        "Fabric",
-        "Wicker",
-        "Rattan",
-        "Stone",
-        "Marble",
         "Acrylic",
-        "Veneer",
         "Bamboo",
+        "Cane",
         "Concrete",
         "Engineered Wood",
+        "Fabric",
+        "Glass",
         "Laminates",
-        "Vinyl",
-        "Resin",
-        "Cane",
-        "Stainless Steel",
-        "No Selection",
+        "Leather",
+        "Marble",
+        "Metal",
         "None",
+        "Plastic",
+        "Rattan",
+        "Resin",
+        "Stainless Steel",
+        "Stone",
+        "Veneer",
+        "Vinyl",
+        "Wicker",
+        "Wood",
+        "N/A",
     ]
 }

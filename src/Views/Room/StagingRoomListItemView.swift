@@ -112,7 +112,7 @@ struct StagingRoomListItemView: View {
     @ViewBuilder
     private func ItemPreviewImage(item: Item, model: Model? = nil) -> some View {
         Group {
-            if item.image.imageExists, let imageURL = item.image.imageURL {
+            if let itemImage = item.image, itemImage.imageExists, let imageURL = itemImage.imageURL {
                 ItemCachedAsyncImage(imageURL: imageURL)
             } else if let modelImageURL = model?.primaryImage.imageURL {
                 ItemCachedAsyncImage(imageURL: modelImageURL)

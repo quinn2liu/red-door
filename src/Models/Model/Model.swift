@@ -17,8 +17,12 @@ struct Model: Identifiable, Codable, Hashable {
 
     // Attributes
     var type: String
+
     var primaryColor: String
+    var secondaryColor: String
+
     var primaryMaterial: String
+    var secondaryMaterial: String
 
     // Items
     var itemIds: [String]
@@ -28,6 +32,11 @@ struct Model: Identifiable, Codable, Hashable {
     var primaryImage: RDImage
     var secondaryImages: [RDImage]
 
+    // Description
+    var description: String
+    var descriptionLowercased: String
+    var isEssential: Bool
+
     init(
         id: String = UUID().uuidString,
         name: String = "",
@@ -35,26 +44,40 @@ struct Model: Identifiable, Codable, Hashable {
         itemIds: [String] = [],
         availableItemCount: Int = 0,
 
-        type: String = "No Selection",
-        primaryColor: String = "No Selection",
-        primaryMaterial: String = "No Selection",
+        type: String = "N/A",
+        primaryColor: String = "N/A",
+        secondaryColor: String = "N/A",
+
+        primaryMaterial: String = "N/A",
+        secondaryMaterial: String = "N/A",
 
         primaryImage: RDImage = RDImage(),
-        secondaryImages: [RDImage] = []
+        secondaryImages: [RDImage] = [],
+
+        description: String = "",
+        isEssential: Bool = false
     ) {
         self.id = id
         self.name = name
         nameLowercased = name.lowercased()
 
         self.type = type
+
         self.primaryColor = primaryColor
+        self.secondaryColor = secondaryColor
+
         self.primaryMaterial = primaryMaterial
+        self.secondaryMaterial = secondaryMaterial
 
         self.itemIds = itemIds
         self.availableItemCount = availableItemCount
 
         self.primaryImage = primaryImage
         self.secondaryImages = secondaryImages
+
+        self.description = description
+        self.descriptionLowercased = description.lowercased()
+        self.isEssential = isEssential
     }
 }
 

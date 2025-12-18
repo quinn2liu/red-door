@@ -1,6 +1,6 @@
 TODO: General:
-    ☐ FEATURE: Authentication
-    ☐ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images.
+    ☐ FEATURE: Authentication (lowkey not needed for testing)
+    ✔ DEBUG: item images are being initialized to empty RDImage, but it should be optional because not all items have images. @done(25-12-17 19:58)
 
 TODO: Address:
 
@@ -33,6 +33,7 @@ TODO: Model:
     ☐ FEATURE: add model description
     ☐ FEATURE: search by description?
     ☐ FEATURE: add essentials v custom
+    ☐ FEATURE: essential vs custom filtering
 
 TODO: Item:
     ☐ FEATURE: Flag for attention (like repairs)

@@ -134,7 +134,11 @@ struct ItemDetailView: View {
             Text("List ID: \(viewModel.selectedItem.listId)")
             Text("Attention: \(viewModel.selectedItem.attention.description)")
             Text("Is Available: \(viewModel.selectedItem.isAvailable.description)")
-            CachedAsyncImage(url: viewModel.selectedItem.image.imageURL) // curently no way to set item image
+            if let itemImage = viewModel.selectedItem.image, itemImage.imageExists, let imageURL = itemImage.imageURL {
+                CachedAsyncImage(url: imageURL)
+            } else {
+                Image(systemName: SFSymbols.photoBadgePlus)
+            }
         }
     }
 }

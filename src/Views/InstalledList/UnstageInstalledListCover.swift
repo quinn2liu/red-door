@@ -168,7 +168,7 @@ struct UnstageInstalledListCover: View {
     @ViewBuilder
     private func ItemPreviewImage(item: Item, model: Model?) -> some View {
         Group {
-            if item.image.imageExists, let imageURL = item.image.imageURL {
+            if let itemImage = item.image, let imageURL = itemImage.imageURL {
                 ItemCachedAsyncImage(imageURL: imageURL)
             } else if let modelImageURL = model?.primaryImage.imageURL {
                 ItemCachedAsyncImage(imageURL: modelImageURL)

@@ -36,7 +36,7 @@ struct CreateModelView: View {
 
                 ModelDetailsView(isEditing: isEditing, viewModel: $viewModel)
 
-                Stepper("Item Count: \(viewModel.itemCount)", value: $viewModel.itemCount, in: 1 ... 100, step: 1)
+                Spacer()
 
                 RDButton(variant: .default, size: .default, leadingIcon: "plus", text: "Add Model to Inventory") {
                     saveModel()
@@ -48,6 +48,7 @@ struct CreateModelView: View {
             .toolbar(.hidden)
             .frameTop()
             .frameHorizontalPadding()
+            .frameBottomPadding()
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
                     .animation(.easeInOut(duration: 0.3), value: isImageSelected)
@@ -98,7 +99,7 @@ struct CreateModelView: View {
 
     @ViewBuilder
     private func ModelNameEntry() -> some View {
-        TextField("Item Name", text: $viewModel.selectedModel.name)
+        TextField("Model Name", text: $viewModel.selectedModel.name)
             .padding(6)
             .background(isImageSelected ? Color.clear : Color(.systemGray5))
             .cornerRadius(8)

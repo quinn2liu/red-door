@@ -15,9 +15,9 @@ struct Item: Identifiable, Codable, Hashable {
     var attention: Bool // whether the item needs attention (like repairs)
     var isAvailable: Bool // whether item is available to be added to a list (in storage)
 
-    var image: RDImage
+    var image: RDImage?
 
-    init(modelId: String, id: String = UUID().uuidString, attention: Bool = false, listId: String = Warehouse.warehouse1.name, isAvailable: Bool = true, image: RDImage = RDImage()) {
+    init(modelId: String, id: String = UUID().uuidString, attention: Bool = false, listId: String = Warehouse.warehouse1.name, isAvailable: Bool = true, image: RDImage? = nil) {
         self.modelId = modelId
         self.id = id
         self.attention = attention

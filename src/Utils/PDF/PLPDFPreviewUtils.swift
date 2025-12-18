@@ -150,14 +150,16 @@ func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
 
     for room in rooms {
         for item in room.items {
-            if let url = item.image.imageExists ? item.image.imageURL : room.modelsById[item.modelId]?.primaryImage.imageURL {
-                do {
-                    let (data, _) = try await URLSession.shared.data(from: url)
-                    if let image = UIImage(data: data) {
-                        result[item.id] = image
+            if let itemImage = item.image {
+                if let imageURL = itemImage.imageURL {
+                    do {
+                        let (data, _) = try await URLSession.shared.data(from: imageURL)
+                        if let image = UIImage(data: data) {
+                            result[item.id] = image
+                        }
+                    } catch {
+                        print("Failed to preload image for item \(item.id): \(error)")
                     }
-                } catch {
-                    print("Failed to preload image for item \(item.id): \(error)")
                 }
             }
         }

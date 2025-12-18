@@ -93,8 +93,8 @@ struct RoomModelView: View {
         let model = modelViewModel.selectedModel
 
         HStack {
-            if item.image.imageExists {
-                CachedAsyncImage(url: item.image.imageURL)
+            if let itemImage = item.image, itemImage.imageExists {
+                CachedAsyncImage(url: itemImage.imageURL)
             } else {
                 Image(systemName: SFSymbols.photoBadgePlus)
             }

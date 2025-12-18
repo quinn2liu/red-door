@@ -100,8 +100,8 @@ struct UnstageItemSheet: View {
     @ViewBuilder
     private func ItemPreviewImage(item: Item, model: Model?) -> some View {
         Group {
-            if item.image.imageExists, let imageURL = item.image.imageURL {
-                ItemCachedAsyncImage(imageURL: imageURL)
+            if let itemImage = item.image, itemImage.imageExists {
+                ItemCachedAsyncImage(imageURL: itemImage.imageURL)
             } else if let modelImageURL = model?.primaryImage.imageURL {
                 ItemCachedAsyncImage(imageURL: modelImageURL)
             } else {
@@ -119,7 +119,7 @@ struct UnstageItemSheet: View {
     // MARK: Item Cached Async Image
 
     @ViewBuilder
-    private func ItemCachedAsyncImage(imageURL: URL) -> some View {
+    private func ItemCachedAsyncImage(imageURL: URL?) -> some View {
         CachedAsyncImage(url: imageURL) { phase in
             switch phase {
             case .empty:

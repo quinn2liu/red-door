@@ -171,8 +171,8 @@ struct ModelView: View {
         let model = viewModel.selectedModel
 
         HStack {
-            if item.image.imageExists {
-                CachedAsyncImage(url: item.image.imageURL)
+            if let itemImage = item.image, itemImage.imageExists {
+                CachedAsyncImage(url: itemImage.imageURL)
             } else {
                 Image(systemName: SFSymbols.photoBadgePlus)
             }
