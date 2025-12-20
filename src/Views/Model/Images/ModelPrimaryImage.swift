@@ -18,6 +18,7 @@ struct ModelPrimaryImage: View {
     @Binding var primaryRDImage: RDImage
     @Binding var selectedRDImage: RDImage?
     @Binding var isImageSelected: Bool
+    // TODO: don't need this to be a binding
     @Binding var isEditing: Bool
 
     var body: some View {

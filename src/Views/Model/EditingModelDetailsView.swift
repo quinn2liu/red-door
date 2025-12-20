@@ -252,15 +252,11 @@ struct ColorPickerToggle: View {
                 Text(title)
                     .foregroundColor(.primary)
 
-                HStack(spacing: 6) {
-                    Text(selectedColor)
-                        .foregroundColor(.blue)
-                    Image(systemName: SFSymbols.circleFill)
-                        .foregroundStyle(Model.colorMap[selectedColor] ?? .black)
-                }
-                .padding(isActive ? 0 : 8)
-                .background(isActive ? Color.clear : Color(.systemGray5))
-                .cornerRadius(6)
+                Image(systemName: SFSymbols.circleFill)
+                    .foregroundStyle(Model.colorMap[selectedColor] ?? .black)
+                    .padding(isActive ? 0 : 8)
+                    .background(isActive ? Color.clear : Color(.systemGray5))
+                    .cornerRadius(6)
             }
         }
     }

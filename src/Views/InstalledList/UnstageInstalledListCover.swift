@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
 
 struct UnstageInstalledListCover: View {
     @Environment(\.dismiss) private var dismiss
@@ -149,7 +148,7 @@ struct UnstageInstalledListCover: View {
     private func ItemListItem(_ item: Item) -> some View {
         if let model = modelsById[item.modelId] {
             HStack(spacing: 8) {
-                ItemPreviewImage(item: item, model: model)
+                ItemModelImage(item: item, model: model)
 
                 Text(model.name)
 
@@ -163,55 +162,6 @@ struct UnstageInstalledListCover: View {
         }
     }
 
-    // MARK: Item Preview Image
-
-    @ViewBuilder
-    private func ItemPreviewImage(item: Item, model: Model?) -> some View {
-        Group {
-            if let itemImage = item.image, let imageURL = itemImage.imageURL {
-                ItemCachedAsyncImage(imageURL: imageURL)
-            } else if let modelImageURL = model?.primaryImage.imageURL {
-                ItemCachedAsyncImage(imageURL: modelImageURL)
-            } else {
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            }
-        }
-        .frame(32)
-        .cornerRadius(8)
-    }
-
-    // MARK: Item Cached Async Image
-
-    @ViewBuilder
-    private func ItemCachedAsyncImage(imageURL: URL) -> some View {
-        CachedAsyncImage(url: imageURL) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            case let .success(image):
-                image
-                    .resizable()
-                    .scaledToFill()                        
-            case .failure:
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            @unknown default:
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            }
-        }
-    }
 
     // MARK: Footer
 

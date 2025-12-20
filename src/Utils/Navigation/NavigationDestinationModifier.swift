@@ -17,9 +17,10 @@ struct NavigationDestinationsModifier: ViewModifier {
             .navigationDestination(for: Model.self) { model in
                 ModelView(model: model)
             }
-            .navigationDestination(for: Item.self) { item in
-                ItemDetailView(item: item)
-            }
+            // TODO: try to find a solution for this
+            // .navigationDestination(for: Item.self) { item in
+            //     ItemDetailView(item: item)
+            // }
             .navigationDestination(for: RDList.self) { list in
                 if list.listType == .pull_list && list.status == .planning {
                     PullListDetailsView(pullList: list)

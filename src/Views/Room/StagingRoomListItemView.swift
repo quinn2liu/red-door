@@ -5,7 +5,6 @@
 //  Created by Quinn Liu on 1/1/25.
 //
 
-import CachedAsyncImage
 import SwiftUI
 
 struct StagingRoomListItemView: View {
@@ -95,7 +94,7 @@ struct StagingRoomListItemView: View {
             }
             
             Group {
-                ItemPreviewImage(item: item, model: model)
+                ItemModelImage(item: item, model: model)
 
                 Text(model?.name ?? "No Model Name")
             }
@@ -105,57 +104,6 @@ struct StagingRoomListItemView: View {
         }
     }
 
-    // MARK: Item Preview Image
-
-    // TODO: good place for image store or other optimization?
-
-    @ViewBuilder
-    private func ItemPreviewImage(item: Item, model: Model? = nil) -> some View {
-        Group {
-            if let itemImage = item.image, itemImage.imageExists, let imageURL = itemImage.imageURL {
-                ItemCachedAsyncImage(imageURL: imageURL)
-            } else if let modelImageURL = model?.primaryImage.imageURL {
-                ItemCachedAsyncImage(imageURL: modelImageURL)
-            } else {
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            }
-        }
-        .frame(32)
-        .cornerRadius(8)
-    }
-
-    // MARK: Item Cached Async Image
-
-    @ViewBuilder
-    private func ItemCachedAsyncImage(imageURL: URL) -> some View {
-        CachedAsyncImage(url: imageURL) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            case let .success(image):
-                image
-                    .resizable()
-                    .scaledToFill()                        
-            case .failure:
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            @unknown default:
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            }
-        }
-    }
 
     // MARK: toggleItemSelection()
     private func toggleItemSelection(_ itemId: String) async {

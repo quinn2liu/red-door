@@ -19,7 +19,6 @@ struct ModelView: View {
     // Presented variables
     @State private var isLoading: Bool = false
     @State private var showEditSheet: Bool = false
-    @State private var showEditingItems: Bool = false
     @State private var showDetails: Bool = false
 
     // Image selected variables
@@ -37,49 +36,51 @@ struct ModelView: View {
         ZStack {
             VStack(spacing: 12) {
                 TopBar()
+                .padding(.horizontal, 16)
+
                 ScrollView {
-                    ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
-
-                    ItemListView()
-
                     VStack(spacing: 12) {
-                        Button(action: {
-                            withAnimation(.spring(response: 0.3)) {
-                                showDetails.toggle()
-                            }
-                        }) {
-                            HStack(spacing: 0) {
-                                Text("Details")
-                                .foregroundColor(.white)
-                                .bold()
+                        ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
 
-                                Spacer()
-                                
-                                Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                        ItemListView()
+
+                        VStack(spacing: 12) {
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3)) {
+                                    showDetails.toggle()
+                                }
+                            }) {
+                                HStack(spacing: 0) {
+                                    Text("Details")
                                     .foregroundColor(.white)
-                            }
-                            .padding(8)
-                            .background(.red)
-                            .cornerRadius(6)
-                        }
+                                    .bold()
 
-                        if showDetails {
-                            ModelDetailsView(viewModel: $viewModel)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
+                                    Spacer()
+                                    
+                                    Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                                        .foregroundColor(.white)
+                                }
+                                .padding(8)
+                                .background(.red)
+                                .cornerRadius(6)
+                            }
+
+                            if showDetails {
+                                ModelDetailsView(viewModel: $viewModel)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
                         }
                     }
+                    .padding(.top, 4)
+                    .frameHorizontalPadding()
                 }
             }
             .frameTop()
-            .frameHorizontalPadding()
             .toolbar(.hidden)
             .sheet(isPresented: $showEditSheet) {
                 EditModelDetailsSheet(viewModel: $viewModel, onDelete: {
                     dismiss()
                 })
-            }
-            .sheet(isPresented: $showEditingItems) {
-                EditItemsSheet()
             }
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
@@ -134,7 +135,7 @@ struct ModelView: View {
     @ViewBuilder
     private func ItemListView() -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 0) {
+            HStack(alignment: .bottom,spacing: 0) {
                 Text("Item Count: ")
                     .foregroundColor(.red)
                     .bold()
@@ -144,10 +145,15 @@ struct ModelView: View {
             }
 
             if !viewModel.items.isEmpty {
-                VStack(spacing: 0) {
-                    ForEach(viewModel.items, id: \.self) { item in
-                        NavigationLink(value: item) {
-                            ItemListItem(item)
+                let columns = [
+                    GridItem(.flexible(), spacing: 4),
+                    GridItem(.flexible(), spacing: 4)
+                ]
+                
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(Array(viewModel.items.enumerated()), id: \.offset) { index, item in
+                        NavigationLink(destination: ItemDetailView(item: item, model: viewModel.selectedModel)) {
+                            ItemListItem(item, index: index)
                         }
                     }
                 }
@@ -158,30 +164,44 @@ struct ModelView: View {
     // MARK: Item List Item
 
     @ViewBuilder
-    private func ItemListItem(_ item: Item) -> some View {
-        let model = viewModel.selectedModel
+    private func ItemListItem(_ item: Item, index: Int) -> some View {
+        HStack(spacing: 8) {
+            Text("\(index + 1).")
+                .foregroundColor(.primary)
+                .bold()
+                .frame(width: 20)
 
-        HStack {
-            if let itemImage = item.image, itemImage.imageExists {
-                CachedAsyncImage(url: itemImage.imageURL)
-            } else {
-                Image(systemName: SFSymbols.photoBadgePlus)
+            ItemModelImage(item: item, model: viewModel.selectedModel, size: 48)
+            
+            VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                Text("Available:")
+                    .foregroundColor(.secondary)  
+                    .font(.footnote)                      
+
+                Image(systemName: item.isAvailable ? SFSymbols.checkmarkCircleFill : SFSymbols.xmarkCircleFill)
+                    .foregroundColor(item.isAvailable ? .green : .red)
+                    .frame(16)
+                    .font(.footnote)
+                }
+                
+                if item.attention {
+                    HStack(spacing: 4) {
+                        Text("Attention Needed:")
+                            .foregroundColor(.secondary)  
+                            .font(.footnote)   
+
+                        Image(systemName: SFSymbols.exclamationmarkTriangleFill)
+                            .foregroundColor(.yellow) 
+                            .frame(16)                   
+                    }
+                }
             }
-            Text(item.id)
-            Text(model.type)
-            Text(item.attention.description)
         }
-    }
-
-    // MARK: EditItemsSheet
-
-    // TODO: maybe put this in separate file...?
-    @ViewBuilder
-    private func EditItemsSheet() -> some View {
-        ForEach(viewModel.items, id: \.self) { item in
-            ItemListItem(item)
-        }
-    }
+        .padding(8)
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
+}
 
     // MARK: - Helper Functions
 

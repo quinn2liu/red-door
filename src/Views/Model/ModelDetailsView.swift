@@ -15,6 +15,8 @@ struct ModelDetailsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
+
+                // MARK: Colors
                 Text("Colors:")
                     .foregroundColor(.red)
                     .bold()
@@ -25,14 +27,11 @@ struct ModelDetailsView: View {
                             Text("Primary: ")
                                 .foregroundColor(.primary)
 
-                            HStack(spacing: 6) {
-                                Text(viewModel.selectedModel.primaryColor)
-                                Image(systemName: SFSymbols.circleFill)
-                                    .foregroundStyle(Model.colorMap[viewModel.selectedModel.primaryColor] ?? .black)
-                            }
-                            .padding(8)
-                            .background(Color(.systemGray5))
-                            .cornerRadius(6)
+                            Image(systemName: SFSymbols.circleFill)
+                                .foregroundColor(Model.colorMap[viewModel.selectedModel.secondaryColor] ?? .black)
+                                .padding(8)
+                                .background(Color(.systemGray5))
+                                .cornerRadius(6)
                         }
                     }
 
@@ -43,15 +42,11 @@ struct ModelDetailsView: View {
                             Text("Secondary:")
                                 .foregroundColor(.primary)
 
-                            HStack(spacing: 6) {
-                                Text(viewModel.selectedModel.secondaryColor)
-                                    .foregroundColor(.blue)
-                                Image(systemName: SFSymbols.circleFill)
-                                    .foregroundStyle(Model.colorMap[viewModel.selectedModel.secondaryColor] ?? .black)
-                            }
-                            .padding(8)
-                            .background(Color(.systemGray5))
-                            .cornerRadius(6)
+                            Image(systemName: SFSymbols.circleFill)
+                                .foregroundColor(Model.colorMap[viewModel.selectedModel.secondaryColor] ?? .black)
+                                .padding(8)
+                                .background(Color(.systemGray5))
+                                .cornerRadius(6)
                         }
                     }
                 }
@@ -60,6 +55,8 @@ struct ModelDetailsView: View {
                 .cornerRadius(8)
             }
 
+
+            // MARK: Materials
             VStack(alignment: .leading, spacing: 4) {
                 Text("Materials:")
                     .foregroundColor(.red)
@@ -93,6 +90,7 @@ struct ModelDetailsView: View {
                 .cornerRadius(8)
             }
 
+            // MARK: Details
             VStack(alignment: .leading, spacing: 4) {
                 Text("Details:")
                     .foregroundColor(.red)
@@ -132,6 +130,7 @@ struct ModelDetailsView: View {
                 .cornerRadius(8)
             }
             
+            // MARK: Description
             VStack(alignment: .leading, spacing: 4) {
                 Text("Description")
                     .foregroundColor(.red)

@@ -10,7 +10,7 @@ import Foundation
 import PhotosUI
 import SwiftUI
 
-// TODO: Figure out how this works lol
+// TODO: change primaryRDImage to rdImage (and figure out how this works lol)
 struct SingleCameraPicker: UIViewControllerRepresentable {
     @Binding var primaryRDImage: RDImage
     var dismiss: () -> Void

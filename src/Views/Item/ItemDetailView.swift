@@ -11,6 +11,7 @@ import SwiftUI
 struct ItemDetailView: View {
     @Environment(NavigationCoordinator.self) var coordinator
     @State private var viewModel: ItemViewModel
+    private let model: Model
 
     @State private var showEditSheet: Bool = false
     @State private var backupItem: Item? = nil
@@ -18,35 +19,78 @@ struct ItemDetailView: View {
     @State private var showQRCode: Bool = false
     @State private var qrCode: UIImage? = nil
 
-    init(item: Item) {
+    init(item: Item, model: Model) {
         viewModel = ItemViewModel(selectedItem: item)
+        self.model = model
     }
 
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 16) {
-            TopBar()
+        ZStack {
+            VStack(spacing: 12) {
+                TopBar()
+                    .padding(.horizontal, 16)
 
-            Text("Item ID: \(viewModel.selectedItem.id)")
+                ScrollView {
+                    VStack(spacing: 12) {
+                        HStack(spacing: 0) {
+                            VStack(spacing: 6) {
+                                Text("Model Image:")
+                                    .foregroundColor(.red)
+                                    .bold()
+                                CachedAsyncImage(url: model.primaryImage.imageURL) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(48)
+                                        .cornerRadius(8)
+                                } placeholder: {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .foregroundColor(Color(.systemGray6))
+                                        .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
+                                        .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                                            .font(.largeTitle)
+                                            .bold()
+                                            .foregroundColor(.secondary)
+                                        )
+                                }
+                            }
 
-            Spacer()
+                            Spacer()
 
-            RDButton(variant: .red, size: .default, leadingIcon: "trash", fullWidth: false) {
-                Task {
-                    await viewModel.deleteItem()
+                            VStack(spacing: 6) {
+                                Text("Item Image:")
+                                    .foregroundColor(.red)
+                                    .bold()
+                                ItemImage(itemImage: $viewModel.selectedItem.image, isEditing: false)
+                            }
+                        }
+                        
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .bottom, spacing: 0) {
+                                Text("Item ID: ")
+                                    .foregroundColor(.red)
+                                    .bold()
+                                
+                                Text(viewModel.selectedItem.id)
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .padding(.top, 4)
+                    .frameHorizontalPadding()
                 }
-                coordinator.resetSelectedPath()
             }
-        }
-        .fullScreenCover(isPresented: $showQRCode) {
-            ItemQRCodeView()
-        }
-        .frameTop()
-        .frameHorizontalPadding()
-        .toolbar(.hidden)
-        .sheet(isPresented: $showEditSheet) {
-            ItemEditSheet()
+            .frameTop()
+            .toolbar(.hidden)
+            .fullScreenCover(isPresented: $showQRCode) {
+                ItemQRCodeView()
+            }
+            .sheet(isPresented: $showEditSheet) {
+                ItemEditSheet(viewModel: $viewModel)
+            }
         }
     }
 
@@ -99,7 +143,7 @@ struct ItemDetailView: View {
                     }
                 }
             })
-
+            
             Spacer()
 
             if let qrCode: UIImage = qrCodeImage {
@@ -118,27 +162,5 @@ struct ItemDetailView: View {
         .frameHorizontalPadding()
         .frameVerticalPadding()
         .toolbar(.hidden)
-    }
-
-    // MARK: - Item Edit Sheet
-
-    @ViewBuilder
-    private func ItemEditSheet() -> some View {
-        VStack(spacing: 16) {
-            RDButton(variant: .red, size: .default, leadingIcon: "xmark", fullWidth: false) {
-                showEditSheet = false
-            }
-            Text("Edit Item")
-            Text("Item ID: \(viewModel.selectedItem.id)")
-            Text("Model ID: \(viewModel.selectedItem.modelId)")
-            Text("List ID: \(viewModel.selectedItem.listId)")
-            Text("Attention: \(viewModel.selectedItem.attention.description)")
-            Text("Is Available: \(viewModel.selectedItem.isAvailable.description)")
-            if let itemImage = viewModel.selectedItem.image, itemImage.imageExists, let imageURL = itemImage.imageURL {
-                CachedAsyncImage(url: imageURL)
-            } else {
-                Image(systemName: SFSymbols.photoBadgePlus)
-            }
-        }
     }
 }

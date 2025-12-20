@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
 
 struct UnstageItemSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -42,7 +41,7 @@ struct UnstageItemSheet: View {
                     .foregroundColor(.primary)
             }
 
-            ItemPreviewImage(item: item, model: model)
+            ItemModelImage(item: item, model: model, size: Constants.screenWidthPadding / 2)
 
             ScrollView {
                 LazyVStack {
@@ -95,53 +94,4 @@ struct UnstageItemSheet: View {
     }
 
 
-    // MARK: Item Preview Image
-
-    @ViewBuilder
-    private func ItemPreviewImage(item: Item, model: Model?) -> some View {
-        Group {
-            if let itemImage = item.image, itemImage.imageExists {
-                ItemCachedAsyncImage(imageURL: itemImage.imageURL)
-            } else if let modelImageURL = model?.primaryImage.imageURL {
-                ItemCachedAsyncImage(imageURL: modelImageURL)
-            } else {
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            }
-        }
-        .frame(Constants.screenWidthPadding / 2)
-        .cornerRadius(8)
-    }
-
-    // MARK: Item Cached Async Image
-
-    @ViewBuilder
-    private func ItemCachedAsyncImage(imageURL: URL?) -> some View {
-        CachedAsyncImage(url: imageURL) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            case let .success(image):
-                image
-                    .resizable()
-                    .scaledToFill()                        
-            case .failure:
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            @unknown default:
-                Color.gray
-                    .overlay(
-                        Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
-                            .foregroundColor(.white)
-                    )
-            }
-        }
-    }
 }
