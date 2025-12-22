@@ -11,7 +11,7 @@ import SwiftUI
 struct ItemDetailView: View {
     @Environment(NavigationCoordinator.self) var coordinator
     @State private var viewModel: ItemViewModel
-    private let model: Model
+    @State private var model: Model? = nil
 
     @State private var showEditSheet: Bool = false
     @State private var backupItem: Item? = nil
@@ -19,7 +19,7 @@ struct ItemDetailView: View {
     @State private var showQRCode: Bool = false
     @State private var qrCode: UIImage? = nil
 
-    init(item: Item, model: Model) {
+    init(item: Item, model: Model? = nil) {
         viewModel = ItemViewModel(selectedItem: item)
         self.model = model
     }
@@ -39,22 +39,7 @@ struct ItemDetailView: View {
                                 Text("Model Image:")
                                     .foregroundColor(.red)
                                     .bold()
-                                CachedAsyncImage(url: model.primaryImage.imageURL) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(48)
-                                        .cornerRadius(8)
-                                } placeholder: {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .foregroundColor(Color(.systemGray6))
-                                        .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
-                                        .overlay(Image(systemName: SFSymbols.photoBadgePlus)
-                                            .font(.largeTitle)
-                                            .bold()
-                                            .foregroundColor(.secondary)
-                                        )
-                                }
+                                ModelImageView()
                             }
 
                             Spacer()
@@ -86,10 +71,19 @@ struct ItemDetailView: View {
             .frameTop()
             .toolbar(.hidden)
             .fullScreenCover(isPresented: $showQRCode) {
-                ItemQRCodeView()
+                if let model: Model = model {
+                    ItemLabelView(item: viewModel.selectedItem, model: model, )
+                } else {
+                    Text("Error loading item. Please try again.")
+                }
             }
             .sheet(isPresented: $showEditSheet) {
                 ItemEditSheet(viewModel: $viewModel)
+            }
+            .task {
+                if model == nil {
+                    model = await Item.getItemModel(modelId: viewModel.selectedItem.modelId)
+                }
             }
         }
     }
@@ -118,49 +112,36 @@ struct ItemDetailView: View {
         })
     }
 
-    // MARK: - Item QR Code View
+    // MARK: - Model Image View
 
     @ViewBuilder
-    private func ItemQRCodeView() -> some View {
-        let qrCodeImage: UIImage? = viewModel.selectedItem.id.generateQRCode()
-        VStack(spacing: 0) {
-            TopAppBar(leadingIcon: {
-                BackButton()
-            }, header: {
-                Text("QR Code")
-            }, trailingIcon: {
-                Group {
-                    if #available(iOS 17, *), let qrCode: UIImage = qrCodeImage, let imageData: Data = qrCode.pngData() {
-                        ShareLink(
-                            item: QRCodeImage(data: imageData),
-                            preview: SharePreview(
-                                viewModel.selectedItem.id,
-                                image: Image(uiImage: qrCode)
-                            )
-                        ) {
-                            Image(systemName: SFSymbols.squareAndArrowUp)
-                        }
-                    }
-                }
-            })
-            
-            Spacer()
-
-            if let qrCode: UIImage = qrCodeImage {
-                Image(uiImage: qrCode)
-                    .interpolation(.none)
+    private func ModelImageView() -> some View {
+        if let model: Model = model {
+            CachedAsyncImage(url: model.primaryImage.imageURL) { image in
+                image
                     .resizable()
-                    .scaledToFit()
-            } else {
-                Text("Error Generating QR Code")
-                    .foregroundColor(.red)
+                    .scaledToFill()
+                    .frame(Constants.screenWidthPadding / 2)
+                    .cornerRadius(8)
+            } placeholder: {
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(Color(.systemGray6))
+                    .frame(Constants.screenWidthPadding / 2)
+                    .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(.secondary)
+                    )
             }
-
-            Spacer()
+        } else {
+            RoundedRectangle(cornerRadius: 12)
+                .foregroundColor(Color(.systemGray6))
+                .frame(Constants.screenWidthPadding / 2)
+                .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(.secondary)
+                )
         }
-        .frameTop()
-        .frameHorizontalPadding()
-        .frameVerticalPadding()
-        .toolbar(.hidden)
     }
 }

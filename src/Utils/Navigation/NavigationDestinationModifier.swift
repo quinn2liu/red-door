@@ -18,9 +18,9 @@ struct NavigationDestinationsModifier: ViewModifier {
                 ModelView(model: model)
             }
             // TODO: try to find a solution for this
-            // .navigationDestination(for: Item.self) { item in
-            //     ItemDetailView(item: item)
-            // }
+            .navigationDestination(for: Item.self) { item in
+                ItemDetailView(item: item)
+            }
             .navigationDestination(for: RDList.self) { list in
                 if list.listType == .pull_list && list.status == .planning {
                     PullListDetailsView(pullList: list)
