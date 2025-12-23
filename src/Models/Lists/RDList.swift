@@ -7,6 +7,7 @@
 
 import Foundation
 import MapKit
+import FirebaseFirestore
 
 enum InstallationStatus: String, Codable {
     case planning = "planning"
@@ -88,5 +89,15 @@ struct RDList: Codable, Identifiable, Hashable {
         status = .planning
         self.client = ""
         self.roomIds = []
+    }
+
+    static func getList(listId: String) async -> RDList {
+        do {
+            let documentSnapshot = try await Firestore.firestore().collection("lists").document(listId).getDocument()
+            return try documentSnapshot.data(as: RDList.self)
+        } catch {
+            print("Error getting list: \(error)")
+            return RDList()
+        }
     }
 }

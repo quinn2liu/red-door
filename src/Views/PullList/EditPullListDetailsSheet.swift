@@ -44,7 +44,7 @@ struct EditPullListDetailsSheet: View {
                 Text("Client:")
                 TextField("", text: $editingList.client)
                     .padding(6)
-                    .background(Color(.systemGray6))
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
             }
 

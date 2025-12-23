@@ -63,7 +63,7 @@ struct AddressEntryView: View {
                         }
                     }
                     .pickerStyle(.menu)
-                    .background(Color(.systemGray6))
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
                 }
 
@@ -88,7 +88,7 @@ struct AddressEntryView: View {
                 .foregroundStyle(Color(.secondaryLabel))
             TextField("", text: text)
                 .padding(6)
-                .background(Color(.systemGray6))
+                .background(Color(.systemGray5))
                 .cornerRadius(8)
         }
     }

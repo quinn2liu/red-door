@@ -49,7 +49,7 @@ struct ModelPrimaryImage: View {
                     .scaledToFill()
             } else { // no image selected
                 RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(Color(.systemGray6))
+                    .foregroundColor(Color(.systemGray5))
                     .frame(width: Constants.screenWidthPadding / 2, height: Constants.screenWidthPadding / 2)
                     .overlay(Image(systemName: SFSymbols.photoBadgePlus)
                         .font(.largeTitle)

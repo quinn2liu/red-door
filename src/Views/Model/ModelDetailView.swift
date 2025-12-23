@@ -1,5 +1,5 @@
 //
-//  ModelView.swift
+//  ModelDetailView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 8/13/24.
@@ -9,7 +9,7 @@ import CachedAsyncImage
 import PhotosUI
 import SwiftUI
 
-struct ModelView: View {
+struct ModelDetailView: View {
     // Environment variables
     @Environment(\.dismiss) private var dismiss
 
@@ -19,7 +19,7 @@ struct ModelView: View {
     // Presented variables
     @State private var isLoading: Bool = false
     @State private var showEditSheet: Bool = false
-    @State private var showDetails: Bool = false
+    @State private var showInformation: Bool = false
 
     // Image selected variables
     @State private var selectedRDImage: RDImage?
@@ -47,17 +47,17 @@ struct ModelView: View {
                         VStack(spacing: 12) {
                             Button(action: {
                                 withAnimation(.spring(response: 0.3)) {
-                                    showDetails.toggle()
+                                    showInformation.toggle()
                                 }
                             }) {
                                 HStack(spacing: 0) {
-                                    Text("Details")
+                                    Text("Information")
                                     .foregroundColor(.white)
                                     .bold()
 
                                     Spacer()
                                     
-                                    Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                                    Image(systemName: showInformation ? "chevron.up" : "chevron.down")
                                         .foregroundColor(.white)
                                 }
                                 .padding(8)
@@ -65,8 +65,8 @@ struct ModelView: View {
                                 .cornerRadius(6)
                             }
 
-                            if showDetails {
-                                ModelDetailsView(viewModel: $viewModel)
+                            if showInformation {
+                                ModelInformationView(model: viewModel.selectedModel)
                                     .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }
@@ -78,9 +78,7 @@ struct ModelView: View {
             .frameTop()
             .toolbar(.hidden)
             .sheet(isPresented: $showEditSheet) {
-                EditModelDetailsSheet(viewModel: $viewModel, onDelete: {
-                    dismiss()
-                })
+                EditModelInformationSheet(viewModel: $viewModel)
             }
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
@@ -151,9 +149,9 @@ struct ModelView: View {
                 ]
                 
                 LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(Array(viewModel.items.enumerated()), id: \.offset) { index, item in
+                    ForEach(viewModel.items, id: \.self) { item in
                         NavigationLink(destination: ItemDetailView(item: item, model: viewModel.selectedModel)) {
-                            ItemListItem(item, index: index)
+                            ItemListItem(item)
                         }
                     }
                 }
@@ -164,30 +162,25 @@ struct ModelView: View {
     // MARK: Item List Item
 
     @ViewBuilder
-    private func ItemListItem(_ item: Item, index: Int) -> some View {
+    private func ItemListItem(_ item: Item) -> some View {
         HStack(spacing: 8) {
-            Text("\(index + 1).")
-                .foregroundColor(.primary)
-                .bold()
-                .frame(width: 20)
-
             ItemModelImage(item: item, model: viewModel.selectedModel, size: 48)
             
             VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Text("Available:")
-                    .foregroundColor(.secondary)  
-                    .font(.footnote)                      
+                HStack(spacing: 0) {
+                    Text("Available: ")
+                        .foregroundColor(.secondary)  
+                        .font(.footnote)                      
 
-                Image(systemName: item.isAvailable ? SFSymbols.checkmarkCircleFill : SFSymbols.xmarkCircleFill)
-                    .foregroundColor(item.isAvailable ? .green : .red)
-                    .frame(16)
-                    .font(.footnote)
-                }
-                
+                    Image(systemName: item.isAvailable ? SFSymbols.checkmarkCircleFill : SFSymbols.xmarkCircleFill)
+                        .foregroundColor(item.isAvailable ? .green : .red)
+                        .frame(16)
+                        .font(.footnote)
+                    }
+                    
                 if item.attention {
-                    HStack(spacing: 4) {
-                        Text("Attention Needed:")
+                    HStack(spacing: 0) {
+                        Text("Attention Needed: ")
                             .foregroundColor(.secondary)  
                             .font(.footnote)   
 
@@ -199,7 +192,7 @@ struct ModelView: View {
             }
         }
         .padding(8)
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray5))
         .cornerRadius(8)
 }
 

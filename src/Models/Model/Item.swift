@@ -13,14 +13,16 @@ struct Item: Identifiable, Codable, Hashable {
     var id: String // the item's id (a variation of the modelId
     var listId: String // listId -> RDList ID the item is currently at (1 or 2 signify corresponding warehouse)
     var attention: Bool // whether the item needs attention (like repairs)
+    var attentionReason: String // the reason the item needs attention
     var isAvailable: Bool // whether item is available to be added to a list (in storage)
 
     var image: RDImage?
 
-    init(modelId: String, id: String = UUID().uuidString, attention: Bool = false, listId: String = Warehouse.warehouse1.name, isAvailable: Bool = true, image: RDImage? = nil) {
+    init(modelId: String, id: String = UUID().uuidString, attention: Bool = false, listId: String = Warehouse.warehouse1.name, isAvailable: Bool = true, image: RDImage? = nil, attentionReason: String = "") {
         self.modelId = modelId
         self.id = id
         self.attention = attention
+        self.attentionReason = attentionReason
         self.listId = listId
         self.isAvailable = isAvailable
         self.image = image

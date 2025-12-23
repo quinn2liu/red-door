@@ -46,7 +46,7 @@ struct ItemLabelGeneratedPDFView: View {
                         .clipped()
                 } else {
                     Rectangle()
-                        .foregroundColor(Color(.systemGray6))
+                        .foregroundColor(Color(.systemGray5))
                         .frame(width: 200, height: 200)
                         .overlay(
                             Image(systemName: SFSymbols.photoBadgePlus)
@@ -68,14 +68,14 @@ struct ItemLabelGeneratedPDFView: View {
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                         .padding(8)
-                        .background(Color(.systemGray6))
+                        .background(Color(.systemGray5))
                         .cornerRadius(8)
                 } else {
                     Text(model.description)
                         .font(.system(size: 12))
                         .foregroundColor(.primary)
                         .padding(8)
-                        .background(Color(.systemGray6))
+                        .background(Color(.systemGray5))
                         .cornerRadius(8)
                 }
             }

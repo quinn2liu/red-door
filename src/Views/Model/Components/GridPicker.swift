@@ -51,7 +51,7 @@ struct GridPicker: View {
         .transition(.opacity.combined(with: .move(edge: .top)))
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(.systemGray6), lineWidth: 2)
+                .stroke(Color(.systemGray5), lineWidth: 2)
         )
     }
 }

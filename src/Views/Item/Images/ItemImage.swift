@@ -34,7 +34,9 @@ struct ItemImage: View {
             }
         } label: {
             StandardView()
+                .cornerRadius(12)
         }
+        .tint(.clear)
         .alert(
             editingImage.imageURL != URL(string: "") ? "Upload Method" : "Update Image",
             isPresented: $showEditAlert
@@ -45,10 +47,12 @@ struct ItemImage: View {
             switch item {
             case .library:
                 SingleLibraryPicker(primaryRDImage: $editingImage) {
+                    itemImage = editingImage
                     activeSheet = nil
                 }
             case .camera:
                 SingleCameraPicker(primaryRDImage: $editingImage) {
+                    itemImage = editingImage
                     activeSheet = nil
                 }
             }
@@ -70,7 +74,6 @@ struct ItemImage: View {
                         .resizable()
                         .scaledToFill()
                         .frame(size)
-                        .cornerRadius(12)
                 case .failure:
                     EmptyView()
                 @unknown default:
@@ -82,10 +85,9 @@ struct ItemImage: View {
                 .resizable()
                 .scaledToFill()
                 .frame(size)
-                .cornerRadius(12)
         } else {
-            RoundedRectangle(cornerRadius: 12)
-                .background(Color(.systemGray6))
+            Rectangle()
+                .foregroundColor(Color(.systemGray5))
                 .frame(size)
                 .overlay(
                     Image(systemName: SFSymbols.photoBadgePlus)

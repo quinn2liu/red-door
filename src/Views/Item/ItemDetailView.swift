@@ -12,6 +12,7 @@ struct ItemDetailView: View {
     @Environment(NavigationCoordinator.self) var coordinator
     @State private var viewModel: ItemViewModel
     @State private var model: Model? = nil
+    @State private var list: RDList? = nil
 
     @State private var showEditSheet: Bool = false
     @State private var backupItem: Item? = nil
@@ -19,9 +20,13 @@ struct ItemDetailView: View {
     @State private var showQRCode: Bool = false
     @State private var qrCode: UIImage? = nil
 
-    init(item: Item, model: Model? = nil) {
+    @State private var showInformation: Bool = false
+
+
+    init(item: Item, model: Model? = nil, list: RDList? = nil) {
         viewModel = ItemViewModel(selectedItem: item)
         self.model = model
+        self.list = list
     }
 
     // MARK: - Body
@@ -33,7 +38,8 @@ struct ItemDetailView: View {
                     .padding(.horizontal, 16)
 
                 ScrollView {
-                    VStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        // MARK: Model and Item Images
                         HStack(spacing: 0) {
                             VStack(spacing: 6) {
                                 Text("Model Image:")
@@ -51,18 +57,10 @@ struct ItemDetailView: View {
                                 ItemImage(itemImage: $viewModel.selectedItem.image, isEditing: false)
                             }
                         }
-                        
 
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(alignment: .bottom, spacing: 0) {
-                                Text("Item ID: ")
-                                    .foregroundColor(.red)
-                                    .bold()
-                                
-                                Text(viewModel.selectedItem.id)
-                                    .font(.caption)
-                            }
-                        }
+                        ItemDetails()
+
+                        ModelInformation()
                     }
                     .padding(.top, 4)
                     .frameHorizontalPadding()
@@ -78,41 +76,138 @@ struct ItemDetailView: View {
                 }
             }
             .sheet(isPresented: $showEditSheet) {
-                ItemEditSheet(viewModel: $viewModel)
+                if let model: Model = model {
+                    EditItemSheet(viewModel: $viewModel, model: model)
+                } else {
+                    Text("Error loading item. Please try again.")
+                }
             }
             .task {
                 if model == nil {
                     model = await Item.getItemModel(modelId: viewModel.selectedItem.modelId)
                 }
+                if !viewModel.selectedItem.isAvailable && list == nil {
+                    list = await RDList.getList(listId: viewModel.selectedItem.listId)
+                }
             }
         }
     }
 
-    // MARK: - Top Bar
+    // MARK: Top Bar
 
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            Text(viewModel.selectedItem.id)
-        }, trailingIcon: {
-            HStack(spacing: 8) {
-                RDButton(variant: .red, size: .icon, leadingIcon: "qrcode", fullWidth: false) {
-                    showQRCode = true
-                }
-                .clipShape(Circle())
+            HStack(spacing: 0) {
+                Text("Item of Model: ")
+                    .font(.headline)
+                    .foregroundColor(.red)
 
-                RDButton(variant: .red, size: .icon, leadingIcon: "square.and.pencil", fullWidth: false) {
-                    showEditSheet = true
-                    backupItem = viewModel.selectedItem
-                }
-                .clipShape(Circle())
+                Text(model?.name ?? "Loading...")
             }
+        }, trailingIcon: {
+            RDButton(variant: .red, size: .icon, leadingIcon: "square.and.pencil", fullWidth: false) {
+                showEditSheet = true
+                backupItem = viewModel.selectedItem
+            }
+            .clipShape(Circle())
         })
     }
 
-    // MARK: - Model Image View
+    // MARK: Item Details
+    @ViewBuilder
+    private func ItemDetails() -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 0) {
+                Text("Location: ")
+                    .foregroundColor(.red)
+                    .bold()
+
+                if viewModel.selectedItem.isAvailable {
+                    Text(viewModel.selectedItem.listId)
+                } else {
+                    Text(list?.address.getStreetAddress() ?? "Loading...")
+                }
+            }
+
+            HStack(alignment: .center, spacing: 0) {
+                Text("ID: ")
+                    .foregroundColor(.red)
+                    .bold()
+                
+                Text(viewModel.selectedItem.id)
+                    .font(.caption)
+            }
+
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 4) {
+                    Text("Needs Attention: ")
+                        .foregroundColor(.red)
+                        .bold()
+                    
+                    Image(systemName: SFSymbols.exclamationmarkTriangleFill)
+                        .foregroundColor(viewModel.selectedItem.attention ? .yellow : .gray)
+                        .frame(16)
+                        .font(.caption)
+                }
+
+                if viewModel.selectedItem.attention {
+                    Text(viewModel.selectedItem.attentionReason)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                        .background(Color(.systemGray5))
+                        .cornerRadius(6)
+                }
+            }
+        }
+    }
+
+    // MARK: Model Information
+    @ViewBuilder
+    private func ModelInformation() -> some View {
+        VStack(spacing: 12) {
+            HStack {
+                Button(action: {
+                    withAnimation(.spring(response: 0.3)) {
+                        showInformation.toggle()
+                    }
+                }) {
+                    HStack(spacing: 0) {
+                        Text("Model Information")
+                        .foregroundColor(.white)
+                        .bold()
+
+                        Spacer()
+                        
+                        Image(systemName: showInformation ? "chevron.up" : "chevron.down")
+                            .foregroundColor(.white)
+                    }
+                    .padding(8)
+                    .background(.red)
+                    .cornerRadius(6)
+                }
+
+                Spacer()
+
+                SmallCTA(type: .red, leadingIcon: SFSymbols.qrcode, text: "Label") {
+                    showQRCode = true
+                }
+            }
+
+            if showInformation {
+                if let model: Model = model {
+                    ModelInformationView(model: model)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                } else {
+                    Text("Error loading model. Please try again.")    
+                }
+            }
+        }
+    }
+
+    // MARK: Model Image View
 
     @ViewBuilder
     private func ModelImageView() -> some View {
@@ -125,7 +220,7 @@ struct ItemDetailView: View {
                     .cornerRadius(8)
             } placeholder: {
                 RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(Color(.systemGray6))
+                    .foregroundColor(Color(.systemGray5))
                     .frame(Constants.screenWidthPadding / 2)
                     .overlay(Image(systemName: SFSymbols.photoBadgePlus)
                         .font(.largeTitle)
@@ -133,9 +228,10 @@ struct ItemDetailView: View {
                         .foregroundColor(.secondary)
                     )
             }
+            
         } else {
             RoundedRectangle(cornerRadius: 12)
-                .foregroundColor(Color(.systemGray6))
+                .foregroundColor(Color(.systemGray5))
                 .frame(Constants.screenWidthPadding / 2)
                 .overlay(Image(systemName: SFSymbols.photoBadgePlus)
                     .font(.largeTitle)

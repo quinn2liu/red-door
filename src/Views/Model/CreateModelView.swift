@@ -29,36 +29,37 @@ struct CreateModelView: View {
 
     var body: some View {
         ZStack {
-            VStack(spacing: 12) {
-                TopBar()
+            ScrollView {
+                VStack(spacing: 12) {
+                    TopBar()
 
-                ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
+                    ModelImages(model: $viewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: $isEditing)
 
-                EditingModelDetailsView(viewModel: $viewModel)
+                    EditModelInformationSection(viewModel: $viewModel)
 
-                Spacer()
+                    Spacer()
 
-                RDButton(variant: .default, size: .default, leadingIcon: "plus", text: "Add Model to Inventory") {
-                    saveModel()
+                    RDButton(variant: .default, size: .default, leadingIcon: "plus", text: "Add Model to Inventory") {
+                        saveModel()
+                    }
+                }   
+                .toolbar(.hidden)
+                .frameTop()
+                .frameHorizontalPadding()
+
+                if isLoading {
+                    Color.black.opacity(0.3).ignoresSafeArea()
+                    ProgressView("Saving Model...")
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
+                        .shadow(radius: 10)
                 }
-            }   
-            .toolbar(.hidden)
-            .frameTop()
-            .frameHorizontalPadding()
-            .frameBottomPadding()
-            .overlay(
-                ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
-                    .animation(.easeInOut(duration: 0.3), value: isImageSelected)
-            )
-
-            if isLoading {
-                Color.black.opacity(0.3).ignoresSafeArea()
-                ProgressView("Saving Model...")
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemBackground)))
-                    .shadow(radius: 10)
             }
         }
+        .overlay(
+            ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+                .animation(.easeInOut(duration: 0.3), value: isImageSelected)
+        )
     }
 
     // MARK: saveModel()

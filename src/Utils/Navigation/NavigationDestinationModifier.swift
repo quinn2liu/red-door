@@ -15,9 +15,8 @@ struct NavigationDestinationsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .navigationDestination(for: Model.self) { model in
-                ModelView(model: model)
+                ModelDetailView(model: model)
             }
-            // TODO: try to find a solution for this
             .navigationDestination(for: Item.self) { item in
                 ItemDetailView(item: item)
             }

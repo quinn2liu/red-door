@@ -37,7 +37,7 @@ struct CreatePullListView: View {
                 Text("Client:")
                 TextField("", text: $viewModel.selectedList.client)
                     .padding(6)
-                    .background(Color(.systemGray6))
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
             }
 

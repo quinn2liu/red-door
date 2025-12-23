@@ -1,5 +1,5 @@
 //
-//  ModelDetailsView.swift
+//  ModelInformationView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 12/21/24.
@@ -7,14 +7,28 @@
 
 import SwiftUI
 
-struct ModelDetailsView: View {
-    @Binding var viewModel: ModelViewModel
+struct ModelInformationView: View {
+    let model: Model
 
     // MARK: Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
+
+                // MARK: Description
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Description")
+                        .foregroundColor(.red)
+                        .bold()
+                        
+                    Text(model.description.isEmpty ? "No description" : model.description)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(model.description.isEmpty ? .secondary : .primary)
+                        .padding(8)
+                        .background(Color(.systemGray5))
+                        .cornerRadius(8)
+                }
 
                 // MARK: Colors
                 Text("Colors:")
@@ -28,7 +42,7 @@ struct ModelDetailsView: View {
                                 .foregroundColor(.primary)
 
                             Image(systemName: SFSymbols.circleFill)
-                                .foregroundColor(Model.colorMap[viewModel.selectedModel.secondaryColor] ?? .black)
+                                .foregroundColor(Model.colorMap[model.secondaryColor] ?? .black)
                                 .padding(8)
                                 .background(Color(.systemGray5))
                                 .cornerRadius(6)
@@ -43,7 +57,7 @@ struct ModelDetailsView: View {
                                 .foregroundColor(.primary)
 
                             Image(systemName: SFSymbols.circleFill)
-                                .foregroundColor(Model.colorMap[viewModel.selectedModel.secondaryColor] ?? .black)
+                                .foregroundColor(Model.colorMap[model.secondaryColor] ?? .black)
                                 .padding(8)
                                 .background(Color(.systemGray5))
                                 .cornerRadius(6)
@@ -51,7 +65,7 @@ struct ModelDetailsView: View {
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray6))
+                .background(Color(.systemGray5))
                 .cornerRadius(8)
             }
 
@@ -66,7 +80,7 @@ struct ModelDetailsView: View {
                     HStack(spacing: 0) {
                         Text("Primary: ")
                             .foregroundColor(.primary)
-                        Text(viewModel.selectedModel.primaryMaterial)
+                        Text(model.primaryMaterial)
                             .foregroundColor(.primary)
                             .padding(8)
                             .background(Color(.systemGray5))
@@ -78,7 +92,7 @@ struct ModelDetailsView: View {
                     HStack(spacing: 0) {
                         Text("Secondary: ")
                             .foregroundColor(.primary)
-                        Text(viewModel.selectedModel.secondaryMaterial)
+                        Text(model.secondaryMaterial)
                             .foregroundColor(.primary)
                             .padding(8)
                             .background(Color(.systemGray5))
@@ -86,7 +100,7 @@ struct ModelDetailsView: View {
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray6))
+                .background(Color(.systemGray5))
                 .cornerRadius(8)
             }
 
@@ -102,10 +116,10 @@ struct ModelDetailsView: View {
                             Text("Model Type:")
 
                             HStack(spacing: 8) {
-                                Text(viewModel.selectedModel.type)
+                                Text(model.type)
                                     .lineLimit(1)
                                     .truncationMode(.tail)
-                                Image(systemName: Model.typeMap[viewModel.selectedModel.type] ?? "camera.metering.unknown")
+                                Image(systemName: Model.typeMap[model.type] ?? "camera.metering.unknown")
                                     .padding(8)
                                     .background(Color(.systemGray5))
                                     .cornerRadius(6)
@@ -120,28 +134,14 @@ struct ModelDetailsView: View {
                                 .foregroundColor(.red)
                                 .bold()
                             
-                            Image(systemName: viewModel.selectedModel.isEssential ? SFSymbols.checkmarkCircleFill : SFSymbols.circle)
-                                .foregroundColor(viewModel.selectedModel.isEssential ? .yellow : .gray)
+                            Image(systemName: model.isEssential ? SFSymbols.checkmarkCircleFill : SFSymbols.circle)
+                                .foregroundColor(model.isEssential ? .yellow : .gray)
                         }
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray6))
+                .background(Color(.systemGray5))
                 .cornerRadius(8)
-            }
-            
-            // MARK: Description
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Description")
-                    .foregroundColor(.red)
-                    .bold()
-                    
-                Text(viewModel.selectedModel.description.isEmpty ? "No description" : viewModel.selectedModel.description)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundColor(viewModel.selectedModel.description.isEmpty ? .secondary : .primary)
-                    .padding(8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
             }
         }
     }

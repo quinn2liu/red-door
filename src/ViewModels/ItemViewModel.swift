@@ -21,31 +21,16 @@ class ItemViewModel {
         self.itemRef = db.collection("items").document(selectedItem.id)
     }
 
-    // MARK: if we have items as a subcollection, i'm not sure we need this...
-
-    func getItemModel(modelId: String, completion: @escaping (Result<Model, Error>) -> Void) {
-        db.collection("models").document(modelId).getDocument { documentSnapshot, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-
-            guard let documentSnapshot = documentSnapshot,
-                  documentSnapshot.exists
-            else {
-                completion(.failure(NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "Model (\(modelId)) not found."])))
-                return
-            }
-
-            do {
-                let model = try documentSnapshot.data(as: Model.self)
-                completion(.success(model))
-            } catch {
-                completion(.failure(error))
-            }
+    // MARK: Get Item Model
+    func getItemModel(modelId: String) async throws -> Model {
+        let documentSnapshot = try await db.collection("models").document(modelId).getDocument()
+        guard documentSnapshot.exists else {
+            throw NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "Model (\(modelId)) not found."])
         }
+        return try documentSnapshot.data(as: Model.self)
     }
 
+    // MARK: Delete Item
     func deleteItem() async {
         let batch = db.batch()
 
@@ -64,6 +49,7 @@ class ItemViewModel {
         }
     }
 
+    // MARK: Unstage Item
     func unstageItem(warehouseId: String) async -> Item {
         let modelRef = db.collection("models").document(selectedItem.modelId)
         let batch = db.batch()
@@ -80,5 +66,20 @@ class ItemViewModel {
             print("Error unstaging item: \(error.localizedDescription)")
         }
         return selectedItem
+    }
+
+    // MARK: Update Item
+    func updateItem() async {
+        do {
+            if let image = selectedItem.image, image.imageType == .dirty {
+                selectedItem.image = try await FirebaseImageManager.shared.updateImage(image, resultImageType: .item)
+                print("Updated item image: \(selectedItem.image?.id ?? "No image")")
+            } else {
+                print("No image to update")
+            }
+            try itemRef.setData(from: selectedItem)
+        } catch {
+            print("Error updating item: \(error)")
+        }
     }
 }

@@ -41,7 +41,7 @@ struct AddressSearchView: View {
                 .padding()
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(.systemGray6), lineWidth: 2)
+                        .stroke(Color(.systemGray5), lineWidth: 2)
                 )
                 .onSubmit {
                     searchAddress(searchText)
@@ -82,7 +82,7 @@ struct AddressSearchView: View {
                     .padding(.vertical, 10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(.systemGray6), lineWidth: 2)
+                            .stroke(Color(.systemGray5), lineWidth: 2)
                     )
 
                 Spacer()
@@ -124,7 +124,7 @@ struct AddressSearchView: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(isSelected ? Color.blue.opacity(0.6) : Color(.systemGray6), lineWidth: 2)
+                    .stroke(isSelected ? Color.blue.opacity(0.6) : Color(.systemGray5), lineWidth: 2)
             )
         }
         .buttonStyle(.plain)

@@ -1,5 +1,5 @@
 //
-//  EditingModelDetailsView.swift
+//  EditModelInformationSection.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 12/21/24.
@@ -7,12 +7,15 @@
 
 import SwiftUI
 
-struct EditingModelDetailsView: View {
+struct EditModelInformationSection: View {
     @Binding var viewModel: ModelViewModel
+
     @State private var isPrimaryColorPickerActive = false
     @State private var isSecondaryColorPickerActive = false
     @State private var isPrimaryMaterialPickerActive = false
     @State private var isSecondaryMaterialPickerActive = false
+
+    @FocusState private var focusDescription: Bool
 
     let initialItemCount: Int
 
@@ -26,13 +29,30 @@ struct EditingModelDetailsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
+                Text("Description")
+                    .foregroundColor(.red)
+                    .bold()
+                    
+                TextField("Type here", text: $viewModel.selectedModel.description)
+                    .focused($focusDescription)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        focusDescription = false
+                    }
+                    .disabled(viewModel.selectedModel.description.count > 100)
+                    .padding(8)
+                    .background(Color(.systemGray5))
+                    .cornerRadius(8)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Colors:")
                     .foregroundColor(.red)
                     .bold()
 
                 ColorPickerRow()
                     .padding(8)
-                    .background(Color(.systemGray6))
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
             }
 
@@ -43,7 +63,7 @@ struct EditingModelDetailsView: View {
 
                 MaterialPickerRow()
                     .padding(8)
-                    .background(Color(.systemGray6))
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
             }
 
@@ -55,7 +75,7 @@ struct EditingModelDetailsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .center, spacing: 0) {
                         HStack(alignment: .center, spacing: 4) {
-                            Text("Model Type:")
+                            Text("Type:")
 
                             Picker("", selection: $viewModel.selectedModel.type) {
                                 ForEach(Array(Model.typeMap), id: \.key) { option, iconName in
@@ -92,21 +112,8 @@ struct EditingModelDetailsView: View {
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray6))
+                .background(Color(.systemGray5))
                 .cornerRadius(8)
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Description")
-                    .foregroundColor(.red)
-                    .bold()
-                    
-                TextField("Type here", text: $viewModel.selectedModel.description, axis: .vertical)
-                    .disabled(viewModel.selectedModel.description.count > 100)
-                    .lineLimit(3...5)
-                    .padding(8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
             }
         }
     }
@@ -225,9 +232,10 @@ struct MaterialPickerToggle: View {
                     .foregroundColor(.primary)
 
                 Text(selectedMaterial)
+                    .font(.caption2)
                     .foregroundColor(.blue)
                     .padding(8)
-                    .background(isActive ? Color.clear : Color(.systemGray5) )
+                    .background(isActive ? Color.clear : Color(.systemGray4) )
                     .cornerRadius(6)
             }
         }
@@ -255,7 +263,7 @@ struct ColorPickerToggle: View {
                 Image(systemName: SFSymbols.circleFill)
                     .foregroundStyle(Model.colorMap[selectedColor] ?? .black)
                     .padding(isActive ? 0 : 8)
-                    .background(isActive ? Color.clear : Color(.systemGray5))
+                    .background(isActive ? Color.clear : Color(.systemGray4))
                     .cornerRadius(6)
             }
         }

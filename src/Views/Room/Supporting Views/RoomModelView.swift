@@ -37,7 +37,7 @@ struct RoomModelView: View {
         VStack(spacing: 0) {
             ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
 
-            ModelDetailsView(viewModel: $modelViewModel)
+            ModelInformationView(model: modelViewModel.selectedModel)
 
             // TODO: rename this
             ModelItemList()

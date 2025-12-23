@@ -1,5 +1,5 @@
 //
-//  EditModelDetailsSheet.swift
+//  EditModelInformationSheet.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 12/21/24.
@@ -8,7 +8,7 @@
 import PhotosUI
 import SwiftUI
 
-struct EditModelDetailsSheet: View {
+struct EditModelInformationSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     @Binding var viewModel: ModelViewModel
@@ -34,42 +34,44 @@ struct EditModelDetailsSheet: View {
     
     var body: some View {
         ZStack {
-            VStack(spacing: 12) {
-                TopBar()
-                
-                ModelImages(
-                    model: $editingViewModel.selectedModel,
-                    selectedRDImage: $selectedRDImage,
-                    isImageSelected: $isImageSelected,
-                    isEditing: .constant(true)
-                )
-                
-                EditingModelDetailsView(viewModel: $editingViewModel)
-                
-                Spacer()
-                
-                RDButton(variant: .red, size: .default, leadingIcon: "trash", text: "Delete Model", fullWidth: false) {
-                    showDeleteAlert = true
-                }
-                .alert(
-                    "Confirm Delete",
-                    isPresented: $showDeleteAlert
-                ) {
-                    Button(role: .destructive) {
-                        deleteModel()
-                    } label: {
-                        Text("Delete")
-                    }
+            ScrollView {
+                VStack(spacing: 12) {
+                    TopBar()
                     
-                    Button(role: .cancel) {} label: {
-                        Text("Cancel")
+                    ModelImages(
+                        model: $editingViewModel.selectedModel,
+                        selectedRDImage: $selectedRDImage,
+                        isImageSelected: $isImageSelected,
+                        isEditing: .constant(true)
+                    )
+                    
+                    EditModelInformationSection(viewModel: $editingViewModel)
+                    
+                    Spacer()
+                    
+                    RDButton(variant: .red, size: .default, leadingIcon: "trash", text: "Delete Model", fullWidth: false) {
+                        showDeleteAlert = true
+                    }
+                    .alert(
+                        "Confirm Delete",
+                        isPresented: $showDeleteAlert
+                    ) {
+                        Button(role: .destructive) {
+                            deleteModel()
+                        } label: {
+                            Text("Delete")
+                        }
+                        
+                        Button(role: .cancel) {} label: {
+                            Text("Cancel")
+                        }
                     }
                 }
+                .frameTop()
+                .frameHorizontalPadding()
+                .frameTopPadding()
             }
             .toolbar(.hidden)
-            .frameTop()
-            .frameHorizontalPadding()
-            .frameTopPadding()
             .overlay(
                 ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
                     .animation(.easeInOut(duration: 0.3), value: isImageSelected)
@@ -122,8 +124,8 @@ struct EditModelDetailsSheet: View {
     // MARK: Helper Functions
     
     private func saveModel() {
-        isLoading = true
         Task {
+            isLoading = true
             // Update the original viewModel's selectedModel with the edited version
             viewModel.selectedModel = editingViewModel.selectedModel
             // Update itemCount if it changed
@@ -139,13 +141,10 @@ struct EditModelDetailsSheet: View {
     private func deleteModel() {
         isLoading = true
         Task {
-            // Update the original viewModel's selectedModel before deleting
             viewModel.selectedModel = editingViewModel.selectedModel
             await viewModel.deleteModel()
             isLoading = false
             dismiss()
-            // Notify parent that deletion occurred
-            onDelete?()
         }
     }
 }

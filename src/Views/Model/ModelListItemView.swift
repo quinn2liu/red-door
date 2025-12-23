@@ -24,12 +24,16 @@ struct ModelListItemView: View {
             ModelImage()
             
             VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 4) {
+                HStack(alignment: .center, spacing: 4) {
                     Text(model.name)
                         .font(.headline)
                         .foregroundColor(.primary)
                     
-                    Text("(\(model.itemIds.count))")
+                    Text("•")
+                        .foregroundColor(.secondary)
+                    
+                    Text("Count: \(model.itemIds.count)")
+                        .font(.footnote)
                         .foregroundColor(.red)
                 }
                 
@@ -83,7 +87,7 @@ struct ModelListItemView: View {
             }
         }
         .padding(8)
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray5))
         .cornerRadius(8)
     }
 
