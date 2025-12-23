@@ -133,7 +133,7 @@ struct ModelDetailView: View {
     @ViewBuilder
     private func ItemListView() -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .bottom,spacing: 0) {
+            HStack(alignment: .bottom, spacing: 0) {
                 Text("Item Count: ")
                     .foregroundColor(.red)
                     .bold()
@@ -180,7 +180,7 @@ struct ModelDetailView: View {
                     
                 if item.attention {
                     HStack(spacing: 0) {
-                        Text("Attention Needed: ")
+                        Text("Attention: ")
                             .foregroundColor(.secondary)  
                             .font(.footnote)   
 

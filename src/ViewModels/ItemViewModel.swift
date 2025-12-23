@@ -71,11 +71,9 @@ class ItemViewModel {
     // MARK: Update Item
     func updateItem() async {
         do {
-            if let image = selectedItem.image, image.imageType == .dirty {
-                selectedItem.image = try await FirebaseImageManager.shared.updateImage(image, resultImageType: .item)
-                print("Updated item image: \(selectedItem.image?.id ?? "No image")")
-            } else {
-                print("No image to update")
+            if var image = selectedItem.image, image.imageType == .dirty {
+                image.objectId = selectedItem.id
+                selectedItem.image = try await FirebaseImageManager.shared.updateImage(image, resultImageType: .item) ?? RDImage()
             }
             try itemRef.setData(from: selectedItem)
         } catch {

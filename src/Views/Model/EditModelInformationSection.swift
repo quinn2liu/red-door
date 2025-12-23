@@ -262,7 +262,7 @@ struct ColorPickerToggle: View {
 
                 Image(systemName: SFSymbols.circleFill)
                     .foregroundStyle(Model.colorMap[selectedColor] ?? .black)
-                    .padding(isActive ? 0 : 8)
+                    .padding(8)
                     .background(isActive ? Color.clear : Color(.systemGray4))
                     .cornerRadius(6)
             }

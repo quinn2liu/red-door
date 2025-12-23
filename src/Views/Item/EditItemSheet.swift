@@ -23,6 +23,7 @@ struct EditItemSheet: View {
         self.model = model
     }
 
+    // MARK: Body
     var body: some View {
         ZStack {
             VStack(spacing: 16) {
@@ -130,6 +131,9 @@ struct EditItemSheet: View {
         if editingItem != viewModel.selectedItem {
             Task {
                 isLoading = true
+                if !editingItem.attention {
+                    editingItem.attentionReason = ""
+                }
                 viewModel.selectedItem = editingItem
                 await viewModel.updateItem()
                 isLoading = false

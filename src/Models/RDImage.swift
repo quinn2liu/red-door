@@ -19,7 +19,7 @@ enum RDImageTypeEnum: String, Codable {
         case .model_primary, .model_secondary:
             return "model_images"
         case .item:
-            return "items"
+            return "item_images"
         case .rd_list:
             return "rd_lists"
         case .misc:

@@ -13,15 +13,21 @@ struct ItemImage: View {
     private let isEditing: Bool
     var size: CGFloat = 48
     @State private var editingImage: RDImage
+    
+    // Optional bindings for overlay functionality
+    var selectedRDImage: Binding<RDImage?>? = nil
+    var isImageSelected: Binding<Bool>? = nil
 
     @State private var showEditAlert: Bool = false
     @State private var activeSheet: ImageSourceEnum?
 
-    init(itemImage: Binding<RDImage?>, isEditing: Bool, size: CGFloat = Constants.screenWidthPadding / 2) {
+    init(itemImage: Binding<RDImage?>, isEditing: Bool, size: CGFloat = Constants.screenWidthPadding / 2, selectedRDImage: Binding<RDImage?>? = nil, isImageSelected: Binding<Bool>? = nil) {
         _itemImage = itemImage
         self.isEditing = isEditing
         self.size = size
         self.editingImage = itemImage.wrappedValue ?? RDImage()
+        self.selectedRDImage = selectedRDImage
+        self.isImageSelected = isImageSelected
     }
     
     // MARK: Body
@@ -30,7 +36,17 @@ struct ItemImage: View {
             if isEditing {
                 showEditAlert = true
             } else {
-                // make an overlay to show the image full screen
+                // Show overlay if bindings are provided
+                if let selectedRDImage = selectedRDImage, let isImageSelected = isImageSelected {
+                    if let image = itemImage {
+                        if image.imageURL != nil {
+                            selectedRDImage.wrappedValue = image
+                        } else if let uiImage = image.uiImage {
+                            selectedRDImage.wrappedValue = RDImage(uiImage: uiImage)
+                        }
+                        isImageSelected.wrappedValue = true
+                    }
+                }
             }
         } label: {
             StandardView()
@@ -113,6 +129,12 @@ struct ItemImage: View {
                 activeSheet = .camera
             } label: {
                 Text("Camera")
+            }
+
+            Button(role: .destructive) {
+                editingImage.imageType = .delete
+            } label: {
+                Text("Delete")
             }
 
             Button(role: .cancel) {} label: {

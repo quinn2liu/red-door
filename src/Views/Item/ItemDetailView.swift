@@ -21,6 +21,10 @@ struct ItemDetailView: View {
     @State private var qrCode: UIImage? = nil
 
     @State private var showInformation: Bool = false
+    
+    // Image overlay variables
+    @State private var selectedRDImage: RDImage? = nil
+    @State private var isImageSelected: Bool = false
 
 
     init(item: Item, model: Model? = nil, list: RDList? = nil) {
@@ -54,7 +58,7 @@ struct ItemDetailView: View {
                                 Text("Item Image:")
                                     .foregroundColor(.red)
                                     .bold()
-                                ItemImage(itemImage: $viewModel.selectedItem.image, isEditing: false)
+                                ItemImage(itemImage: $viewModel.selectedItem.image, isEditing: false, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected)
                             }
                         }
 
@@ -90,6 +94,10 @@ struct ItemDetailView: View {
                     list = await RDList.getList(listId: viewModel.selectedItem.listId)
                 }
             }
+            .overlay(
+                ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+                    .animation(.easeInOut(duration: 0.3), value: isImageSelected)
+            )
         }
     }
 
@@ -101,7 +109,7 @@ struct ItemDetailView: View {
             BackButton()
         }, header: {
             HStack(spacing: 0) {
-                Text("Item of Model: ")
+                Text("(Item) Model: ")
                     .font(.headline)
                     .foregroundColor(.red)
 
@@ -141,7 +149,7 @@ struct ItemDetailView: View {
                     .font(.caption)
             }
 
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .center, spacing: 4) {
                     Text("Needs Attention: ")
                         .foregroundColor(.red)
@@ -149,8 +157,6 @@ struct ItemDetailView: View {
                     
                     Image(systemName: SFSymbols.exclamationmarkTriangleFill)
                         .foregroundColor(viewModel.selectedItem.attention ? .yellow : .gray)
-                        .frame(16)
-                        .font(.caption)
                 }
 
                 if viewModel.selectedItem.attention {
@@ -211,14 +217,35 @@ struct ItemDetailView: View {
 
     @ViewBuilder
     private func ModelImageView() -> some View {
-        if let model: Model = model {
-            CachedAsyncImage(url: model.primaryImage.imageURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(Constants.screenWidthPadding / 2)
-                    .cornerRadius(8)
-            } placeholder: {
+        Button {
+            if let model = model {
+                if model.primaryImage.imageURL != nil {
+                    selectedRDImage = model.primaryImage
+                } else if let uiImage = model.primaryImage.uiImage {
+                    selectedRDImage = RDImage(uiImage: uiImage)
+                }
+                isImageSelected = true
+            }
+        } label: {
+            if let model: Model = model {
+                CachedAsyncImage(url: model.primaryImage.imageURL) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(Constants.screenWidthPadding / 2)
+                        .cornerRadius(8)
+                } placeholder: {
+                    RoundedRectangle(cornerRadius: 12)
+                        .foregroundColor(Color(.systemGray5))
+                        .frame(Constants.screenWidthPadding / 2)
+                        .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.secondary)
+                        )
+                }
+                
+            } else {
                 RoundedRectangle(cornerRadius: 12)
                     .foregroundColor(Color(.systemGray5))
                     .frame(Constants.screenWidthPadding / 2)
@@ -228,16 +255,7 @@ struct ItemDetailView: View {
                         .foregroundColor(.secondary)
                     )
             }
-            
-        } else {
-            RoundedRectangle(cornerRadius: 12)
-                .foregroundColor(Color(.systemGray5))
-                .frame(Constants.screenWidthPadding / 2)
-                .overlay(Image(systemName: SFSymbols.photoBadgePlus)
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.secondary)
-                )
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }

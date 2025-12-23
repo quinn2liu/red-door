@@ -1,7 +1,9 @@
 TODO: General:
     ☐ FEATURE: Authentication (lowkey not needed for testing)
     ☐ DEBUG: keep testing the flow... selecting the item didn't work?
-    ☐ DEBUG: MAKE ITEM IMAGE UPLOADING WORK
+    ☐ FEATURE: when adding item to pull list, have the list items have the index and make sure it gives an alert if already in the list
+    ☐ FEATURE: pulllist pdf needs to use model image as a backup if item image is not available
+    ☐ FEATURE: in options view, make it possibel for users to see current bugs and feature requests
 
 TODO: Address:
 
@@ -23,25 +25,16 @@ TODO: Pull Lists:
         ☐ FEATURE: Remove room
 
 TODO: Installed Lists:
-    ☐ VIEW: "unstaged" installed list view
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
-
-TODO: RDList:
-    ☐ VIEW: RDList List Item
 
 TODO: Model:
     ☐ FEATURE: search by description?
     ☐ FEATURE: essential vs custom filtering
     ☐ FEATURE: when editing or creating a model, need to validate that the model is okay (you can't have no primary image, name must exist, etc.)
 
-    ☐ DEBUG: investigate deleting an item and deleting the images
-
 TODO: Item:
-    ☐ FEATURE: Flag for attention (like repairs)
-    ☐ VIEW: Better Item View
     ☐ VIEW: Navigate to pull list button (if not in storage)
-    ☐ FEATURE: QR Code should generate a LABEL (image, name, etc) instead of just the QR Code
 
 TODO: Major Changes:
     ☐ VIEW: Update all Edit views to be a sheet instead of "isEditing" state variable

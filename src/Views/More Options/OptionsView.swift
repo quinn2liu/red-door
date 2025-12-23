@@ -21,6 +21,8 @@ struct OptionsView: View {
     @State private var warehouseName: String = ""
     @State private var showWarehouseNameAlert: Bool = false
     @State private var showWarehouseDeleteAlert: Bool = false
+
+    @State private var showProfileSheet: Bool = false
     
     private var warehouseAddressExists: Bool {
         warehouseViewModel.warehouses.contains(where: { $0.address.id == newWarehouse.address.id })
@@ -58,6 +60,9 @@ struct OptionsView: View {
         } message: {
             Text("Reach out to administrator to delete this storage location permanently.")
         }
+        .sheet(isPresented: $showProfileSheet) {
+            ProfileSheet()
+        }
     }
 
     // MARK: Top Bar
@@ -78,9 +83,13 @@ struct OptionsView: View {
     // MARK: Profile Image
     @ViewBuilder
     private func ProfileImage() -> some View {
-        Image(systemName: SFSymbols.personCircle)
-            .foregroundColor(.red)
-            .font(.system(size: 24))
+        Button {
+            showProfileSheet = true
+        } label: {
+            Image(systemName: SFSymbols.personCircle)
+                .foregroundColor(.red)
+                .font(.system(size: 24))
+        }
     }
 
     // MARK: Warehouse Section
@@ -167,7 +176,7 @@ struct OptionsView: View {
                 .foregroundColor(.primary)
 
             (
-                Text(warehouse.address.getStreetAddress() ?? "")
+                Text("\(warehouse.address.getStreetAddress() ?? ""), ")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 +
@@ -194,7 +203,20 @@ struct OptionsView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.gray, lineWidth: 1)
         )
+    }
 
+    // MARK: Profile Sheet
+    @ViewBuilder
+    private func ProfileSheet() -> some View {
+        VStack(spacing: 12) {
+            Text("Profile Section")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            Text("You currently can't sign in with an account. But this section will be available in the future 🙂")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
     }
 }
 
