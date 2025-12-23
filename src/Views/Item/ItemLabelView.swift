@@ -6,13 +6,17 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
+import PDFKit
 
 struct ItemLabelView: View {
     let item: Item
     let model: Model
     let qrCode: UIImage?
     let image: RDImage
+
+    @State private var pdfDocument: PDFDocument? = nil
+    @State private var isGeneratingPDF: Bool = false
+    @State private var pdfData: Data? = nil
 
     init(item: Item, model: Model) {
         self.item = item
@@ -24,47 +28,68 @@ struct ItemLabelView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 16) {
             TopBar()
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text(model.name)
-                    .font(.headline)
-                    .foregroundColor(.red)
-                    .bold()
-
-                HStack(spacing: 0) {
-                    // QR Code
-                    ItemQRCodeView()
-
+            VStack(alignment: .center, spacing: 0) {
+                if pdfDocument == nil {
                     Spacer()
 
-                    // Item Image
-                    ItemLabelImage()
-                }
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text("Generating PDF")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                // Description
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Description:")
-                        .font(.caption)
-                        .foregroundColor(.primary)
-                        .bold()
+                    Spacer()
+                } else {
+                    PDFKitView(document: pdfDocument!)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray, lineWidth: 1)
+                        )
 
-                    if model.description.isEmpty {
-                        Text("No description")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text(model.description)
-                            .font(.caption)
-                            .foregroundColor(.primary)
-                            .padding(8)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
-                            .frame(Constants.screenWidthPadding / 2)
+                    if isGeneratingPDF {
+                        ProgressView("Preparing PDF for export...")
+                            .padding()
+                    }
+
+                    // iOS 17+ ShareLink
+                    if #available(iOS 17, *), let pdfData {
+                        ShareLink(
+                            item: PDFFile(data: pdfData),
+                            preview: SharePreview(
+                                "NAME:\(model.name)-ID:\(item.id)-Label.pdf",
+                                image: Image(systemName: SFSymbols.docFill)
+                            ),
+                            label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: SFSymbols.squareAndArrowUp)
+                                        .font(.system(size: 16))
+                                        .fontWeight(.bold)
+                                    
+                                    Text("Share / Export Label")
+                                        .font(.body)
+                                        .fontWeight(.medium)
+                                }
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.red))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+                        )
+                        .padding()
                     }
                 }
             }
+
+            Spacer()
+        }
+        .task {
+            await generatePDF()
         }
         .frameTop()
         .frameHorizontalPadding()
@@ -80,76 +105,61 @@ struct ItemLabelView: View {
         }, header: {
             Text("QR Code")
         }, trailingIcon: {
-            // TODO: SHARE BUTTON FOR PDF
             Spacer().frame(width: 32)
         })
     }
 
-    // MARK: - Item QR Code View
+    // MARK: PDF Generator
 
-    @ViewBuilder
-    private func ItemQRCodeView() -> some View {
-        if let qrCode: UIImage = qrCode {
-            Image(uiImage: qrCode)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFill()
-                .frame(Constants.screenWidthPadding / 2)
-        } else {
-            Text("Error Generating QR Code")
-                .foregroundColor(.red)
-        }
-    }
+    @MainActor
+    private func generatePDF() async {
+        isGeneratingPDF = true
 
-    // MARK: Item Image
-    @ViewBuilder
-    private func ItemLabelImage() -> some View {
-        let size = Constants.screenWidthPadding / 2
-        
+        // Preload item image if available
+        var itemImage: UIImage? = nil
         if let imageURL = image.imageURL {
-            CachedAsyncImage(url: imageURL) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                        .frame(size)
-                case let .success(image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(size)
-                        .cornerRadius(12)
-                        .clipped()
-                case .failure:
-                    RoundedRectangle(cornerRadius: 12)
-                        .foregroundColor(Color(.systemGray6))
-                        .frame(size)
-                        .overlay(Image(systemName: SFSymbols.photoBadgePlus)
-                            .font(.largeTitle)
-                            .bold()
-                            .foregroundColor(.secondary)
-                        )
-                @unknown default:
-                    EmptyView()
-                }
+            do {
+                let (data, _) = try await URLSession.shared.data(from: imageURL)
+                itemImage = UIImage(data: data)
+            } catch {
+                print("Failed to preload image: \(error)")
             }
-        } else {
-            RoundedRectangle(cornerRadius: 12)
-                .foregroundColor(Color(.systemGray6))
-                .frame(size)
-                .overlay(Image(systemName: SFSymbols.photoBadgePlus)
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.secondary)
-                )
         }
+
+        let highResQRCode = item.id.generateQRCode(scale: 3.0)
+
+        let pdfView = ItemLabelGeneratedPDFView(
+            item: item,
+            model: model,
+            qrCodeImage: highResQRCode,
+            itemImage: itemImage
+        )
+
+        let renderer = ImageRenderer(content: pdfView)
+        renderer.proposedSize = .init(width: 690, height: 1000)
+
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".pdf")
+
+        renderer.render { size, context in
+            // Use the actual rendered size for the PDF page
+            var box = CGRect(origin: .zero, size: size)
+            guard let pdf = CGContext(tempURL as CFURL, mediaBox: &box, nil) else { return }
+
+            pdf.beginPDFPage(nil)
+            context(pdf)
+            pdf.endPDFPage()
+            pdf.closePDF()
+        }
+
+        if let data = try? Data(contentsOf: tempURL) {
+            pdfData = data
+            pdfDocument = PDFDocument(data: data)
+        }
+
+        try? FileManager.default.removeItem(at: tempURL)
+
+        isGeneratingPDF = false
     }
 
-    // MARK: Item Label Share Link
-    // @ViewBuilder
-    // private func ItemLabelShareLink() -> some View {
-    //     ShareLink(
-    //         item: QRCodeImage(data: qrCode.pngData()),
-    //         preview: SharePreview(item.id, image: Image(uiImage: qrCode))
-    //     )
-    // }
 }
