@@ -1,10 +1,7 @@
 TODO: General:
     ☐ FEATURE: Authentication (lowkey not needed for testing)
     ☐ DEBUG: keep testing the flow... selecting the item didn't work?
-    ☐ TODO: Item Label Creation
-    ☐ TODO: Make all the text a smaller font size
-    ☐ TODO: description keyboard should have a dismiss keyboard button
-    ☐ TODO: move description up as the first thing in details
+    ☐ DEBUG: MAKE ITEM IMAGE UPLOADING WORK
 
 TODO: Address:
 
