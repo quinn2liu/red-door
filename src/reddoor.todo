@@ -1,8 +1,7 @@
 TODO: General:
     ☐ FEATURE: Authentication (lowkey not needed for testing)
-    ☐ DEBUG: keep testing the flow... selecting the item didn't work?
     ☐ FEATURE: when adding item to pull list, have the list items have the index and make sure it gives an alert if already in the list
-    ☐ FEATURE: in options view, make it possibel for users to see current bugs and feature requests
+    ☐ FEATURE: in options view, make it possible for users to see current bugs and feature requests
 
 TODO: Address:
 
@@ -36,9 +35,6 @@ TODO: Item:
     ☐ VIEW: Navigate to pull list button (if not in storage)
 
 TODO: Major Changes:
-    ☐ VIEW: Update all Edit views to be a sheet instead of "isEditing" state variable
-        ☐ FEATURE: ^^^ When editing, create a copy of the original object, i.e. changes only applied to copy and then saved to original if confirmed.
-
     Architecture:
         ☐ FEATURE: Kingfisher
         ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)
