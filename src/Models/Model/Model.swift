@@ -9,6 +9,18 @@ import Foundation
 import SwiftUI
 import FirebaseFirestore
 
+struct ItemWithModel: Identifiable, Codable, Hashable {
+    var id: String
+    var item: Item
+    var model: Model
+
+    init(item: Item, model: Model) {
+        self.id = item.id
+        self.item = item
+        self.model = model
+    }
+}
+
 struct Model: Identifiable, Codable, Hashable {
     // ID
     var id: String

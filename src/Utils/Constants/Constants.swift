@@ -44,4 +44,5 @@ enum SFSymbols {
     static let starCircleFill = "star.circle.fill"
     static let exclamationmarkTriangleFill = "exclamationmark.triangle.fill"
     static let xmarkCircleFill = "xmark.circle.fill"
+    static let chevronRight = "chevron.right"
 }

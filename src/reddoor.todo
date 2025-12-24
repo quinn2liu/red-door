@@ -1,5 +1,4 @@
 TODO: General:
-    ☐ FEATURE: Authentication (lowkey not needed for testing)
     ☐ FEATURE: when adding item to pull list, have the list items have the index and make sure it gives an alert if already in the list
     ☐ FEATURE: in options view, make it possible for users to see current bugs and feature requests
 
@@ -8,7 +7,6 @@ TODO: Address:
 TODO: Pull Lists:
 
     Pull List View / Create Pull List View:
-        ☐ VIEW: PullListListItemView in PullListDocumentView
         ☐ VIEW: update room list item view
         ☐ VIEW: add option to add an image of the location
         ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
@@ -17,6 +15,7 @@ TODO: Pull Lists:
 
     Room:
         ☐ FEATURE: update room ID (what would the best format be?)
+            - room name has weird logic, make it more normal
         ☐ FEATURE: Remove item from room
         ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
         ☐ VIEW: General Room Views
@@ -30,11 +29,15 @@ TODO: Model:
     ☐ FEATURE: search by description?
     ☐ FEATURE: essential vs custom filtering
     ☐ FEATURE: when editing or creating a model, need to validate that the model is okay (you can't have no primary image, name must exist, etc.)
+    ☐ FEATURE: explore what you can do with the ItemWithModel struct
 
 TODO: Item:
-    ☐ VIEW: Navigate to pull list button (if not in storage)
+
 
 TODO: Major Changes:
+    ☐ FEATURE: Authentication (lowkey not needed for testing)
+
     Architecture:
         ☐ FEATURE: Kingfisher
+            ☐ FEATURE: abstract the image views to avoid duplicate code
         ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)

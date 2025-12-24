@@ -152,7 +152,7 @@ struct InstalledListDocumentView: View {
                     LazyVStack(alignment: .leading, spacing: 8) {
                         ForEach(viewModel.primaryLists, id: \.self) { installedList in
                             NavigationLink(value: installedList) {
-                                Text(installedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
+                                RDListDocumentListItem(list: installedList)
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
@@ -192,7 +192,7 @@ struct InstalledListDocumentView: View {
                     LazyVStack(alignment: .leading, spacing: 8) {
                         ForEach(viewModel.secondaryLists, id: \.self) { unstagedList in
                             NavigationLink(value: unstagedList) {
-                                Text(unstagedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
+                                RDListDocumentListItem(list: unstagedList)
                             }
                             .buttonStyle(PlainButtonStyle())
                             .onAppear {
@@ -223,13 +223,7 @@ struct InstalledListDocumentView: View {
             LazyVStack(spacing: 8) {
                 ForEach(viewModel.searchResults, id: \.self) { installedList in
                     NavigationLink(value: installedList) {
-                        HStack {
-                            Text(installedList.address.getStreetAddress() ?? "") // TODO: make a InstalledListView
-                            Spacer()
-                            Text(installedList.status.rawValue.capitalized)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        RDListDocumentListItem(list: installedList)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }

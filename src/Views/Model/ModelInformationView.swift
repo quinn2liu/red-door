@@ -76,7 +76,7 @@ struct ModelInformationView: View {
                     .foregroundColor(.red)
                     .bold()
 
-                HStack(alignment: .top, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
                     HStack(spacing: 0) {
                         Text("Primary: ")
                             .foregroundColor(.primary)
@@ -134,7 +134,7 @@ struct ModelInformationView: View {
                                 .foregroundColor(.red)
                                 .bold()
                             
-                            Image(systemName: model.isEssential ? SFSymbols.checkmarkCircleFill : SFSymbols.circle)
+                            Image(systemName: model.isEssential ? SFSymbols.starCircleFill : SFSymbols.circle)
                                 .foregroundColor(model.isEssential ? .yellow : .gray)
                         }
                     }

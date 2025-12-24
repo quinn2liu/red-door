@@ -25,6 +25,7 @@ struct RDList: Codable, Identifiable, Hashable {
 
     var createdDate: String
     var installDate: String
+    var uninstallDate: String
     var status: InstallationStatus
     var client: String
 
@@ -35,6 +36,7 @@ struct RDList: Codable, Identifiable, Hashable {
     init(
         address: Address,
         installDate: String = "",
+        uninstallDate: String = "",
         client: String = "",
         status: InstallationStatus = .planning,
         roomNames: [String] = [],
@@ -47,6 +49,8 @@ struct RDList: Codable, Identifiable, Hashable {
         self.addressId = address.id
 
         self.createdDate = ISO8601DateFormatter().string(from: Date())
+        self.installDate = installDate
+        self.uninstallDate = uninstallDate
         self.installDate = installDate
         self.status = status
         self.client = client
@@ -68,6 +72,8 @@ struct RDList: Codable, Identifiable, Hashable {
 
         self.createdDate = list.createdDate
         self.installDate = list.installDate
+        self.uninstallDate = list.uninstallDate
+
         self.status = status
         self.client = list.client
         self.roomIds = list.roomIds
@@ -86,14 +92,17 @@ struct RDList: Codable, Identifiable, Hashable {
 
         self.createdDate = ISO8601DateFormatter().string(from: Date())
         self.installDate = ""
+        self.uninstallDate = ""
+
         status = .planning
         self.client = ""
         self.roomIds = []
     }
 
-    static func getList(listId: String) async -> RDList {
+    // TODO: Eventually move to RDListDataStore
+    static func getList(listId: String, listType: DocumentType = .installed_list) async -> RDList {
         do {
-            let documentSnapshot = try await Firestore.firestore().collection("lists").document(listId).getDocument()
+            let documentSnapshot = try await Firestore.firestore().collection(listType.collectionString).document(listId).getDocument()
             return try documentSnapshot.data(as: RDList.self)
         } catch {
             print("Error getting list: \(error)")

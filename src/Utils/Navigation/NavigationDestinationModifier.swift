@@ -20,6 +20,9 @@ struct NavigationDestinationsModifier: ViewModifier {
             .navigationDestination(for: Item.self) { item in
                 ItemDetailView(item: item)
             }
+            .navigationDestination(for: ItemWithModel.self) { itemWithModel in
+                ItemDetailView(item: itemWithModel.item, model: itemWithModel.model)
+            }
             .navigationDestination(for: RDList.self) { list in
                 if list.listType == .pull_list && list.status == .planning {
                     PullListDetailsView(pullList: list)

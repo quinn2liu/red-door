@@ -133,7 +133,7 @@ struct PullListDetailsView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(viewModel.rooms, id: \.self) { room in
-                        RoomPreviewListItemView(room: room)
+                        PreviewRoomListItemView(room: room, parentList: viewModel.selectedList, rooms: viewModel.rooms)
                     }
                 }
             }

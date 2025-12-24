@@ -33,7 +33,7 @@ struct StagingPullListView: View {
             RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
 
             HStack(spacing: 0) {
-                SmallCTA(type: .secondary, leadingIcon: "arrow.counterclockwise", text: "Set as planning") {
+                SmallCTA(type: .secondary, leadingIcon: SFSymbols.pencilAndListClipboard, text: "Set as planning") {
                     Task { @MainActor in
                         viewModel.selectedList.status = .planning
                         viewModel.updateSelectedList()

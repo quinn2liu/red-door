@@ -136,7 +136,17 @@ struct ItemDetailView: View {
                 if viewModel.selectedItem.isAvailable {
                     Text(viewModel.selectedItem.listId)
                 } else {
-                    Text(list?.address.getStreetAddress() ?? "Loading...")
+                    if let list = list {
+                        NavigationLink(value: list) {
+                            Text(list.address.getStreetAddress() ?? "Loading...")
+                        }
+                    } else {
+                        Text("Loading...")
+                            .font(.caption)
+                            .padding(8)
+                            .background(Color(.systemGray5))
+                            .cornerRadius(6)
+                    }
                 }
             }
 

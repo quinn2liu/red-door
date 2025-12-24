@@ -179,7 +179,7 @@ struct PullListDocumentView: View {
                     LazyVStack(alignment: .leading, spacing: 8) {
                         ForEach(viewModel.primaryLists, id: \.self) { pullList in
                             NavigationLink(value: pullList) {
-                                Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
+                                RDListDocumentListItem(list: pullList)
                             }
                             .buttonStyle(PlainButtonStyle())
                         } 
@@ -220,7 +220,7 @@ struct PullListDocumentView: View {
                     LazyVStack(alignment: .leading, spacing: 8) {
                         ForEach(viewModel.secondaryLists, id: \.self) { pullList in
                             NavigationLink(value: pullList) {
-                                Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
+                                RDListDocumentListItem(list: pullList)
                             }
                             .buttonStyle(PlainButtonStyle())
                             .onAppear {
@@ -251,13 +251,7 @@ struct PullListDocumentView: View {
             LazyVStack(spacing: 8) {
                 ForEach(viewModel.searchResults, id: \.self) { pullList in
                     NavigationLink(value: pullList) {
-                        HStack {
-                            Text(pullList.address.getStreetAddress() ?? "") // TODO: make a PL list item
-                            Spacer()
-                            Text(pullList.status.rawValue.capitalized)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        RDListDocumentListItem(list: pullList)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }

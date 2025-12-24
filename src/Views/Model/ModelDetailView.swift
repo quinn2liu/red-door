@@ -149,9 +149,9 @@ struct ModelDetailView: View {
                 ]
                 
                 LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(viewModel.items, id: \.self) { item in
-                        NavigationLink(destination: ItemDetailView(item: item, model: viewModel.selectedModel)) {
-                            ItemListItem(item)
+                    ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
+                        NavigationLink(value: ItemWithModel(item: item, model: viewModel.selectedModel)) {
+                            ItemListItem(item, index: index)
                         }
                     }
                 }
@@ -162,13 +162,17 @@ struct ModelDetailView: View {
     // MARK: Item List Item
 
     @ViewBuilder
-    private func ItemListItem(_ item: Item) -> some View {
+    private func ItemListItem(_ item: Item, index: Int) -> some View {
         HStack(spacing: 8) {
+            Text("\(index + 1).")
+                .foregroundColor(.secondary)
+                .font(.footnote)
+
             ItemModelImage(item: item, model: viewModel.selectedModel, size: 48)
             
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 0) {
-                    Text("Available: ")
+                HStack(spacing: 6) {
+                    Text("Available:")
                         .foregroundColor(.secondary)  
                         .font(.footnote)                      
 
@@ -179,8 +183,8 @@ struct ModelDetailView: View {
                     }
                     
                 if item.attention {
-                    HStack(spacing: 0) {
-                        Text("Attention: ")
+                    HStack(spacing: 6) {
+                        Text("Attention:")
                             .foregroundColor(.secondary)  
                             .font(.footnote)   
 
@@ -191,6 +195,7 @@ struct ModelDetailView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(8)
         .background(Color(.systemGray5))
         .cornerRadius(8)

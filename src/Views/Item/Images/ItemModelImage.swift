@@ -11,7 +11,7 @@ import CachedAsyncImage
 struct ItemModelImage: View {
     let item: Item
     let model: Model?
-    var size: CGFloat = 32
+    var size: CGFloat = 48
     
     var body: some View {
         Group {
