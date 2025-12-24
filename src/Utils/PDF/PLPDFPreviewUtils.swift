@@ -148,8 +148,8 @@ struct PullListPDFView: View {
 func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
     var result: [String: UIImage] = [:]
 
-    for room in rooms {
-        for item in room.items {
+    for roomVM in rooms {
+        for item in roomVM.items {
             if let itemImage = item.image {
                 if let imageURL = itemImage.imageURL {
                     do {
@@ -160,6 +160,15 @@ func preloadImages(for rooms: [RoomViewModel]) async -> [String: UIImage] {
                     } catch {
                         print("Failed to preload image for item \(item.id): \(error)")
                     }
+                }
+            } else if let modelImageURL = roomVM.modelsById[item.modelId]?.primaryImage.imageURL {
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: modelImageURL)
+                    if let image = UIImage(data: data) {
+                        result[item.id] = image
+                    }
+                } catch {
+                    print("Failed to preload image for item \(item.id): \(error)")
                 }
             }
         }

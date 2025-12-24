@@ -2,7 +2,6 @@ TODO: General:
     ☐ FEATURE: Authentication (lowkey not needed for testing)
     ☐ DEBUG: keep testing the flow... selecting the item didn't work?
     ☐ FEATURE: when adding item to pull list, have the list items have the index and make sure it gives an alert if already in the list
-    ☐ FEATURE: pulllist pdf needs to use model image as a backup if item image is not available
     ☐ FEATURE: in options view, make it possibel for users to see current bugs and feature requests
 
 TODO: Address:
