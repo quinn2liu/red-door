@@ -36,7 +36,7 @@ struct StagingPullListView: View {
                 SmallCTA(type: .secondary, leadingIcon: SFSymbols.pencilAndListClipboard, text: "Set as planning") {
                     Task { @MainActor in
                         viewModel.selectedList.status = .planning
-                        viewModel.updateSelectedList()
+                        await viewModel.updateSelectedList()
                         coordinator.resetSelectedPath()
                         try? await Task.sleep(for: .milliseconds(500))
                         coordinator.appendToSelectedPath(viewModel.selectedList)

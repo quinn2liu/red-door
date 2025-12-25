@@ -12,14 +12,14 @@ struct EditPullListDetailsSheet: View {
     
     @Binding var viewModel: PullListViewModel
     @State private var editingList: RDList
+    @State private var newRoomNames: [String] = []
     @State private var date: Date
 
     @State private var showAddressSheet: Bool = false
-    @State private var showCreateRoom: Bool = false
-    @State private var editingRoomId: String? = nil
+    @State private var showEditRoom: Bool = false
 
     @FocusState var keyboardFocused: Bool
-    @State private var newRoomName: String = ""
+    @State private var editingRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
 
     init(viewModel: Binding<PullListViewModel>) {
@@ -48,33 +48,7 @@ struct EditPullListDetailsSheet: View {
                     .cornerRadius(8)
             }
 
-            VStack(spacing: 12) {
-                HStack(spacing: 0) {
-                    Text("Rooms:")
-                        .font(.headline)
-                        .foregroundColor(.red)
-
-                    Spacer()
-
-                    SmallCTA(type: .red, leadingIcon: "plus", text: "Add Room") {
-                        editingRoomId = nil
-                        showCreateRoom = true
-                    }
-                }
-
-                ScrollView {
-                    LazyVStack {
-                        ForEach(viewModel.rooms, id: \.id) { room in
-                            EmptyRoomListItem(room.roomName)
-                                .onTapGesture {
-                                    editingRoomId = room.id
-                                    newRoomName = room.roomName
-                                    showCreateRoom = true
-                                }
-                        }
-                    }
-                }
-            }
+            RoomsList()
         }
         .frameTop()
         .frameHorizontalPadding()
@@ -82,12 +56,10 @@ struct EditPullListDetailsSheet: View {
         .sheet(isPresented: $showAddressSheet) {
             AddressSheet(selectedAddress: $editingList.address, addressId: $editingList.addressId)
         }
-        .sheet(isPresented: $showCreateRoom) {
-            CreateEmptyRoomSheet()
+        .sheet(isPresented: $showEditRoom) {
+            EditRoomSheet()
                 .onAppear {
-                    if editingRoomId == nil {
-                        newRoomName = ""
-                    }
+                    editingRoomName = ""
                     keyboardFocused = true
                 }
         }
@@ -113,7 +85,10 @@ struct EditPullListDetailsSheet: View {
                 }
                 if editingList != viewModel.selectedList {
                     viewModel.selectedList = editingList
-                    viewModel.updateSelectedList()
+                    Task {
+                        await viewModel.updateSelectedList(newRoomNames: newRoomNames)
+                        await viewModel.loadRooms()
+                    }
                 }
                 dismiss()
             }
@@ -121,18 +96,46 @@ struct EditPullListDetailsSheet: View {
         })
     }
 
+    // MARK: Rooms List
+    @ViewBuilder
+    private func RoomsList() -> some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 0) {
+                Text("Rooms:")
+                    .font(.headline)
+                    .foregroundColor(.red)
+
+                Spacer()
+
+                SmallCTA(type: .red, leadingIcon: "plus", text: "Add Room") {
+                    showEditRoom = true
+                    editingRoomName = ""
+                }
+            }
+
+            ScrollView {
+                LazyVStack {
+                    ForEach(editingList.roomIds, id: \.self) { roomId in
+                        let roomName = roomId.replacingOccurrences(of: "-", with: " ").capitalized
+                        RoomListItem(roomName: roomName)
+                    }
+                }
+            }
+        }
+    }
+
+
     // MARK: Create Empty Room Sheet
     @ViewBuilder
-    private func CreateEmptyRoomSheet() -> some View {
+    private func EditRoomSheet() -> some View {
         VStack(spacing: 16) {
-            TextField("Room Name", text: $newRoomName)
+            TextField("Room Name", text: $editingRoomName)
                 .focused($keyboardFocused)
                 .submitLabel(.done)
 
             HStack(spacing: 0) {
                 Button {
-                    showCreateRoom = false
-                    editingRoomId = nil
+                    showEditRoom = false
                 } label: {
                     Text("Cancel")
                         .foregroundStyle(.red)
@@ -141,21 +144,15 @@ struct EditPullListDetailsSheet: View {
                 Spacer()
 
                 Button {
-                    if editingRoomId == nil {
-                        // Creating a new room
-                        existingRoomAlert = !viewModel.createEmptyRoom(newRoomName)
-                        if !existingRoomAlert {
-                            editingList.roomIds.append(Room.roomNameToId(listId: editingList.id, roomName: newRoomName))
-                            showCreateRoom = false
-                            editingRoomId = nil
-                        }
-                    } else {
-                        // TODO: Handle editing existing room
-                        showCreateRoom = false
-                        editingRoomId = nil
+                    // Creating a new room
+                    existingRoomAlert = viewModel.roomExists(newRoomName: editingRoomName, roomIds: editingList.roomIds)
+                    if !existingRoomAlert {
+                        editingList.roomIds.append(Room.nameToId(roomName: editingRoomName))
+                        newRoomNames.append(editingRoomName)
+                        showEditRoom = false
                     }
                 } label: {
-                    Text(editingRoomId == nil ? "Add Room" : "Save")
+                    Text("Add Room")
                         .fontWeight(.semibold)
                         .foregroundStyle(.blue)
                 }
@@ -169,9 +166,10 @@ struct EditPullListDetailsSheet: View {
         .presentationDetents([.fraction(0.125)])
     }
 
-    // MARK: EmptyRoomListItem
+    // MARK: Room List Item
+
     @ViewBuilder
-    private func EmptyRoomListItem(_ roomName: String) -> some View {
+    private func RoomListItem(roomName: String) -> some View {
         HStack(spacing: 0) {
             Text(roomName)
                 .foregroundStyle(Color(.label))

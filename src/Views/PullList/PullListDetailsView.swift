@@ -157,7 +157,7 @@ struct PullListDetailsView: View {
         RDButton(variant: .default, size: .default, leadingIcon: "truck.box.badge.clock.fill", text: "Begin Install", fullWidth: true) {
             Task { @MainActor in
                 viewModel.selectedList.status = .staging
-                viewModel.updateSelectedList()
+                await viewModel.updateSelectedList()
                 coordinator.resetSelectedPath()
                 try? await Task.sleep(for: .milliseconds(250))
                 coordinator.appendToSelectedPath(viewModel.selectedList)

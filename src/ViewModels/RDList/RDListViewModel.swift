@@ -39,9 +39,17 @@ class RDListViewModel {
 
     // MARK: Update RDList
 
-    func updateSelectedList() {
+    func updateSelectedList(newRoomNames: [String] = []) async {
+        let batch = db.batch()
         do {
-            try selectedListReference.setData(from: selectedList, merge: true)
+            for roomName in newRoomNames {
+                let newRoom = Room(roomName: roomName, listId: selectedList.id)
+                rooms.append(newRoom)
+                let roomRef = selectedListReference.collection("rooms").document(newRoom.id)
+                try batch.setData(from: newRoom, forDocument: roomRef)
+            }
+            try batch.setData(from: selectedList, forDocument: selectedListReference)
+            try await batch.commit()
         } catch {
             print("Error updating RDList: \(selectedList.id): \(error)")
         }
@@ -100,30 +108,23 @@ extension RDListViewModel {
     // MARK: Create Empty Room (doesn't exist in firebase)
 
     func createEmptyRoom(_ roomName: String) -> Bool {
-        if roomExists(newRoomName: roomName, roomNames: selectedList.roomIds) {
+        if roomExists(newRoomName: roomName, roomIds: selectedList.roomIds) {
             return false // room not added
         } else {
-            selectedList.roomIds.append(Room.roomNameToId(listId: selectedList.id, roomName: roomName))
-            rooms.append(Room(roomName: roomName, listId: selectedList.id))
+            let newRoom = Room(roomName: roomName, listId: selectedList.id)
+            selectedList.roomIds.append(newRoom.id)
+            rooms.append(newRoom)
             return true // room successfully added
         }
     }
 
     // MARK: (Helper) Room Exists
 
-    func roomExists(newRoomName: String, roomNames: [String]) -> Bool {
-        let trimmedNewRoom = newRoomName
-            .lowercased()
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: " ", with: "")
+    func roomExists(newRoomName: String, roomIds: [String]) -> Bool {
+        let normalizedNewRoomName = Room.nameToId(roomName: newRoomName)
 
-        return roomNames.contains { roomName in
-            let trimmedRoomName = roomName
-                .lowercased()
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: " ", with: "")
-
-            return trimmedRoomName == trimmedNewRoom
+        return roomIds.contains { roomId in
+            return roomId == normalizedNewRoomName
         }
     }
 

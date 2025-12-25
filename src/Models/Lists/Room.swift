@@ -8,16 +8,14 @@
 import Foundation
 
 struct Room: Codable, Identifiable, Hashable {
-    // TODO: don't give the room an ID, it's not needed
-    var id: String // listId + roomName(spaces replaced by -, lowercased), separated by ";" ex: (adslkfasdflkjasdkl;living-room)
-
+    var id: String // normalized room name (lowercased, spaces replaced by "-")
     var roomName: String
-    var listId: String // Id of parent list (pull list or installed list)
+    var listId: String
     var itemModelIdMap: [String: String] = [:]
     var selectedItemIdSet: Set<String> = []
 
     init(roomName: String, listId: String, itemModelIdMap: [String: String] = [:], selectedItemIdSet: Set<String> = []) {
-        id = listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
+        id = roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
         self.roomName = roomName
         self.listId = listId
         self.itemModelIdMap = itemModelIdMap
@@ -26,11 +24,7 @@ struct Room: Codable, Identifiable, Hashable {
 }
 
 extension Room {
-    static func roomNameToId(listId: String, roomName: String) -> String {
-        return listId + ";" + roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
+    static func nameToId(roomName: String) -> String {
+        return roomName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-")
     }
-
-    static var MOCK_DATA: [Room] = [
-        .init(roomName: "test room name", listId: "test list id"),
-    ]
 }
