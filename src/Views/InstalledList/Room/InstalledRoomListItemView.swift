@@ -34,10 +34,11 @@ struct InstalledRoomListItemView: View {
                 Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
             }
 
+            // TODO: fix this
             if showRoomPreview {
-                NavigationLink(destination: RoomDetailsView(viewModel: $viewModel)) {
-                    RoomPreview()
-                }
+                // NavigationLink(destination: RoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
+                //     RoomPreview()
+                // }
             }
         }
         .contentShape(Rectangle())

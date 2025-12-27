@@ -1,5 +1,5 @@
 //
-//  RoomDetailsView.swift
+//  PlanningRoomDetailsView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 10/4/25.
@@ -8,40 +8,60 @@
 import CachedAsyncImage
 import SwiftUI
 
-struct RoomDetailsView: View {
+struct PlanningRoomDetailsView: View {
     // MARK: init Variables
     
-    @Binding var viewModel: RoomViewModel
+    private var parentList: RDList
+    private var rooms: [Room]
+    @Binding var roomViewModel: RoomViewModel
 
-    init(viewModel: Binding<RoomViewModel>) {
-        _viewModel = viewModel
+    init(parentList: RDList, rooms: [Room], roomViewModel: Binding<RoomViewModel>) {
+        self.parentList = parentList
+        self.rooms = rooms
+        _roomViewModel = roomViewModel
     }
 
     // MARK: State Variables
 
-    @State private var showItems: Bool = false
     @State private var showSheet: Bool = false
     @State private var isEditing: Bool = false
 
+
+    // MARK: Body
+    
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
 
+            HStack(spacing: 0) {
+                SmallCTA(type: .default, leadingIcon: SFSymbols.arrowCounterclockwise, text: "Refresh") { 
+                    Task {
+                        await roomViewModel.loadItemsAndModels()
+                    }
+                }
+                
+                Spacer()
+
+                SmallCTA(type: .red, leadingIcon: SFSymbols.plus, text: "Add Items") { 
+                    showSheet = true
+                }
+            }
+
             RoomItemList()
         }
         .sheet(isPresented: $showSheet) {
-            RoomAddItemsSheet(roomViewModel: $viewModel, showSheet: $showSheet)
+            RoomAddItemsSheet(roomViewModel: $roomViewModel, showSheet: $showSheet)
         }
         .onAppear {
-            if !viewModel.items.isEmpty {
+            if !roomViewModel.items.isEmpty {
                 Task {
-                    await viewModel.loadItemsAndModels()
+                    await roomViewModel.loadItemsAndModels()
                 }
             }
         }
-        .onChange(of: viewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
+        .onChange(of: roomViewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
             Task {
-                await viewModel.loadItemsAndModels()
+                await roomViewModel.loadItemsAndModels()
             }
         }
         .toolbar(.hidden)
@@ -51,38 +71,59 @@ struct RoomDetailsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 
-    // MARK: TopBar()
+    // MARK: Top Bar
 
     @ViewBuilder
     private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
-            Text(viewModel.selectedRoom.roomName)
+            Text(roomViewModel.selectedRoom.roomName)
         }, trailingIcon: {
-            EditRoomMenu()
-        })
+            RoomDetailsMenu()
+        }
+        )
     }
 
-    // MARK: RoomItemList()
+    // MARK: Room Details Menu
+
+    @ViewBuilder
+    private func RoomDetailsMenu() -> some View {
+        Menu {
+            Button("Edit Room", systemImage: SFSymbols.pencil) {
+                isEditing = true
+            }
+
+            Button("Delete Room", systemImage: SFSymbols.trash) {
+                // Task {
+                //     await roomViewModel.deleteRoom()
+                // }
+            }
+        } label: {
+            RDButton(variant: .red, size: .icon, leadingIcon: SFSymbols.ellipsis, iconBold: true, fullWidth: false, action: {})    
+                .clipShape(Circle())
+        }
+    }
+
+    // MARK: Room Item List
 
     @ViewBuilder
     private func RoomItemList() -> some View {
         LazyVStack(spacing: 12) {
-            ForEach(viewModel.items, id: \.self) { item in
-                NavigationLink(destination: RoomItemView(item: item, roomViewModel: $viewModel)) { // MARK: RoomItemView should take in a viewmodel
+            ForEach(roomViewModel.items, id: \.self) { item in
+                NavigationLink(destination: StagingRoomItemView(roomViewModel: $roomViewModel, parentList: parentList, rooms: rooms, item: item)) {
                     RoomItemListItem(item)
                 }
             }
         }
     }
 
-    // MARK: RoomItemListItem()
+    // MARK: Room Item List Item
 
     @ViewBuilder
     private func RoomItemListItem(_ item: Item) -> some View {
         HStack(spacing: 12) {
-            if let model = viewModel.getModelForItem(item) {
+            if let model = roomViewModel.getModelForItem(item) {
                 if let uiImage = model.primaryImage.uiImage {
                     Image(uiImage: uiImage)
                         .resizable()
@@ -132,30 +173,5 @@ struct RoomDetailsView: View {
                     .foregroundStyle(Color.yellow)
             }
         }
-    }
-
-    // MARK: EditRoomMenu()
-
-    @ViewBuilder
-    private func EditRoomMenu() -> some View {
-
-        Menu {
-            Button {
-                // TODO: delete room
-            } label: {
-                Image(systemName: SFSymbols.trash)
-                Text("Delete Room")
-            }
-
-            Button {
-                showSheet = true
-            } label: {
-                Image(systemName: SFSymbols.plus)
-                Text("Add Items")
-            }
-        } label: {
-                RDButton(variant: .red, size: .icon, leadingIcon: "ellipsis", iconBold: true, fullWidth: false) { }
-                .clipShape(Circle())
-        }.tint(.red)
     }
 }

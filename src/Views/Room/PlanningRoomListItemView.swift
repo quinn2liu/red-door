@@ -25,43 +25,68 @@ struct PreviewRoomListItemView: View {
     // MARK: Body
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Text(viewModel.selectedRoom.roomName)
-
-                (
-                    Text("Items: ")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    +
-                    Text("\(viewModel.items.count)")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                )
-
-                Spacer()
-
-                Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
-                    .bold()
-                    .foregroundColor(.secondary)
+        VStack(alignment: .leading, spacing: 16) {
+            // Use NavigationLink when items are empty, Button when not
+            if viewModel.items.isEmpty {
+                NavigationLink(
+                    destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)
+                ) {
+                    RoomPreviewHeader()
+                }
+            } else {
+                Button {
+                    showRoomPreview.toggle()
+                } label: {
+                    RoomPreviewHeader()
+                }
             }
-
+            
             if showRoomPreview {
                 NavigationLink(destination: StagingRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
                     RoomPreview()
                 }
             }
         }
-        .task {
-            await viewModel.loadItemsAndModels()
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            showRoomPreview.toggle()
-        }
         .padding()
         .background(Color(.systemGray5))
         .cornerRadius(6)
+        .task {
+            await viewModel.loadItemsAndModels()
+        }
+    }
+
+    // MARK: Room Preview Content
+
+    @ViewBuilder
+    private func RoomPreviewHeader() -> some View {
+        HStack(spacing: 8) {
+            Text(viewModel.selectedRoom.roomName)
+                .foregroundColor(.primary)
+
+            Spacer()
+
+            (
+                Text("Items: ")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                +
+                Text("\(viewModel.items.count)")
+                    .font(.caption)
+                    .foregroundColor(.red)
+            )
+
+            if !viewModel.items.isEmpty {
+                Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
+                    .bold()
+                    .foregroundColor(.secondary)
+                    .frame(24)
+            } else {
+                Image(systemName: SFSymbols.chevronRight)
+                    .bold()
+                    .foregroundColor(.secondary)
+                    .frame(24)
+            }
+        }
     }
 
     // MARK: Room Preview
@@ -70,22 +95,13 @@ struct PreviewRoomListItemView: View {
     private func RoomPreview() -> some View {
         HStack(spacing: 0) {
             LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 8) {
+                GridItem(.adaptive(minimum: 120, maximum: 200)),
+                GridItem(.adaptive(minimum: 120, maximum: 200))
+            ], spacing: 4) {
                 ForEach(viewModel.items, id: \.self) { item in
-                    ItemListItem(
-                        item: item
-                    )
+                    ItemListItem(item: item)
                 }
-
             }
-
-            Spacer()
-
-            Image(systemName: SFSymbols.chevronRight)
-                .bold()
-                .foregroundColor(.secondary)
         }
         .task {
             if viewModel.selectedRoom.itemModelIdMap.isEmpty {

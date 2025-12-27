@@ -112,7 +112,7 @@ struct PullListDetailsView: View {
                 }
             }.tint(.red)
         } label: {
-            RDButton(variant: .red, size: .icon, leadingIcon: "ellipsis", iconBold: true, fullWidth: false, action: { })
+            RDButton(variant: .red, size: .icon, leadingIcon: SFSymbols.ellipsis, iconBold: true, fullWidth: false, action: { })
                 .clipShape(Circle())
         }
     }
@@ -154,7 +154,7 @@ struct PullListDetailsView: View {
 
     @ViewBuilder
     private func Footer() -> some View {
-        RDButton(variant: .default, size: .default, leadingIcon: "truck.box.badge.clock.fill", text: "Begin Install", fullWidth: true) {
+        RDButton(variant: .default, size: .default, leadingIcon: SFSymbols.truckBoxBadgeClockFill, text: "Begin Install", fullWidth: true) {
             Task { @MainActor in
                 viewModel.selectedList.status = .staging
                 await viewModel.updateSelectedList()

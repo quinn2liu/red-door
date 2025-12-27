@@ -24,7 +24,6 @@ struct StagingRoomDetailsView: View {
     // MARK: State Variables
 
     @State private var showItems: Bool = false
-    @State private var showSheet: Bool = false
     @State private var isEditing: Bool = false
 
     var body: some View {
@@ -32,9 +31,6 @@ struct StagingRoomDetailsView: View {
             TopBar()
 
             RoomItemList()
-        }
-        .sheet(isPresented: $showSheet) {
-            RoomAddItemsSheet(roomViewModel: $roomViewModel, showSheet: $showSheet)
         }
         .onAppear {
             if !roomViewModel.items.isEmpty {
@@ -55,7 +51,7 @@ struct StagingRoomDetailsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 
-    // MARK: TopBar()
+    // MARK: Top Bar
 
     @ViewBuilder
     private func TopBar() -> some View {
@@ -74,7 +70,7 @@ struct StagingRoomDetailsView: View {
         )
     }
 
-    // MARK: RoomItemList()
+    // MARK: Room Item List
 
     @ViewBuilder
     private func RoomItemList() -> some View {
@@ -87,7 +83,7 @@ struct StagingRoomDetailsView: View {
         }
     }
 
-    // MARK: RoomItemListItem()
+    // MARK: Room Item List Item
 
     @ViewBuilder
     private func RoomItemListItem(_ item: Item) -> some View {

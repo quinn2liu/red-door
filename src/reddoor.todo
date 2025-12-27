@@ -28,10 +28,13 @@ TODO: Installed Lists:
 TODO: Model:
     ☐ FEATURE: search by description?
     ☐ FEATURE: essential vs custom filtering
+        ☐ FEATURE: make a filter menu to select which filter to use
     ☐ FEATURE: when editing or creating a model, need to validate that the model is okay (you can't have no primary image, name must exist, etc.)
     ☐ FEATURE: explore what you can do with the ItemWithModel struct
 
 TODO: Item:
+    ☐ FEATURE: check whether item images are deleted with the item
+    ☐ VIEW: instead of atttention string, highlight the list item in yellow
 
 
 TODO: Major Changes:
