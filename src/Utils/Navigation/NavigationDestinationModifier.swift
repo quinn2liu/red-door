@@ -25,7 +25,7 @@ struct NavigationDestinationsModifier: ViewModifier {
             }
             .navigationDestination(for: RDList.self) { list in
                 if list.listType == .pull_list && list.status == .planning {
-                    PullListDetailsView(pullList: list)
+                    PlanningPullListView(pullList: list)
                 } else if list.listType == .pull_list && list.status == .staging {
                     StagingPullListView(pullList: list)
                 } else if list.listType == .installed_list {

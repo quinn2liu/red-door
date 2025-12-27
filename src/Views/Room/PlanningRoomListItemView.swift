@@ -42,7 +42,7 @@ struct PreviewRoomListItemView: View {
             }
             
             if showRoomPreview {
-                NavigationLink(destination: StagingRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
+                NavigationLink(destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
                     RoomPreview()
                 }
             }

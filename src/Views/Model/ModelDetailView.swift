@@ -151,55 +151,13 @@ struct ModelDetailView: View {
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
                         NavigationLink(value: ItemWithModel(item: item, model: viewModel.selectedModel)) {
-                            ItemListItem(item, index: index)
+                            ModelItemListItem(item: item, model: viewModel.selectedModel, index: index)
                         }
                     }
                 }
             }
         }
     }
-
-    // MARK: Item List Item
-
-    @ViewBuilder
-    private func ItemListItem(_ item: Item, index: Int) -> some View {
-        HStack(spacing: 8) {
-            Text("\(index + 1).")
-                .foregroundColor(.secondary)
-                .font(.footnote)
-
-            ItemModelImage(item: item, model: viewModel.selectedModel, size: 48)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Text("Available:")
-                        .foregroundColor(.secondary)  
-                        .font(.footnote)                      
-
-                    Image(systemName: item.isAvailable ? SFSymbols.checkmarkCircleFill : SFSymbols.xmarkCircleFill)
-                        .foregroundColor(item.isAvailable ? .green : .red)
-                        .frame(16)
-                        .font(.footnote)
-                    }
-                    
-                if item.attention {
-                    HStack(spacing: 6) {
-                        Text("Attention:")
-                            .foregroundColor(.secondary)  
-                            .font(.footnote)   
-
-                        Image(systemName: SFSymbols.exclamationmarkTriangleFill)
-                            .foregroundColor(.yellow) 
-                            .frame(16)                   
-                    }
-                }
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(8)
-        .background(Color(.systemGray5))
-        .cornerRadius(8)
-}
 
     // MARK: - Helper Functions
 

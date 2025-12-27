@@ -34,20 +34,19 @@ struct RoomModelView: View {
     // MARK: Body
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 12) {
+            TopBar()
+
             ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
 
             ModelInformationView(model: modelViewModel.selectedModel)
 
-            // TODO: rename this
-            ModelItemList()
+            ModelItemListView()
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                ModelNameView()
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
+        .frameTop()
+        .frameTopPadding()
+        .frameHorizontalPadding()
+        .toolbar(.hidden)
         .task {
             await loadItems()
         }
@@ -56,7 +55,23 @@ struct RoomModelView: View {
         )
     }
 
-    // MARK: - ModelNameView()
+    // MARK: Top Bar
+    @ViewBuilder
+    private func TopBar() -> some View {
+        TopAppBar(
+            leadingIcon: {
+                BackButton()
+            },
+            header: {
+                ModelNameView()
+            },
+            trailingIcon: {
+                Spacer().frame(32)
+            }
+        )
+    }
+
+    // MARK: - Model Name View
 
     @ViewBuilder private func ModelNameView() -> some View {
         HStack {
@@ -66,41 +81,40 @@ struct RoomModelView: View {
         }
     }
 
+    // MARK: Model Item List View
+
     @ViewBuilder
-    private func ModelItemList() -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("Item Count: \(modelViewModel.selectedModel.itemIds.count)")
-                Spacer()
+    private func ModelItemListView() -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .bottom, spacing: 0) {
+                Text("Item Count: ")
+                    .foregroundColor(.red)
+                    .bold()
+                
+                Text("\(modelViewModel.selectedModel.itemIds.count)")
+                    .bold()
             }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
 
             if !modelViewModel.items.isEmpty {
-                VStack(spacing: 0) {
-                    ForEach(modelViewModel.items, id: \.self) { item in
-                        NavigationLink(destination: RoomItemView(item: item, roomViewModel: $roomViewModel)) {
-                            ModelItemListItem(item)
+                let columns = [
+                    GridItem(.flexible(), spacing: 4),
+                    GridItem(.flexible(), spacing: 4)
+                ]
+
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 8) {
+                        ForEach(Array(modelViewModel.items.enumerated()), id: \.element.id) { index, item in
+                            if item.isAvailable {
+                                NavigationLink(destination: RoomItemView(item: item, model: modelViewModel.selectedModel, roomViewModel: $roomViewModel)) {
+                                    ModelItemListItem(item: item, model: modelViewModel.selectedModel, index: index)
+                                }
+                            } else {
+                                ModelItemListItem(item: item, model: modelViewModel.selectedModel, index: index)
+                            }
                         }
                     }
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private func ModelItemListItem(_ item: Item) -> some View {
-        let model = modelViewModel.selectedModel
-
-        HStack {
-            if let itemImage = item.image, itemImage.imageExists {
-                CachedAsyncImage(url: itemImage.imageURL)
-            } else {
-                Image(systemName: SFSymbols.photoBadgePlus)
-            }
-            Text(item.id)
-            Text(model.type)
-            Text(item.attention.description)
         }
     }
 

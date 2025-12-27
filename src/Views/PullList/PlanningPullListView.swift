@@ -1,5 +1,5 @@
 //
-//  PullListDetailsView.swift
+//  PlanningPullListView.swift
 //  RedDoor
 //
 //  Created by Quinn Liu on 1/1/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PullListDetailsView: View {
+struct PlanningPullListView: View {
     // MARK: Navigation
 
     @Environment(\.dismiss) private var dismiss

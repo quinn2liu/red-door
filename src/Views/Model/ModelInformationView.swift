@@ -42,7 +42,7 @@ struct ModelInformationView: View {
                                 .foregroundColor(.primary)
 
                             Image(systemName: SFSymbols.circleFill)
-                                .foregroundColor(Model.colorMap[model.secondaryColor] ?? .black)
+                                .foregroundColor(Model.colorMap[model.primaryColor] ?? .black)
                                 .padding(8)
                                 .background(Color(.systemGray5))
                                 .cornerRadius(6)

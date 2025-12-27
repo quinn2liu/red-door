@@ -52,6 +52,8 @@ class RoomViewModel {
 extension RoomViewModel {
     // MARK: Add Item to Room
 
+    // TODO: maybe add a check for if the item already in pull list (check all rooms)
+
     func addItemToRoom(item: Item) -> Bool {
         let itemIdsSet = Set(selectedRoom.itemModelIdMap.keys)
         if !itemIdsSet.contains(item.id) { // the itemId doesn't already exist in the room's items and was added

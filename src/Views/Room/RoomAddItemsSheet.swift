@@ -41,21 +41,23 @@ struct RoomAddItemsSheet: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 12) {
-                if searchFocused {
-                    SearchBar()
-                } else {
-                    TopBar()
+            VStack(spacing: 6) {
+
+                DragIndicator()
+
+                VStack(spacing: 12) {
+                    if searchFocused {
+                        SearchBar()
+                    } else {
+                        TopBar()
+                    }
+
+                    ModelInventoryFilterView(selectedType: $selectedType)
+
+                    InventoryList()
                 }
-
-                ModelInventoryFilterView(selectedType: $selectedType)
-
-                InventoryList()
-
-                Spacer()
             }
             .frameTop()
-            .frameTopPadding()
             .frameHorizontalPadding()
             .onAppear {
                 emptyQuerySearch()
@@ -74,9 +76,6 @@ struct RoomAddItemsSheet: View {
             }
             .navigationDestination(for: Model.self) { model in
                 RoomModelView(model: model, roomViewModel: $roomViewModel)
-            }
-            .navigationDestination(for: Item.self) { item in
-                RoomItemView(item: item, roomViewModel: $roomViewModel)
             }
         }
     }

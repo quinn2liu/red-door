@@ -1,6 +1,8 @@
 TODO: General:
     ☐ FEATURE: when adding item to pull list, have the list items have the index and make sure it gives an alert if already in the list
     ☐ FEATURE: in options view, make it possible for users to see current bugs and feature requests
+    ☐ FEATURE: make all the view names consistent
+    ☐ FEATURE: maybe go back to the old file structure lol
 
 TODO: Address:
 
@@ -14,12 +16,13 @@ TODO: Pull Lists:
             - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
 
     Room:
-        ☐ FEATURE: update room ID (what would the best format be?)
-            - room name has weird logic, make it more normal
         ☐ FEATURE: Remove item from room
         ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
         ☐ VIEW: General Room Views
         ☐ FEATURE: Remove room
+        ☐ TODO: RoomAddItemsSheet should use updated logic to standard model inventory view
+        ☐ TODO: Make sure that the same item can't be added to multiple rooms (roomviewmodel.addItemToRoom)
+            - maybe RDList has a list of all its itemids (maybe itemId to roomId map, for easy realtime listening? or maybe contains the rooms as objects?)
 
 TODO: Installed Lists:
     Pipeline:
@@ -35,7 +38,7 @@ TODO: Model:
 TODO: Item:
     ☐ FEATURE: check whether item images are deleted with the item
     ☐ VIEW: instead of atttention string, highlight the list item in yellow
-
+    ☐ FEATURE: items can be manually moved to inventory.
 
 TODO: Major Changes:
     ☐ FEATURE: Authentication (lowkey not needed for testing)
@@ -44,3 +47,4 @@ TODO: Major Changes:
         ☐ FEATURE: Kingfisher
             ☐ FEATURE: abstract the image views to avoid duplicate code
         ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)
+        ☐ FEATURE: look into making "model view components", "item view components", "RDlist view components", etc to avoid duplicate code
