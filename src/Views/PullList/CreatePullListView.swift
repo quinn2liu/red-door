@@ -16,7 +16,8 @@ struct CreatePullListView: View {
     @State private var selectedAddressMode: String = "Search"
     let addressOptions = ["Search", "Entry"]
     @State private var address: String = ""
-    @State private var date: Date = .init()
+    @State private var installDate: Date = .init()
+    @State private var uninstallDate: Date = .init()
 
     @State private var showCreateRoom: Bool = false
     private var rooms: [Room]?
@@ -24,14 +25,26 @@ struct CreatePullListView: View {
     // MARK: Body
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             TopBar()
 
             DatePicker(
-                "Install Date:",
-                selection: $date,
+                selection: $installDate,
                 displayedComponents: [.date]
-            )
+            ) {
+                Text("Install Date:")
+                    .foregroundColor(.secondary)
+                    .bold()
+            }
+
+            DatePicker(
+                selection: $uninstallDate,
+                displayedComponents: [.date]
+            ) {
+                Text("Uninstall Date:")
+                    .foregroundColor(.red)
+                    .bold()
+            }
 
             HStack {
                 Text("Client:")
@@ -41,35 +54,34 @@ struct CreatePullListView: View {
                     .cornerRadius(8)
             }
 
-            VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                Text("Rooms:")
+                    .font(.headline)
+                    .foregroundColor(.red)
 
-                HStack(spacing: 0) {
-                    Text("Rooms:")
-                        .font(.headline)
-                        .foregroundColor(.red)
+                Spacer()
 
-                    Spacer()
+                SmallCTA(type: .red, leadingIcon: "plus", text: "Add Room") {
+                    showCreateRoom = true
+                } 
+            }
 
-                    SmallCTA(type: .red, leadingIcon: "plus", text: "Add Room") {
-                        showCreateRoom = true
-                    } 
-                }
-
-                ScrollView {
-                    LazyVStack {
-                        ForEach(viewModel.selectedList.roomIds, id: \.self) { roomId in
-                            EmptyRoomListItem(roomId)
-                        }
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(viewModel.rooms, id: \.self) { room in
+                        EmptyRoomListItem(room.roomName)
                     }
                 }
-
-                RDButton(variant: .default, size: .default, text: "Create Pull List", fullWidth: true) {
-                    viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
-                    viewModel.createPullList()
-                    dismiss()
-                }
-                .padding(.bottom, 16)
             }
+
+            RDButton(variant: .default, size: .default, text: "Create Pull List", fullWidth: true) {
+                viewModel.selectedList.installDate = installDate.formatted(.dateTime.year().month().day())
+                viewModel.selectedList.uninstallDate = uninstallDate.formatted(.dateTime.year().month().day())
+                viewModel.createPullList()
+                dismiss()
+            }
+            .padding(.bottom, 16)
+            
         }
         .toolbar(.hidden)
         .frameHorizontalPadding()
@@ -87,7 +99,8 @@ struct CreatePullListView: View {
 
     // MARK: TopBar
 
-    @ViewBuilder private func TopBar() -> some View {
+    @ViewBuilder 
+    private func TopBar() -> some View {
         TopAppBar(leadingIcon: {
             BackButton()
         }, header: {
@@ -99,7 +112,7 @@ struct CreatePullListView: View {
         })
     }
 
-    // MARK: Create Empty Room Sheet ()
+    // MARK: Create Empty Room Sheet
 
     @FocusState var keyboardFocused: Bool
     @State private var newRoomName: String = ""
@@ -141,17 +154,16 @@ struct CreatePullListView: View {
         .presentationDetents([.fraction(0.125)])
     }
 
-    // MARK: EmptyRoomListItem()
+    // MARK: Empty Room List Item
 
-    @ViewBuilder private func EmptyRoomListItem(_ roomName: String) -> some View {
+    @ViewBuilder 
+    private func EmptyRoomListItem(_ roomName: String) -> some View {
         HStack(spacing: 0) {
             Text(roomName)
                 .foregroundStyle(Color(.label))
-
             Spacer()
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 10)
+        .padding(12)
         .background(Color(.systemGray5))
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }

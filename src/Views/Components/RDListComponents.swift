@@ -42,11 +42,23 @@ struct RDListDetails: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Text("Install Date: \(installDate)")
+            (
+                Text("Install Date: ")
+                    .foregroundColor(.red)
+                    .bold()
+                +
+                Text(installDate)
+            )
 
             Spacer()
 
-            Text("Client: \(client)")
+            (
+                Text("Client: ")
+                    .foregroundColor(.red)
+                    .bold()
+                +
+                Text(client)
+            )
         }
     }
 }

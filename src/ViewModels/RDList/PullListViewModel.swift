@@ -126,17 +126,14 @@ class PullListViewModel: RDListViewModel {
 
             // creating empty rooms
             let batch = db.batch()
-            for roomName in selectedList.roomIds {
-                let room = Room(roomName: roomName, listId: selectedList.id)
+            for room in rooms {
                 let roomRef = selectedListReference.collection("rooms").document(room.id)
-
                 do {
                     try batch.setData(from: room, forDocument: roomRef)
                 } catch {
-                    print("Error adding item: \(room.id): \(error)")
+                    print("Error adding room: \(room.id): \(error)")
                 }
             }
-
             batch.commit()
         } catch {
             print("Error creating pull list: \(selectedList.id): \(error)")

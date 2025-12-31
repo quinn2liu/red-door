@@ -23,9 +23,10 @@ struct PlanningRoomDetailsView: View {
 
     // MARK: State Variables
 
-    @State private var showSheet: Bool = false
-    @State private var isEditing: Bool = false
-
+    @State private var showAddItemsSheet: Bool = false
+    @State private var showEditRoomSheet: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
 
     // MARK: Body
     
@@ -43,20 +44,21 @@ struct PlanningRoomDetailsView: View {
                 Spacer()
 
                 SmallCTA(type: .red, leadingIcon: SFSymbols.plus, text: "Add Items") { 
-                    showSheet = true
+                    showAddItemsSheet = true
                 }
             }
 
             RoomItemList()
         }
-        .sheet(isPresented: $showSheet) {
-            RoomAddItemsSheet(roomViewModel: $roomViewModel, showSheet: $showSheet)
+        .sheet(isPresented: $showAddItemsSheet) {
+            RoomAddItemsSheet(roomViewModel: $roomViewModel, showSheet: $showAddItemsSheet)
         }
-        .onAppear {
+        .sheet(isPresented: $showEditRoomSheet) {
+            EditRoomSheet(roomViewModel: $roomViewModel)
+        }
+        .task {
             if !roomViewModel.items.isEmpty {
-                Task {
-                    await roomViewModel.loadItemsAndModels()
-                }
+                await roomViewModel.loadItemsAndModels()
             }
         }
         .onChange(of: roomViewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
@@ -64,9 +66,13 @@ struct PlanningRoomDetailsView: View {
                 await roomViewModel.loadItemsAndModels()
             }
         }
+        .alert(alertMessage, isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                alertMessage = ""
+            }
+        }
         .toolbar(.hidden)
         .frameTop()
-        .frameTopPadding()
         .frameHorizontalPadding()
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
@@ -75,13 +81,14 @@ struct PlanningRoomDetailsView: View {
 
     @ViewBuilder
     private func TopBar() -> some View {
-        TopAppBar(leadingIcon: {
-            BackButton()
-        }, header: {
-            Text(roomViewModel.selectedRoom.roomName)
-        }, trailingIcon: {
-            RoomDetailsMenu()
-        }
+        TopAppBar(
+            leadingIcon: {
+                BackButton()
+            }, header: {
+                Text(roomViewModel.selectedRoom.roomName)
+            }, trailingIcon: {
+                RoomDetailsMenu()
+            }
         )
     }
 
@@ -90,87 +97,112 @@ struct PlanningRoomDetailsView: View {
     @ViewBuilder
     private func RoomDetailsMenu() -> some View {
         Menu {
-            Button("Edit Room", systemImage: SFSymbols.pencil) {
-                isEditing = true
+            Button("Edit Room Name", systemImage: "pencil") {
+                showEditRoomSheet = true
             }
 
             Button("Delete Room", systemImage: SFSymbols.trash) {
                 // Task {
-                //     await roomViewModel.deleteRoom()
+                    // await roomViewModel.deleteRoom()
                 // }
             }
         } label: {
-            RDButton(variant: .red, size: .icon, leadingIcon: SFSymbols.ellipsis, iconBold: true, fullWidth: false, action: {})    
-                .clipShape(Circle())
+            RDButton(variant: .red, size: .icon, leadingIcon: SFSymbols.ellipsis, iconBold: true, fullWidth: false, action: {})
+            .clipShape(Circle())
         }
+        .tint(.red)
     }
 
     // MARK: Room Item List
 
     @ViewBuilder
     private func RoomItemList() -> some View {
-        LazyVStack(spacing: 12) {
-            ForEach(roomViewModel.items, id: \.self) { item in
-                NavigationLink(destination: StagingRoomItemView(roomViewModel: $roomViewModel, parentList: parentList, rooms: rooms, item: item)) {
-                    RoomItemListItem(item)
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(roomViewModel.items, id: \.self) { item in
+                    NavigationLink(destination: PlanningRoomItemView(roomViewModel: $roomViewModel, parentList: parentList, rooms: rooms, item: item)) {
+                        RoomItemListItemView(item: item, model: roomViewModel.getModelForItem(item))
+                    }
                 }
             }
+        }
+        .refreshable {
+            await roomViewModel.loadItemsAndModels()
         }
     }
 
     // MARK: Room Item List Item
 
     @ViewBuilder
-    private func RoomItemListItem(_ item: Item) -> some View {
-        HStack(spacing: 12) {
-            if let model = roomViewModel.getModelForItem(item) {
-                if let uiImage = model.primaryImage.uiImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 40, height: 40)
-                        .cornerRadius(4)
-                } else if let imageUrl = model.primaryImage.imageURL {
-                    CachedAsyncImage(url: imageUrl) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 40, height: 40)
-                    } placeholder: {
-                        Color.gray
-                    }
-                } else {
-                    Image(systemName: SFSymbols.photoBadgeExclamationmark)
-                        .foregroundStyle(.gray)
-                        .frame(width: 40, height: 40)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(model.name)
-                        .font(.headline)
-                        .foregroundStyle(Color(.label))
-
-                    HStack {
-                        Text(model.type)
-                        Text("•")
-                        Text(model.primaryColor)
-                        Text("•")
-                        Text(model.primaryMaterial)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(Color(.systemGray))
-                }
+    private func RoomItemListItemView(item: Item, model: Model?) -> some View {
+        HStack(alignment: .center, spacing: 6) {
+            if let image = item.image {
+                ItemImage(image: image)
+            } else if let image = model?.primaryImage {
+                ItemImage(image: image)
             } else {
-                // Fallback if model isn't loaded yet
-                Text(item.id)
-                    .foregroundStyle(Color(.label))
+                Color.gray
+                    .overlay(Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
+                        .foregroundColor(.white))
             }
 
-            if item.attention {
-                Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                Text(model?.name ?? "No Model Name")
+                    .foregroundColor(.primary)
+                
+                HStack(spacing: 4) {
+                    Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                    
+                    Text("•")
+                    
+                    Image(systemName: SFSymbols.circleFill)
+                        .foregroundColor(Model.colorMap[model?.primaryColor ?? ""] ?? .black)
+                    
+                    Text("•")
 
-                Image(systemName: SFSymbols.wrenchFill)
-                    .foregroundStyle(Color.yellow)
+                    Text(model?.primaryMaterial ?? "No Material")
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
+            }
+
+            Spacer() 
+
+            RDButton(variant: .default, size: .icon, leadingIcon: SFSymbols.arrowUturnBackward, iconBold: true, fullWidth: false) {
+                Task {
+                    let success = await roomViewModel.removeItemFromRoom(itemId: item.id)
+                    if success {
+                        alertMessage = "Item successfully removed from room"
+                        showAlert = true
+                    } else {
+                        alertMessage = "Failed to remove item from room"
+                        showAlert = true
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .background(Color(.systemGray5))
+        .cornerRadius(8)
+    }
+
+    // MARK: Item Image
+
+    @ViewBuilder
+    private func ItemImage(image: RDImage, size: CGFloat = 48) -> some View {
+        if let imageURL = image.imageURL {
+            CachedAsyncImage(url: imageURL) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(size)
+                    .cornerRadius(4)
+            } placeholder: {
+                RoundedRectangle(cornerRadius: 4)
+                    .foregroundColor(Color(.systemGray4))
+                    .frame(size)
+                    .overlay(Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
+                        .foregroundColor(.secondary))
             }
         }
     }

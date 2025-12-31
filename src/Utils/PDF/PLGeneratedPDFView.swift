@@ -74,12 +74,12 @@ struct PLGeneratedPDFView: View {
     @ViewBuilder
     private func Header() -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Pull List: \(pullList.id)")
+            Text("Pull List: \(pullList.address.getStreetAddress() ?? "")")
                 .font(.system(size: 20, weight: .bold))
                 .padding(.bottom, 6)
-            Text("Client: \(pullList.client)").font(.system(size: 14))
-            Text("Install Date: \(pullList.installDate)").font(.system(size: 14))
-            Text("Type: \(pullList.listType.rawValue)").font(.system(size: 14))
+            Text("Client: \(pullList.client)").font(.system(size: 12))
+            Text("Install Date: \(pullList.installDate)").font(.system(size: 12))
+            Text("Uninstall Date: \(pullList.uninstallDate)").font(.system(size: 12))
         }
         .padding(.top, 40)
         .padding(.horizontal, 40)

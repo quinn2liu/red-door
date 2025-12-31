@@ -128,6 +128,25 @@ struct ItemDetailView: View {
     @ViewBuilder
     private func ItemDetails() -> some View {
         VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Description:")
+                    .foregroundColor(.red)
+                    .bold()
+
+                Group {
+                    if let model: Model = model {
+                        Text(model.description)
+                    } else {
+                        Text("No description")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(.primary)
+                .padding(6)
+                .background(Color(.systemGray5))
+                .cornerRadius(8)
+            }
+
             HStack(alignment: .center, spacing: 0) {
                 Text("Location: ")
                     .foregroundColor(.red)

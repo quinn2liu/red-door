@@ -106,7 +106,7 @@ struct ItemImage: View {
                 .foregroundColor(Color(.systemGray5))
                 .frame(size)
                 .overlay(
-                    Image(systemName: SFSymbols.photoBadgePlus)
+                    Image(systemName: isEditing ? SFSymbols.photoBadgePlus : SFSymbols.photo)
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.secondary)

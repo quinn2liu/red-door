@@ -41,7 +41,7 @@ struct PlanningPullListView: View {
             RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
 
             HStack(spacing: 0) {
-                SmallCTA(type: .red, leadingIcon: "arrow.counterclockwise", text: "Refresh") {
+                SmallCTA(type: .default, leadingIcon: "arrow.counterclockwise", text: "Refresh") {
                     Task {
                         await viewModel.refreshRDList()
                     }

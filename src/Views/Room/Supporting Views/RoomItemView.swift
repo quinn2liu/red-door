@@ -15,7 +15,8 @@ struct RoomItemView: View {
     @Binding var roomViewModel: RoomViewModel
 
     @State private var showInformation = false
-    @State private var showDuplicateAlert = false
+    @State private var showItemAddedAlert = false
+    @State private var itemAddedAlertMessage: String = ""
     @State private var showQRCode = false
 
     // Image overlay variables
@@ -26,6 +27,8 @@ struct RoomItemView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 12) {
+                DragIndicator()
+
                 TopBar()
                     .padding(.horizontal, 16)
 
@@ -63,18 +66,25 @@ struct RoomItemView: View {
                 Spacer()
 
                 RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.plus, iconBold: true, text: "Add Item to room", fullWidth: true) {
-                    let added = roomViewModel.addItemToRoom(item: item)
-                    if !added {
-                        showDuplicateAlert = true
+                    Task {
+                        let added = await roomViewModel.addItemToRoom(item: item)
+                        if added {
+                            itemAddedAlertMessage = "Item added to \(roomViewModel.selectedRoom.roomName)"
+                        } else {
+                            itemAddedAlertMessage = "Item has already been added to this pull list."
+                        }
+                        showItemAddedAlert = true
                     }
-                    dismiss()
                 }
+                .frameHorizontalPadding()
             }
             .frameTop()
-            .frameTopPadding()
             .toolbar(.hidden)
-            .alert(isPresented: $showDuplicateAlert) {
-                Alert(title: Text("Item Already in Room"), message: Text("The item is already in the room. Please add a different item."), dismissButton: .default(Text("OK")))
+            .alert(itemAddedAlertMessage, isPresented: $showItemAddedAlert) {
+                Button("OK", role: .cancel) {
+                    showItemAddedAlert = false
+                    itemAddedAlertMessage = ""
+                }
             }
             .fullScreenCover(isPresented: $showQRCode) {
                 ItemLabelView(item: item, model: model)

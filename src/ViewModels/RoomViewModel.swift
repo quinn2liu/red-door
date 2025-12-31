@@ -18,6 +18,11 @@ class RoomViewModel {
                 .document(selectedRoom.id)
     }
 
+    var listRef: DocumentReference {
+        return Self.db.collection("pull_lists")
+                .document(selectedRoom.listId)
+    }
+
     var selectedRoom: Room
     var items: [Item] = [] // for display
     var modelsById: [String: Model] = [:] // mapping modelId to model, for display
@@ -52,17 +57,61 @@ class RoomViewModel {
 extension RoomViewModel {
     // MARK: Add Item to Room
 
-    // TODO: maybe add a check for if the item already in pull list (check all rooms)
+    // TODO: maybe add a check for if the item already in pull list (check all rooms, or make rd list store the items)
+    func addItemToRoom(item: Item) async -> Bool {
+        do {
+            let result = try await Self.db.runTransaction { transaction, _ in
+                guard let listSnapshot = try? transaction.getDocument(self.listRef) else {
+                    return nil
+                }
+                guard let list = try? listSnapshot.data(as: RDList.self) else {
+                    return nil
+                }
+                var listRoomsItemIds: Set<String> = []
+                for roomId in list.roomIds {
+                    guard let roomSnapshot = try? transaction.getDocument(self.listRef.collection("rooms").document(roomId)) else {
+                        return nil
+                    }
+                    guard let room = try? roomSnapshot.data(as: Room.self) else {
+                        return nil
+                    }
+                    listRoomsItemIds.formUnion(room.itemModelIdMap.keys)
+                }
+                if !listRoomsItemIds.contains(item.id) {
+                    self.selectedRoom.itemModelIdMap.updateValue(item.modelId, forKey: item.id) // insert into map
+                    // update the room with the new item
+                    guard var room = try? transaction.getDocument(self.roomRef).data(as: Room.self) else {
+                        return nil
+                    }
+                    room.itemModelIdMap.updateValue(item.modelId, forKey: item.id)
+                    do {
+                        try transaction.setData(from: room, forDocument: self.roomRef)
+                    } catch {
+                        print("Error updating room: \(room.id): \(error)")
+                        return nil
+                    }
+                    return true
+                }
+                return nil
+            }
+            return result != nil
+        } catch {
+            print("Error adding item \(item.id) to room \(selectedRoom.id): \(error)")
+            return false
+        }
+    }
 
-    func addItemToRoom(item: Item) -> Bool {
-        let itemIdsSet = Set(selectedRoom.itemModelIdMap.keys)
-        if !itemIdsSet.contains(item.id) { // the itemId doesn't already exist in the room's items and was added
-            selectedRoom.itemModelIdMap.updateValue(item.modelId, forKey: item.id) // insert into map
+    // MARK: Remove Item from Room
 
-            // update the room with the new item
-            roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
+    @MainActor
+    func removeItemFromRoom(itemId: String) async -> Bool {
+        do {
+            selectedRoom.itemModelIdMap.removeValue(forKey: itemId)
+            items.removeAll { $0.id == itemId }
+            try await roomRef.updateData(["itemModelIdMap": selectedRoom.itemModelIdMap])
             return true
-        } else { // itemId already exists for the room
+        } catch {
+            print("Error removing item \(itemId): \(error)")
             return false
         }
     }
@@ -73,7 +122,7 @@ extension RoomViewModel {
         let newRoomRef = Self.db.collection("pull_lists").document(selectedRoom.listId).collection("rooms").document(newRoomId)
         
         do {
-            let result = try await Self.db.runTransaction { transaction, _ -> Any? in
+            let result = try await Self.db.runTransaction { transaction, _ in
                 // Read both room documents within the transaction
                 let newRoomSnapshot: DocumentSnapshot
                 let currentRoomSnapshot: DocumentSnapshot
@@ -242,7 +291,7 @@ extension RoomViewModel {
         }
     }
 
-    // MARK: Remove Item from Room
+    // MARK: Deselect Item from Room
 
     @MainActor
     func deselectItem(itemId: String) async {
@@ -255,7 +304,7 @@ extension RoomViewModel {
         }
     }
 
-    // MARK: Add Item to Room
+    // MARK: Select Item in Room
 
     @MainActor
     func selectItem(itemId: String) async {

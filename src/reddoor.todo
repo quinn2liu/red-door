@@ -1,8 +1,8 @@
 TODO: General:
-    ☐ FEATURE: when adding item to pull list, have the list items have the index and make sure it gives an alert if already in the list
     ☐ FEATURE: in options view, make it possible for users to see current bugs and feature requests
     ☐ FEATURE: make all the view names consistent
     ☐ FEATURE: maybe go back to the old file structure lol
+    ☐ VIEW: for views relating to pull lists, to make them reusable, abstract it with a "status" enum? (like planning, staging, installed, unstaged)
 
 TODO: Address:
 
@@ -21,8 +21,11 @@ TODO: Pull Lists:
         ☐ VIEW: General Room Views
         ☐ FEATURE: Remove room
         ☐ TODO: RoomAddItemsSheet should use updated logic to standard model inventory view
-        ☐ TODO: Make sure that the same item can't be added to multiple rooms (roomviewmodel.addItemToRoom)
-            - maybe RDList has a list of all its itemids (maybe itemId to roomId map, for easy realtime listening? or maybe contains the rooms as objects?)
+        ☐ TODO: Get better solution for checking if item is already in pull list (for roomviewmodel.addItemToRoom)
+            - IDEA: RDList contains itemId -> roomId map, and then the list contains a subcollections for rooms (which only contains info like roomName, selectedItemIdSet).
+                - this helps with realtime listening
+                - issue is that you get rid of item the item to model id mapping (so need to fire multiple calls to get the item and model... which we already do lol)
+        ☐ VIEW: make the edit room sheet view abstracted
 
 TODO: Installed Lists:
     Pipeline:

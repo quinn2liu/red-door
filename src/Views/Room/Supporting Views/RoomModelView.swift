@@ -35,6 +35,8 @@ struct RoomModelView: View {
 
     var body: some View {
         VStack(spacing: 12) {
+            DragIndicator()
+            
             TopBar()
 
             ModelImages(model: $modelViewModel.selectedModel, selectedRDImage: $selectedRDImage, isImageSelected: $isImageSelected, isEditing: .constant(false))
@@ -44,7 +46,6 @@ struct RoomModelView: View {
             ModelItemListView()
         }
         .frameTop()
-        .frameTopPadding()
         .frameHorizontalPadding()
         .toolbar(.hidden)
         .task {
@@ -73,7 +74,8 @@ struct RoomModelView: View {
 
     // MARK: - Model Name View
 
-    @ViewBuilder private func ModelNameView() -> some View {
+    @ViewBuilder 
+    private func ModelNameView() -> some View {
         HStack {
             Text("Name:")
                 .font(.headline)
