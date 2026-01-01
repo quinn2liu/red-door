@@ -1,8 +1,6 @@
 TODO: General:
     ☐ FEATURE: in options view, make it possible for users to see current bugs and feature requests
-    ☐ FEATURE: make all the view names consistent
-    ☐ FEATURE: maybe go back to the old file structure lol
-    ☐ VIEW: for views relating to pull lists, to make them reusable, abstract it with a "status" enum? (like planning, staging, installed, unstaged)
+    ☐ FEATURE: delete room from pull
 
 TODO: Address:
 
@@ -51,3 +49,7 @@ TODO: Major Changes:
             ☐ FEATURE: abstract the image views to avoid duplicate code
         ☐ FEATURE: DataStores (Model, Item, Room, RDList, Images, etc.)
         ☐ FEATURE: look into making "model view components", "item view components", "RDlist view components", etc to avoid duplicate code
+
+    ☐ FEATURE: make all the view names consistent
+    ☐ FEATURE: maybe go back to the old file structure lol
+    ☐ VIEW: for views relating to pull lists, to make them reusable, abstract it with a "status" enum? (like planning, staging, installed, unstaged)

@@ -37,9 +37,7 @@ struct EditRoomSheet: View {
                 Spacer()
 
                 Button {
-                    roomViewModel.selectedRoom.id = Room.nameToId(roomName: editingRoom.roomName)
-                    roomViewModel.selectedRoom.roomName = editingRoom.roomName
-                    roomViewModel.updateRoom()
+                    roomViewModel.updateRoom(newRoom: editingRoom)
                     dismiss()
                 } label: {
                     Text("Save")

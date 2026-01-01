@@ -116,7 +116,7 @@ struct PullListPDFView: View {
         )
 
         let renderer = ImageRenderer(content: pdfView)
-        renderer.proposedSize = .init(width: 612, height: 792) // US Letter
+        renderer.proposedSize = .init(width: 850, height: 1100) // Wider format for better column visibility
 
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString + ".pdf")

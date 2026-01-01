@@ -32,24 +32,7 @@ struct PLGeneratedPDFView: View {
                                 RoomHeader()
 
                                 ForEach(roomVM.items, id: \.id) { item in
-                                    HStack(spacing: 0) {
-                                        ItemImage(item)
-                                            .frame(width: 60, alignment: .center)
-                                            .padding(.leading, 10)
-
-                                        Text(item.modelId)
-                                            .font(.system(size: 11))
-                                            .frame(width: 180, alignment: .leading)
-                                            .padding(.leading, 8)
-
-                                        Text(item.listId)
-                                            .font(.system(size: 11))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.leading, 8)
-                                    }
-                                    .frame(height: 50)
-                                    .background(Color.white)
-                                    .overlay(Rectangle().stroke(Color(white: 0.8), lineWidth: 1))
+                                    ItemRow(item: item, roomVM: roomVM)
                                 }
                             }
                             .padding(.horizontal, 40)
@@ -65,7 +48,7 @@ struct PLGeneratedPDFView: View {
 
             Spacer()
         }
-        .frame(width: 612, height: 792)
+        .frame(width: 850, height: 1100)
         .background(Color.white)
     }
 
@@ -92,23 +75,107 @@ struct PLGeneratedPDFView: View {
     private func RoomHeader() -> some View {
         HStack(spacing: 0) {
             Text("Image")
-                .font(.system(size: 12, weight: .bold))
-                .frame(width: 60, alignment: .leading)
-                .padding(.leading, 8)
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 50, alignment: .leading)
+                .padding(.leading, 6)
+
+            Text("Name")    
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 80, alignment: .leading)
+                .padding(.leading, 6)
 
             Text("Item ID")
-                .font(.system(size: 12, weight: .bold))
-                .frame(width: 180, alignment: .leading)
-                .padding(.leading, 8)
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 120, alignment: .leading)
+                .padding(.leading, 6)
+
+            Text("Type")
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 100, alignment: .leading)
+                .padding(.leading, 6)
 
             Text("Location")
-                .font(.system(size: 12, weight: .bold))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 8)
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 120, alignment: .leading)
+                .padding(.leading, 6)
+
+            Text("Essential")
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 60, alignment: .center)
+
+            Text("QR Code")
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 60, alignment: .center)
         }
         .frame(height: 25)
         .background(Color(white: 0.9))
         .overlay(Rectangle().stroke(Color(white: 0.7), lineWidth: 1))
+    }
+
+    // MARK: Item Row
+
+    @ViewBuilder
+    private func ItemRow(item: Item, roomVM: RoomViewModel) -> some View {
+        let model = roomVM.modelsById[item.modelId]
+        
+        HStack(spacing: 0) {
+            ItemImage(item)
+                .frame(width: 50, height: 50, alignment: .center)
+                .padding(.leading, 6)
+
+            Text(model?.name ?? "N/A")
+                .font(.system(size: 9))
+                .frame(width: 80, alignment: .leading)
+                .padding(.leading, 6)
+                .lineLimit(2)
+
+            Text(item.modelId)
+                .font(.system(size: 9))
+                .frame(width: 120, alignment: .leading)
+                .padding(.leading, 6)
+                .lineLimit(2)
+
+            Text(model?.type ?? "N/A")
+                .font(.system(size: 9))
+                .frame(width: 100, alignment: .leading)
+                .padding(.leading, 6)
+                .lineLimit(1)
+
+            Text(item.listId)
+                .font(.system(size: 9))
+                .frame(width: 120, alignment: .leading)
+                .padding(.leading, 6)
+                .lineLimit(2)
+
+            if let model = model {
+                Image(systemName: model.isEssential ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 12))
+                    .foregroundColor(model.isEssential ? .green : .gray)
+                    .frame(width: 60, alignment: .center)
+            } else {
+                Text("—")
+                    .font(.system(size: 9))
+                    .foregroundColor(.gray)
+                    .frame(width: 60, alignment: .center)
+            }
+
+            if let qrCodeImage = item.id.generateQRCode() {
+                Image(uiImage: qrCodeImage)
+                    .interpolation(.none)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                    .frame(width: 60, alignment: .center)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(width: 50, height: 50)
+                    .frame(width: 60, alignment: .center)
+            }
+        }
+        .frame(height: 60)
+        .background(Color.white)
+        .overlay(Rectangle().stroke(Color(white: 0.8), lineWidth: 1))
     }
 
     // MARK: Item Image
@@ -118,12 +185,13 @@ struct PLGeneratedPDFView: View {
         if let uiImage = preloadedImages[item.id] {
             Image(uiImage: uiImage)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 40, height: 40)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 50, height: 50)
+                .clipped()
         } else {
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
-                .frame(width: 40, height: 40)
+                .frame(width: 50, height: 50)
         }
     }
 }

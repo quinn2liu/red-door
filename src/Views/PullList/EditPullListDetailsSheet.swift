@@ -13,19 +13,21 @@ struct EditPullListDetailsSheet: View {
     @Binding var viewModel: PullListViewModel
     @State private var editingList: RDList
     @State private var newRoomNames: [String] = []
-    @State private var date: Date
+    @State private var installDate: Date
+    @State private var uninstallDate: Date
 
     @State private var showAddressSheet: Bool = false
-    @State private var showEditRoom: Bool = false
+    @State private var showAddRoom: Bool = false
 
     @FocusState var keyboardFocused: Bool
-    @State private var editingRoomName: String = ""
+    @State private var newRoomName: String = ""
     @State private var existingRoomAlert: Bool = false
 
     init(viewModel: Binding<PullListViewModel>) {
         _viewModel = viewModel
         self.editingList = viewModel.wrappedValue.selectedList
-        self.date = (try? Date(viewModel.wrappedValue.selectedList.installDate, strategy: .dateTime.year().month().day())) ?? Date()
+        self.installDate = (try? Date(viewModel.wrappedValue.selectedList.installDate, strategy: .dateTime.year().month().day())) ?? Date()
+        self.uninstallDate = (try? Date(viewModel.wrappedValue.selectedList.uninstallDate, strategy: .dateTime.year().month().day())) ?? Date()
     }
 
     // MARK: Body
@@ -35,10 +37,22 @@ struct EditPullListDetailsSheet: View {
             TopBar()
 
             DatePicker(
-                "Install Date:",
-                selection: $date,
+                selection: $installDate,
                 displayedComponents: [.date]
-            )
+            ) {
+                Text("Install Date:")
+                    .foregroundColor(.secondary)
+                    .bold()
+            }
+
+            DatePicker(
+                selection: $uninstallDate,
+                displayedComponents: [.date]
+            ) {
+                Text("Uninstall Date:")
+                    .foregroundColor(.red)
+                    .bold()
+            }
 
             HStack {
                 Text("Client:")
@@ -53,13 +67,14 @@ struct EditPullListDetailsSheet: View {
         .frameTop()
         .frameHorizontalPadding()
         .frameVerticalPadding()
+        .presentationDetents([.medium])
         .sheet(isPresented: $showAddressSheet) {
             AddressSheet(selectedAddress: $editingList.address, addressId: $editingList.addressId)
         }
-        .sheet(isPresented: $showEditRoom) {
-            EditRoomSheet()
+        .sheet(isPresented: $showAddRoom) {
+            AddRoomSheet()
                 .onAppear {
-                    editingRoomName = ""
+                    newRoomName = ""
                     keyboardFocused = true
                 }
         }
@@ -108,8 +123,8 @@ struct EditPullListDetailsSheet: View {
                 Spacer()
 
                 SmallCTA(type: .red, leadingIcon: "plus", text: "Add Room") {
-                    showEditRoom = true
-                    editingRoomName = ""
+                    showAddRoom = true
+                    newRoomName = ""
                 }
             }
 
@@ -127,15 +142,15 @@ struct EditPullListDetailsSheet: View {
 
     // MARK: Create Empty Room Sheet
     @ViewBuilder
-    private func EditRoomSheet() -> some View {
+    private func AddRoomSheet() -> some View {
         VStack(spacing: 16) {
-            TextField("Room Name", text: $editingRoomName)
+            TextField("Room Name", text: $newRoomName)
                 .focused($keyboardFocused)
                 .submitLabel(.done)
 
             HStack(spacing: 0) {
                 Button {
-                    showEditRoom = false
+                    showAddRoom = false
                 } label: {
                     Text("Cancel")
                         .foregroundStyle(.red)
@@ -145,11 +160,11 @@ struct EditPullListDetailsSheet: View {
 
                 Button {
                     // Creating a new room
-                    existingRoomAlert = viewModel.roomExists(newRoomName: editingRoomName, roomIds: editingList.roomIds)
+                    existingRoomAlert = viewModel.roomExists(newRoomName: newRoomName, roomIds: editingList.roomIds)
                     if !existingRoomAlert {
-                        editingList.roomIds.append(Room.nameToId(roomName: editingRoomName))
-                        newRoomNames.append(editingRoomName)
-                        showEditRoom = false
+                        editingList.roomIds.append(Room.nameToId(roomName: newRoomName))
+                        newRoomNames.append(newRoomName)
+                        showAddRoom = false
                     }
                 } label: {
                     Text("Add Room")

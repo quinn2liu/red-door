@@ -41,11 +41,11 @@ class RoomViewModel {
 
     // MARK: updateRoom
 
-    func updateRoom() {
+    func updateRoom(newRoom: Room) {
         do {
-            try roomRef.setData(from: selectedRoom)
+            try roomRef.setData(from: newRoom)
         } catch {
-            print("Error updating room: \(selectedRoom.id): \(error)")
+            print("Error updating room: \(newRoom.id): \(error)")
         }
     }
 
@@ -90,6 +90,7 @@ extension RoomViewModel {
                         print("Error updating room: \(room.id): \(error)")
                         return nil
                     }
+                    self.items.append(item)
                     return true
                 }
                 return nil

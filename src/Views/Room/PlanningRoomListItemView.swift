@@ -26,20 +26,7 @@ struct PreviewRoomListItemView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Use NavigationLink when items are empty, Button when not
-            if viewModel.items.isEmpty {
-                NavigationLink(
-                    destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)
-                ) {
-                    RoomPreviewHeader()
-                }
-            } else {
-                Button {
-                    showRoomPreview.toggle()
-                } label: {
-                    RoomPreviewHeader()
-                }
-            }
+            RoomPreviewHeader()
             
             if showRoomPreview {
                 NavigationLink(destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
@@ -55,11 +42,15 @@ struct PreviewRoomListItemView: View {
         }
     }
 
-    // MARK: Room Preview Content
+    // MARK: Room Preview Header
 
     @ViewBuilder
     private func RoomPreviewHeader() -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 12) {
+            RDButton(variant: .outline, size: .icon, leadingIcon: showRoomPreview ? SFSymbols.minus : SFSymbols.plus, iconBold: true, fullWidth: false) {
+                showRoomPreview.toggle()
+            }
+
             Text(viewModel.selectedRoom.roomName)
                 .foregroundColor(.primary)
 
@@ -75,16 +66,17 @@ struct PreviewRoomListItemView: View {
                     .foregroundColor(.red)
             )
 
-            if !viewModel.items.isEmpty {
-                Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
-                    .bold()
-                    .foregroundColor(.secondary)
-                    .frame(24)
-            } else {
+            NavigationLink(destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
                 Image(systemName: SFSymbols.chevronRight)
-                    .bold()
-                    .foregroundColor(.secondary)
-                    .frame(24)
+                    .font(.system(size: 14))
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(8)
+                    .frame(32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(.red)
+                    )
             }
         }
     }
