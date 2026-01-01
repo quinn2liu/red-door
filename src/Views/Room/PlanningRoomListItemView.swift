@@ -53,6 +53,7 @@ struct PreviewRoomListItemView: View {
 
             Text(viewModel.selectedRoom.roomName)
                 .foregroundColor(.primary)
+                .bold()
 
             Spacer()
 
@@ -87,8 +88,8 @@ struct PreviewRoomListItemView: View {
     private func RoomPreview() -> some View {
         HStack(spacing: 0) {
             LazyVGrid(columns: [
-                GridItem(.adaptive(minimum: 120, maximum: 200)),
-                GridItem(.adaptive(minimum: 120, maximum: 200))
+                GridItem(.flexible()),
+                GridItem(.flexible()),
             ], spacing: 4) {
                 ForEach(viewModel.items, id: \.self) { item in
                     ItemListItem(item: item)
@@ -111,17 +112,29 @@ struct PreviewRoomListItemView: View {
         HStack(spacing: 8) {            
             ItemModelImage(item: item, model: model)
 
-            Group {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(model?.name ?? "No Model Name")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
-                Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                HStack(spacing: 4) {
+                    Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                        .foregroundColor(.secondary)
+
+                    Image(systemName: SFSymbols.circleFill)
+                        .foregroundColor(Model.colorMap[model?.primaryColor ?? ""] ?? .black)
+                }
+                .font(.caption)
+
+                Spacer()
             }
-            .font(.caption)
-            .foregroundColor(.secondary)
         }
+        .frame(maxWidth: .infinity)
         .padding(12)
-        .background(Color(.systemGray4))
-        .cornerRadius(6)
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(item.attention ? Color.yellow.opacity(0.75) : Color(.systemGray3), lineWidth: 2)
+        )
     }
 
 

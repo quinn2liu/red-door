@@ -2,52 +2,349 @@
 //  PlanningRoomItemView.swift
 //  RedDoor
 //
-//  Created by Quinn Liu on 2/23/25.
+//  Created by Quinn Liu on 1/8/25.
 //
 
+import CachedAsyncImage
 import SwiftUI
 
 struct PlanningRoomItemView: View {
+    @Environment(NavigationCoordinator.self) var coordinator
     @Environment(\.dismiss) private var dismiss
-
     @Binding var roomViewModel: RoomViewModel
-    var parentList: RDList
-    var rooms: [Room]
-    var item: Item
-    var model: Model? = nil
+    let item: Item
+    @State var model: Model?
+    let parentList: RDList
+    let rooms: [Room]
+    let currentRoomName: String
+
+    @State private var showQRCode: Bool = false
+    @State private var qrCode: UIImage? = nil
+    @State private var showInformation: Bool = false
 
     @State private var showOtherRoomSheet: Bool = false
-    @State private var roomToMoveTo: Room? = nil
-    @State private var showMovedAlert: Bool = false
-    @State private var showInvalidMoveAlert: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
 
-    // MARK: Body
+    @State private var showRemoveConfirmationAlert: Bool = false
+    
+    // Image overlay variables
+    @State private var selectedRDImage: RDImage? = nil
+    @State private var isImageSelected: Bool = false
+
+    // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Item ID: \(item.id)")
+        ZStack {
+            VStack(spacing: 12) {
+                TopBar()
+                    .padding(.horizontal, 16)
 
-            Button {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 0) {
+                            VStack(spacing: 6) {
+                                Text("Model Image:")
+                                    .bold()
+                                ModelImageView()
+                            }
+
+                            Spacer()
+
+                            VStack(spacing: 6) {
+                                Text("Item Image:")
+                                    .bold()
+                                ItemImageView()
+                            }
+                        }
+
+                        ItemDetails()
+
+                        ModelInformation()
+
+                    }
+                    .padding(.top, 4)
+                    .frameHorizontalPadding()
+                }
+
+                Footer()
+            }
+            .sheet(isPresented: $showOtherRoomSheet) {
+                OtherRoomSheet()
+            }
+            .alert(alertMessage, isPresented: $showAlert) {
+                Button("OK", role: .cancel) {
+                    alertMessage = ""
+                    dismiss()
+                }
+            }
+            .alert("Remove Item", isPresented: $showRemoveConfirmationAlert) {
+                Button("Remove", role: .destructive) {
+                    Task {
+                        let success = await roomViewModel.removeItemFromRoom(itemId: item.id)
+                        if success {
+                            alertMessage = "Item has been removed from \(currentRoomName)."
+                            showAlert = true
+                            dismiss()
+                        }
+                    }
+                }
+                Button("Cancel", role: .cancel) {
+                    showRemoveConfirmationAlert = false
+                }
+            } message: {
+                Text("Are you sure you want to remove this item from \(currentRoomName)?")
+            }
+            .frameTop()
+            .frameBottomPadding()
+            .toolbar(.hidden)
+            .fullScreenCover(isPresented: $showQRCode) {
+                if let model: Model = model {
+                    ItemLabelView(item: item, model: model, )
+                } else {
+                    Text("Error loading item. Please try again.")
+                }
+            }
+            .task {
+                if model == nil {
+                    model = await Item.getItemModel(modelId: item.modelId)
+                }
+            }
+            .overlay(
+                ModelRDImageOverlay(selectedRDImage: selectedRDImage, isImageSelected: $isImageSelected)
+                    .animation(.easeInOut(duration: 0.3), value: isImageSelected)
+            )
+        }
+    }
+
+    // MARK: Top Bar
+
+    @ViewBuilder
+    private func TopBar() -> some View {
+        TopAppBar(leadingIcon: {
+            BackButton()
+        }, header: {
+            HStack(spacing: 0) {
+                Text("Item: ")
+                    .bold()
+                    .foregroundColor(.red)
+
+                Text(model?.name ?? "Loading...")
+            }
+        }, trailingIcon: {
+            Spacer().frame(32)
+        })
+    }
+
+    // MARK: Item Details
+    @ViewBuilder
+    private func ItemDetails() -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Description:")
+                    .foregroundColor(.red)
+                    .bold()
+
+                Group {
+                    if let model: Model = model {
+                        Text(model.description)
+                    } else {
+                        Text("No description")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(.primary)
+                .padding(6)
+                .background(Color(.systemGray4))
+                .cornerRadius(8)
+            }
+
+            HStack(alignment: .center, spacing: 0) {
+                Text("Location: ")
+                    .foregroundColor(.red)
+                    .bold()
+
+                Text(item.listId)
+            }
+
+            HStack(alignment: .center, spacing: 0) {
+                Text("ID: ")
+                    .foregroundColor(.red)
+                    .bold()
+                
+                Text(item.id)
+                    .font(.caption)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .center, spacing: 4) {
+                    Text("Needs Attention: ")
+                        .foregroundColor(.red)
+                        .bold()
+                    
+                    Image(systemName: SFSymbols.exclamationmarkTriangleFill)
+                        .foregroundColor(item.attention ? .yellow : .gray)
+                }
+
+                if item.attention {
+                    Text(item.attentionReason)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                        .background(Color(.systemGray5))
+                        .cornerRadius(6)
+                }
+            }
+        }
+        .padding(8)
+        .background(Color(.systemGray5))
+        .cornerRadius(8)
+    }
+
+    // MARK: Model Information
+    @ViewBuilder
+    private func ModelInformation() -> some View {
+        VStack(spacing: 12) {
+            HStack {
+                Button(action: {
+                    withAnimation(.spring(response: 0.3)) {
+                        showInformation.toggle()
+                    }
+                }) {
+                    HStack(spacing: 0) {
+                        Text("Model Information")
+                        .foregroundColor(.white)
+                        .bold()
+
+                        Spacer()
+                        
+                        Image(systemName: showInformation ? "chevron.up" : "chevron.down")
+                            .foregroundColor(.white)
+                    }
+                    .padding(8)
+                    .background(.red)
+                    .cornerRadius(6)
+                }
+
+                Spacer()
+
+                SmallCTA(type: .red, leadingIcon: SFSymbols.qrcode, text: "Label") {
+                    showQRCode = true
+                }
+            }
+
+            if showInformation {
+                if let model: Model = model {
+                    ModelInformationView(model: model)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                } else {
+                    Text("Error loading model. Please try again.")    
+                }
+            }
+        }
+    }
+
+    // MARK: Model Image View
+    @ViewBuilder
+    private func ModelImageView() -> some View {
+        Button {
+            if model?.primaryImage.imageURL != nil {
+                selectedRDImage = model?.primaryImage
+                isImageSelected = true
+            } else if let uiImage = model?.primaryImage.uiImage {
+                selectedRDImage = RDImage(uiImage: uiImage)
+                isImageSelected = true
+            }
+        } label: {
+            if let model: Model = model, model.primaryImageExists {
+                CachedAsyncImage(url: model.primaryImage.imageURL) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(Constants.screenWidthPadding / 2)
+                    .cornerRadius(8)
+                } placeholder: {
+                    RoundedRectangle(cornerRadius: 12)
+                        .foregroundColor(Color(.systemGray5))
+                        .frame(Constants.screenWidthPadding / 2)
+                        .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.secondary)
+                        )
+                }
+            } else {
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(Color(.systemGray5))
+                    .frame(Constants.screenWidthPadding / 2)
+                    .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(.secondary)
+                    )
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    // TODO: abstract this to avoid duplicate code
+    // MARK: Item Image View
+
+    @ViewBuilder
+    private func ItemImageView() -> some View {
+        Button {
+            if let image = item.image, image.imageURL != nil {
+                selectedRDImage = image
+            } else if let uiImage = item.image?.uiImage {
+                selectedRDImage = RDImage(uiImage: uiImage)
+            }
+            isImageSelected = true
+        } label: {
+            if let image = item.image, image.imageExists {
+                CachedAsyncImage(url: image.imageURL) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(Constants.screenWidthPadding / 2)
+                    .cornerRadius(8)
+                } placeholder: {
+                    RoundedRectangle(cornerRadius: 12)
+                        .foregroundColor(Color(.systemGray5))
+                        .frame(Constants.screenWidthPadding / 2)
+                        .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.secondary)
+                        )
+                }
+            } else {
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(Color(.systemGray5))
+                    .frame(Constants.screenWidthPadding / 2)
+                    .overlay(Image(systemName: SFSymbols.photoBadgePlus)
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(.secondary)
+                    )
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    // MARK: Footer 
+    @ViewBuilder
+    private func Footer() -> some View {
+        HStack(spacing: 12) {
+            RDButton(variant: .default, size: .default, leadingIcon: SFSymbols.arrowUturnBackward, iconBold: true, text: "Move to Other Room", fullWidth: false) {
                 showOtherRoomSheet = true
-            } label: {
-                Text("Move Item to Separate Room")
+            }
+
+            RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.arrowUturnBackward, iconBold: true, text: "Remove from \(currentRoomName)", fullWidth: false) {
+                showRemoveConfirmationAlert = true
             }
         }
-        .alert("Invalid Move", isPresented: $showInvalidMoveAlert) {
-            Button("OK", role: .cancel) {
-                dismiss()
-            }
-        } message: {
-            Text("Item is already in the selected room. Please refresh.")
-        }
-        .sheet(isPresented: $showOtherRoomSheet) {
-            OtherRoomSheet()
-        }
- 
     }
 
     // MARK: Other Room Sheet
-
     @ViewBuilder
     private func OtherRoomSheet() -> some View {
         VStack(spacing: 16) {
@@ -55,19 +352,19 @@ struct PlanningRoomItemView: View {
 
             Text("Other Rooms:")
             LazyVStack(spacing: 12) {
-                ForEach(rooms, id: \.self) { room in
-                    if room.id != roomViewModel.selectedRoom.id {
+                ForEach(rooms, id: \.self) { otherRoom in
+                    if otherRoom.id != roomViewModel.selectedRoom.id {
                         Button {
                             Task {
                                 showOtherRoomSheet = false
-                                let added = await roomViewModel.moveItemToNewRoom(item: item, newRoomId: room.id)
+                                let added = await roomViewModel.moveItemToNewRoom(item: item, newRoomId: otherRoom.id)
                                 if added {
-                                    roomToMoveTo = room
-                                    showMovedAlert = true
+                                    showAlert = true
+                                    alertMessage = "Item has been moved to \(otherRoom.roomName)."
                                 }
                             }
                         } label: {
-                            Text(room.roomName)
+                            Text(otherRoom.roomName)
                                 .padding()
                                 .background(Color(.systemGray5))
                                 .cornerRadius(6)
@@ -76,20 +373,5 @@ struct PlanningRoomItemView: View {
                 }
             }
         }
-        .alert("Item Moved", isPresented: $showMovedAlert) {
-            Button("OK", role: .cancel) {
-                dismiss()
-            }
-        } message: {
-            if let roomToMoveTo = roomToMoveTo {
-                Text("Item has been moved to the \(roomToMoveTo.roomName).")
-            } else {
-                Text("Item has been moved to the selected room.")
-            }
-        }
     }
 }
-
-// #Preview {
-//    RoomItemView()
-// }

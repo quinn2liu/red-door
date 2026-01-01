@@ -32,9 +32,8 @@ struct StagingRoomItemView: View {
         .sheet(isPresented: $showOtherRoomSheet) {
             OtherRoomSheet()
         }
- 
     }
-
+    
     @ViewBuilder
     private func OtherRoomSheet() -> some View {
         VStack(spacing: 16) {

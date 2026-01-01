@@ -9,20 +9,17 @@ import Foundation
 import PDFKit
 import SwiftUI
 
-// MARK: - Sample SwiftUI View
-
 struct PullListPDFView: View {
-    // MARK: view variables
 
     @Environment(\.dismiss) private var dismiss
     @State private var pdfDocument: PDFDocument? = nil
     @State private var isGeneratingPDF: Bool = false
     @State private var pdfData: Data? = nil
 
-    // MARK: Init variables
-
     var pullList: RDList
     var rooms: [Room]
+
+    // MARK: Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -108,7 +105,6 @@ struct PullListPDFView: View {
 
         let preloadedImages: [String: UIImage] = await preloadImages(for: roomViewModels)
 
-        // Create PDF using ImageRenderer
         let pdfView = PLGeneratedPDFView(
             pullList: pullList,
             roomViewModels: roomViewModels,
@@ -116,7 +112,7 @@ struct PullListPDFView: View {
         )
 
         let renderer = ImageRenderer(content: pdfView)
-        renderer.proposedSize = .init(width: 850, height: 1100) // Wider format for better column visibility
+        renderer.proposedSize = .init(width: 850, height: 1100)
 
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString + ".pdf")

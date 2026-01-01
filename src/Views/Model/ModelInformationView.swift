@@ -26,7 +26,7 @@ struct ModelInformationView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(model.description.isEmpty ? .secondary : .primary)
                         .padding(8)
-                        .background(Color(.systemGray5))
+                        .background(Color(.systemGray4))
                         .cornerRadius(8)
                 }
 
@@ -44,7 +44,7 @@ struct ModelInformationView: View {
                             Image(systemName: SFSymbols.circleFill)
                                 .foregroundColor(Model.colorMap[model.primaryColor] ?? .black)
                                 .padding(8)
-                                .background(Color(.systemGray5))
+                                .background(Color(.systemGray4))
                                 .cornerRadius(6)
                         }
                     }
@@ -59,13 +59,13 @@ struct ModelInformationView: View {
                             Image(systemName: SFSymbols.circleFill)
                                 .foregroundColor(Model.colorMap[model.secondaryColor] ?? .black)
                                 .padding(8)
-                                .background(Color(.systemGray5))
+                                .background(Color(.systemGray4))
                                 .cornerRadius(6)
                         }
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray5))
+                .background(Color(.systemGray4))
                 .cornerRadius(8)
             }
 
@@ -83,7 +83,7 @@ struct ModelInformationView: View {
                         Text(model.primaryMaterial)
                             .foregroundColor(.primary)
                             .padding(8)
-                            .background(Color(.systemGray5))
+                            .background(Color(.systemGray4))
                             .cornerRadius(6)
                     }
 
@@ -95,12 +95,12 @@ struct ModelInformationView: View {
                         Text(model.secondaryMaterial)
                             .foregroundColor(.primary)
                             .padding(8)
-                            .background(Color(.systemGray5))
+                            .background(Color(.systemGray4))
                             .cornerRadius(6)
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray5))
+                .background(Color(.systemGray4))
                 .cornerRadius(8)
             }
 
@@ -121,7 +121,7 @@ struct ModelInformationView: View {
                                     .truncationMode(.tail)
                                 Image(systemName: Model.typeMap[model.type] ?? "camera.metering.unknown")
                                     .padding(8)
-                                    .background(Color(.systemGray5))
+                                    .background(Color(.systemGray4))
                                     .cornerRadius(6)
                             }
                         }
@@ -140,9 +140,12 @@ struct ModelInformationView: View {
                     }
                 }
                 .padding(8)
-                .background(Color(.systemGray5))
+                .background(Color(.systemGray4))
                 .cornerRadius(8)
             }
         }
+        .padding(8)
+        .background(Color(.systemGray5))
+        .cornerRadius(8)
     }
 }

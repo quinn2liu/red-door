@@ -94,9 +94,13 @@ struct EditPullListDetailsSheet: View {
             }
         }, trailingIcon: {
             RDButton(variant: .red, size: .icon, leadingIcon: "checkmark", iconBold: true, fullWidth: false) {
-                let dateString = date.formatted(.dateTime.year().month().day())
-                if dateString != viewModel.selectedList.installDate {
-                    viewModel.selectedList.installDate = date.formatted(.dateTime.year().month().day())
+                let installDateString = installDate.formatted(.dateTime.year().month().day())
+                if installDateString != viewModel.selectedList.installDate {
+                    viewModel.selectedList.installDate = installDateString
+                }
+                let uninstallDateString = uninstallDate.formatted(.dateTime.year().month().day())
+                if uninstallDateString != viewModel.selectedList.uninstallDate {
+                    viewModel.selectedList.uninstallDate = uninstallDateString
                 }
                 if editingList != viewModel.selectedList {
                     viewModel.selectedList = editingList
