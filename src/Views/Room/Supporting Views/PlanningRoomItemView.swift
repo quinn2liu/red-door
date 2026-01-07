@@ -21,7 +21,7 @@ struct PlanningRoomItemView: View {
     @State private var qrCode: UIImage? = nil
     @State private var showInformation: Bool = false
 
-    @State private var showOtherRoomSheet: Bool = false
+    @State private var itemToMove: Item? = nil
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
 
@@ -54,7 +54,7 @@ struct PlanningRoomItemView: View {
                 Footer()
                     .frameHorizontalPadding()
             }
-            .sheet(isPresented: $showOtherRoomSheet) {
+            .sheet(item: $itemToMove) { item in
                 MoveItemRoomSheet(roomViewModel: $roomViewModel, alertMessage: $alertMessage, showAlert: $showAlert, parentList: parentList, item: item, rooms: rooms)
             }
             .alert(alertMessage, isPresented: $showAlert) {
@@ -181,7 +181,7 @@ struct PlanningRoomItemView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(8)
         .background(Color(.systemGray5))
         .cornerRadius(8)
@@ -322,7 +322,7 @@ struct PlanningRoomItemView: View {
     private func Footer() -> some View {
         HStack(spacing: 12) {
             RDButton(variant: .default, size: .default, leadingIcon: SFSymbols.arrowUturnBackward, text: "Move to Other Room", fullWidth: true) {
-                showOtherRoomSheet = true
+                itemToMove = item
             }
 
             RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.trash, text: "Remove from \(roomViewModel.selectedRoom.roomName)", fullWidth: true) {

@@ -27,6 +27,7 @@ struct UnstageItemSheet: View {
         _unstagedItems = unstagedItems
     }
 
+    // MARK: Body
     var body: some View {
         VStack(spacing: 12) {
             DragIndicator()
@@ -62,6 +63,7 @@ struct UnstageItemSheet: View {
     }
 
     // MARK: Warehouse List Item
+
     @ViewBuilder
     private func WarehouseListItem(warehouse: Warehouse) -> some View {
         Button {
@@ -92,6 +94,4 @@ struct UnstageItemSheet: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
-
-
 }

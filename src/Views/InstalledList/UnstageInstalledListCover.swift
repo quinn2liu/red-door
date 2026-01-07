@@ -16,6 +16,9 @@ struct UnstageInstalledListCover: View {
     @State private var stagedItems: [Item] = []
     @State private var modelsById: [String: Model] = [:]
 
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+
     @State private var showUnstageSheet: Bool = false
     @State private var selectedItemAndModel: (Item, Model)? = nil
 
@@ -30,9 +33,11 @@ struct UnstageInstalledListCover: View {
             TopBar()
 
             ScrollView {
-                StagedItemList()
-
-                UnstagedItemList()
+                LazyVStack(spacing: 12) {
+                    StagedItemList()
+                    
+                    UnstagedItemList()
+                }
             }
             .refreshable {
                 stagedItems = []
@@ -49,6 +54,9 @@ struct UnstageInstalledListCover: View {
             if let selectedItemAndModel {
                 UnstageItemSheet(selectedItemAndModel, stagedItems: $stagedItems, unstagedItems: $unstagedItems)
             }
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text(alertMessage), message: nil, dismissButton: .default(Text("OK")))
         }
         .frameTop()
         .frameHorizontalPadding()
@@ -117,6 +125,8 @@ struct UnstageInstalledListCover: View {
                     ItemListItem(item)
                 }
             }
+            .padding(4)
+
         }
     }
 
@@ -140,6 +150,7 @@ struct UnstageInstalledListCover: View {
                     ItemListItem(item)
                 }
             }
+            .padding(4)
         }
     }
     
@@ -150,15 +161,52 @@ struct UnstageInstalledListCover: View {
             HStack(spacing: 8) {
                 ItemModelImage(item: item, model: model)
 
-                Text(model.name)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(model.name)
+                        .foregroundColor(.primary)
+                        .bold()
+                
+                    HStack(spacing: 4) {
+                        Image(systemName: Model.typeMap[model.type ?? ""] ?? "nosign")
+                        
+                        Text("•")
+                        
+                        Image(systemName: SFSymbols.circleFill)
+                            .foregroundColor(Model.colorMap[model.primaryColor ?? ""] ?? .black)
+                        
+                        Text("•")
+
+                        Text(model.primaryMaterial ?? "No Material")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
 
                 Spacer()
 
-                RDLinkButton(leadingIcon: "shippingbox") {
-                    selectedItemAndModel = (item, model)
-                    showUnstageSheet = true
+                if item.isAvailable {
+                    RDButton(variant: .default, size: .icon, leadingIcon: SFSymbols.arrowUturnBackward, fullWidth: false) {
+                        Task {
+                            let result = await ItemViewModel(selectedItem: item).revertItemUnstage(listId: item.listId)
+                            unstagedItems.removeAll { $0.id == result.id }
+                            stagedItems.append(result)
+                            alertMessage = "Item status restored to unavailable."
+                            showAlert = true
+                        }
+                    }
+                } else {
+                    RDButton(variant: .red, size: .icon, leadingIcon: SFSymbols.shippingbox, fullWidth: false) {
+                        selectedItemAndModel = (item, model)
+                        showUnstageSheet = true
+                    }
                 }
             }
+            .padding(12)
+            .background(Color(.systemGray5))
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(item.attention ? Color.yellow : Color(.systemGray3), lineWidth: 3)
+            )
         }
     }
 
@@ -169,7 +217,7 @@ struct UnstageInstalledListCover: View {
     private func Footer() -> some View {
         if stagedItems.isEmpty {
             HStack(spacing: 0) {
-                RDButton(variant: .default, text: "Set List as Unstaged", fullWidth: true) {
+                RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.checkmarkSquareFill, text: "Set List as Unstaged", fullWidth: true) {
                     Task {
                         await viewModel.setListAsUnstaged()
                         coordinator.resetSelectedPath()

@@ -50,6 +50,7 @@ struct PreviewRoomListItemView: View {
             RDButton(variant: .outline, size: .icon, leadingIcon: showRoomPreview ? SFSymbols.minus : SFSymbols.plus, iconBold: true, fullWidth: false) {
                 showRoomPreview.toggle()
             }
+            .disabled(viewModel.selectedRoom.itemModelIdMap.isEmpty)
 
             Text(viewModel.selectedRoom.roomName)
                 .foregroundColor(.primary)
@@ -115,6 +116,8 @@ struct PreviewRoomListItemView: View {
                     Text(model?.name ?? "No Model Name")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
 
                     HStack(spacing: 4) {
                         Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")

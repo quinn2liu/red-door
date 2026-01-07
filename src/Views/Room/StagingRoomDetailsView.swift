@@ -23,20 +23,43 @@ struct StagingRoomDetailsView: View {
 
     // MARK: State Variables
 
-    @State private var showItems: Bool = false
-    @State private var isEditing: Bool = false
+    @State private var showAddItemsSheet: Bool = false
+    @State private var showEditRoomSheet: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+    @State private var itemToMove: Item? = nil
 
+    // MARK: Body
+    
     var body: some View {
         VStack(spacing: 16) {
             TopBar()
 
+            HStack(spacing: 0) {
+                SmallCTA(type: .secondary, leadingIcon: SFSymbols.arrowCounterclockwise, text: "Refresh") { 
+                    Task {
+                        await roomViewModel.loadItemsAndModels()
+                    }
+                }
+                
+                Spacer()
+
+                SmallCTA(type: .red, leadingIcon: SFSymbols.plus, text: "Add Items") { 
+                    showAddItemsSheet = true
+                }
+            }
+
             RoomItemList()
         }
-        .onAppear {
+        .sheet(isPresented: $showAddItemsSheet) {
+            RoomAddItemsSheet(roomViewModel: $roomViewModel, showSheet: $showAddItemsSheet)
+        }
+        .sheet(isPresented: $showEditRoomSheet) {
+            EditRoomSheet(roomViewModel: $roomViewModel)
+        }
+        .task {
             if !roomViewModel.items.isEmpty {
-                Task {
-                    await roomViewModel.loadItemsAndModels()
-                }
+                await roomViewModel.loadItemsAndModels()
             }
         }
         .onChange(of: roomViewModel.selectedRoom.itemModelIdMap) { // TODO: not auto-reload?
@@ -44,9 +67,16 @@ struct StagingRoomDetailsView: View {
                 await roomViewModel.loadItemsAndModels()
             }
         }
+        .alert(alertMessage, isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                alertMessage = ""
+            }
+        }
+        .sheet(item: $itemToMove) { item in
+            MoveItemRoomSheet(roomViewModel: $roomViewModel, alertMessage: $alertMessage, showAlert: $showAlert, parentList: parentList, item: item, rooms: rooms)
+        }
         .toolbar(.hidden)
         .frameTop()
-        .frameTopPadding()
         .frameHorizontalPadding()
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
@@ -55,17 +85,20 @@ struct StagingRoomDetailsView: View {
 
     @ViewBuilder
     private func TopBar() -> some View {
-        TopAppBar(leadingIcon: {
-            BackButton()
-        }, header: {
-            Text(roomViewModel.selectedRoom.roomName)
-        }, trailingIcon: {
-            RDButton(variant: .red, size: .icon, leadingIcon: "arrow.counterclockwise", iconBold: true, fullWidth: false) { 
-                Task {
-                    await roomViewModel.loadItemsAndModels()
-                    }
-                }
-                .clipShape(Circle())
+        TopAppBar(
+            leadingIcon: {
+                BackButton()
+            }, header: {
+                (
+                    Text("Room: ")
+                        .foregroundColor(.red)
+                        .bold()
+                    +   
+                    Text(roomViewModel.selectedRoom.roomName)
+                        .bold()
+                )
+            }, trailingIcon: {
+                Spacer().frame(32)
             }
         )
     }
@@ -74,68 +107,89 @@ struct StagingRoomDetailsView: View {
 
     @ViewBuilder
     private func RoomItemList() -> some View {
-        LazyVStack(spacing: 12) {
-            ForEach(roomViewModel.items, id: \.self) { item in
-                NavigationLink(destination: StagingRoomItemView(roomViewModel: $roomViewModel, parentList: parentList, rooms: rooms, item: item)) {
-                    RoomItemListItem(item)
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(roomViewModel.items, id: \.self) { item in
+                    NavigationLink(destination: StagingRoomItemView(roomViewModel: $roomViewModel, item: item, model: roomViewModel.getModelForItem(item), parentList: parentList, rooms: rooms)) {
+                        RoomItemListItemView(item: item, model: roomViewModel.getModelForItem(item))
+                    }
                 }
             }
+            .padding(8)
+        }
+        .refreshable {
+            await roomViewModel.loadItemsAndModels()
         }
     }
 
     // MARK: Room Item List Item
 
     @ViewBuilder
-    private func RoomItemListItem(_ item: Item) -> some View {
-        HStack(spacing: 12) {
-            if let model = roomViewModel.getModelForItem(item) {
-                if let uiImage = model.primaryImage.uiImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 40, height: 40)
-                        .cornerRadius(4)
-                } else if let imageUrl = model.primaryImage.imageURL {
-                    CachedAsyncImage(url: imageUrl) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 40, height: 40)
-                    } placeholder: {
-                        Color.gray
-                    }
-                } else {
-                    Image(systemName: SFSymbols.photoBadgeExclamationmark)
-                        .foregroundStyle(.gray)
-                        .frame(width: 40, height: 40)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(model.name)
-                        .font(.headline)
-                        .foregroundStyle(Color(.label))
-
-                    HStack {
-                        Text(model.type)
-                        Text("•")
-                        Text(model.primaryColor)
-                        Text("•")
-                        Text(model.primaryMaterial)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(Color(.systemGray))
-                }
+    private func RoomItemListItemView(item: Item, model: Model?) -> some View {
+        HStack(alignment: .center, spacing: 8) {
+            if let image = item.image {
+                ItemImage(image: image)
+            } else if let image = model?.primaryImage {
+                ItemImage(image: image)
             } else {
-                // Fallback if model isn't loaded yet
-                Text(item.id)
-                    .foregroundStyle(Color(.label))
+                Color.gray
+                    .overlay(Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
+                        .foregroundColor(.white))
             }
 
-            if item.attention {
-                Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                Text(model?.name ?? "No Model Name")
+                    .foregroundColor(.primary)
+                    .bold()
+                
+                HStack(spacing: 4) {
+                    Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                    
+                    Text("•")
+                    
+                    Image(systemName: SFSymbols.circleFill)
+                        .foregroundColor(Model.colorMap[model?.primaryColor ?? ""] ?? .black)
+                    
+                    Text("•")
 
-                Image(systemName: SFSymbols.wrenchFill)
-                    .foregroundStyle(Color.yellow)
+                    Text(model?.primaryMaterial ?? "No Material")
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
+            }
+
+            Spacer() 
+
+            RDButton(variant: .default, size: .icon, leadingIcon: SFSymbols.arrowUturnBackward, fullWidth: false) {
+                itemToMove = item
+            }
+        }
+        .padding(12)
+        .background(Color(.systemGray5))
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(item.attention ? Color.yellow : Color(.systemGray3), lineWidth: 3)
+        )
+
+    }
+
+    // MARK: Item Image
+
+    @ViewBuilder
+    private func ItemImage(image: RDImage, size: CGFloat = 48) -> some View {
+        if let imageURL = image.imageURL {
+            CachedAsyncImage(url: imageURL) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(size)
+                    .cornerRadius(4)
+            } placeholder: {
+                RoundedRectangle(cornerRadius: 4)
+                    .foregroundColor(Color(.systemGray4))
+                    .frame(size)
+                    .overlay(Image(systemName: SFSymbols.photoBadgeExclamationmarkFill)
+                        .foregroundColor(.secondary))
             }
         }
     }

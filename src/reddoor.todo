@@ -53,3 +53,6 @@ TODO: Major Changes:
     ☐ FEATURE: make all the view names consistent
     ☐ FEATURE: maybe go back to the old file structure lol
     ☐ VIEW: for views relating to pull lists, to make them reusable, abstract it with a "status" enum? (like planning, staging, installed, unstaged)
+
+TODO: Bugs
+    ☐ DEBUG: when adding item to planning room, appears as null room (even after refreshing)

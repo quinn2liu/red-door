@@ -29,7 +29,7 @@ struct EditModelInformationSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Description")
+                Text("Description:")
                     .foregroundColor(.red)
                     .bold()
                     

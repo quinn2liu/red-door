@@ -50,6 +50,7 @@ struct StagingRoomListItemView: View {
             RDButton(variant: .outline, size: .icon, leadingIcon: showRoomPreview ? SFSymbols.minus : SFSymbols.plus, iconBold: true, fullWidth: false) {
                 showRoomPreview.toggle()
             }
+            .disabled(viewModel.selectedRoom.itemModelIdMap.isEmpty)
 
             Text(viewModel.selectedRoom.roomName)
                 .foregroundColor(.primary)
@@ -67,7 +68,7 @@ struct StagingRoomListItemView: View {
                     .foregroundColor(.red)
             )
 
-            NavigationLink(destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
+            NavigationLink(destination: StagingRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
                 Image(systemName: SFSymbols.chevronRight)
                     .font(.system(size: 14))
                     .fontWeight(.bold)
@@ -94,7 +95,6 @@ struct StagingRoomListItemView: View {
                 ItemListItem(item: item)
             }
         }
-        .padding(4)
         .task {
             if !viewModel.selectedRoom.itemModelIdMap.isEmpty {
                 await viewModel.getRoomModels()
@@ -126,6 +126,8 @@ struct StagingRoomListItemView: View {
                     Text(model?.name ?? "No Model Name")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
 
                     HStack(spacing: 4) {
                         Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")

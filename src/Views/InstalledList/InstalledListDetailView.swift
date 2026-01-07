@@ -21,14 +21,19 @@ struct InstalledListDetailView: View {
 
     // MARK: Body
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) {
             RDListTopBar(
                 streetAddress: $viewModel.selectedList.address, 
                 trailingIcon: InstalledListMenu,
                 status: viewModel.selectedList.status
             )
 
-            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
+            RDListDetails(list: viewModel.selectedList)
+
+            Text("Rooms:")
+                .font(.headline)
+                .foregroundColor(.red)
+                .bold()
 
             RoomList()
         }
@@ -39,16 +44,6 @@ struct InstalledListDetailView: View {
         .toolbar(.hidden)
         .frameTop()
         .frameHorizontalPadding()
-    }
-
-    // MARK: Installed List Details
-
-    @ViewBuilder 
-    private func InstalledListDetails() -> some View {
-        VStack(spacing: 12) {
-            Text("Install Date: \(viewModel.selectedList.installDate)")
-            Text("Client: \(viewModel.selectedList.client)")
-        }
     }
 
     // MARK: Room List
@@ -95,5 +90,6 @@ struct InstalledListDetailView: View {
             RDButton(variant: .red, size: .icon, leadingIcon: "ellipsis", iconBold: true, fullWidth: false, action: { })
                 .clipShape(Circle())
         }
+        .tint(.red)
     }
 }

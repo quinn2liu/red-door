@@ -135,6 +135,7 @@ struct InstalledListDocumentView: View {
                         .foregroundColor(.secondary)
 
                     Image(systemName: showInstalledLists ? SFSymbols.chevronUp : SFSymbols.chevronDown)
+                        .bold()
                 }
                 .foregroundColor(.red)
                 .padding(8)

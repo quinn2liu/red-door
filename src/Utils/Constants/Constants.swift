@@ -47,4 +47,6 @@ enum SFSymbols {
     static let chevronRight = "chevron.right"
     static let ellipsis = "ellipsis"
     static let pencil = "pencil"
+    static let checkmarkSquareFill = "checkmark.square.fill"
+    static let shippingbox = "shippingbox"
 }

@@ -38,7 +38,7 @@ struct PlanningPullListView: View {
                 status: viewModel.selectedList.status
             )
 
-            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
+            RDListDetails(list: viewModel.selectedList)
 
             HStack(spacing: 0) {
                 SmallCTA(type: .secondary, leadingIcon: "arrow.counterclockwise", text: "Refresh") {

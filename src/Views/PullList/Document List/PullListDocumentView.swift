@@ -163,6 +163,8 @@ struct PullListDocumentView: View {
                         .foregroundColor(.secondary)
 
                     Image(systemName: showStagingLists ? SFSymbols.chevronUp : SFSymbols.chevronDown)
+                        .bold()
+                        
                 }
                 .padding(8)
                 .background(Color(.systemGray5))

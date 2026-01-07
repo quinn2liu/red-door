@@ -68,6 +68,25 @@ class ItemViewModel {
         return selectedItem
     }
 
+    // MARK: Revert Item Unstage
+    func revertItemUnstage(listId: String) async -> Item {
+        let modelRef = db.collection("models").document(selectedItem.modelId)
+        let batch = db.batch()
+
+        selectedItem.listId = listId
+        selectedItem.isAvailable = false
+        
+        batch.updateData(["listId": listId, "isAvailable": false], forDocument: itemRef)
+        batch.updateData(["availableItemCount": FieldValue.increment(Int64(-1))], forDocument: modelRef)
+
+        do {
+            try await batch.commit()
+        } catch {
+            print("Error reverting item unstage: \(error.localizedDescription)")
+        }
+        return selectedItem
+    }
+
     // MARK: Update Item
     func updateItem() async {
         do {

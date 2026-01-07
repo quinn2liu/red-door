@@ -37,28 +37,47 @@ struct RDListTopBar<TrailingIcon: View>: View {
 }
 
 struct RDListDetails: View {
-    let installDate: String
-    let client: String
+    let list: RDList
 
     var body: some View {
-        HStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
+            (
+                Text("Address: ")
+                    .foregroundColor(.red)
+                    .bold()
+                +
+                Text(list.address.formattedAddress)
+            )
+
             (
                 Text("Install Date: ")
                     .foregroundColor(.red)
                     .bold()
                 +
-                Text(installDate)
+                Text(list.installDate)
             )
 
-            Spacer()
+            (
+                Text("Uninstall Date: ")
+                    .foregroundColor(.red)
+                    .bold()
+                +
+                Text(list.uninstallDate)
+            )
 
             (
                 Text("Client: ")
                     .foregroundColor(.red)
                     .bold()
                 +
-                Text(client)
+                Text(list.client)
             )
         }
+        .frame(maxWidth: .infinity)
+        .padding(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color(.systemGray3), lineWidth: 4)
+        )
     }
 }

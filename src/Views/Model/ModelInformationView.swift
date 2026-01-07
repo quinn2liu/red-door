@@ -18,7 +18,7 @@ struct ModelInformationView: View {
 
                 // MARK: Description
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Description")
+                    Text("Description:")
                         .foregroundColor(.red)
                         .bold()
                         

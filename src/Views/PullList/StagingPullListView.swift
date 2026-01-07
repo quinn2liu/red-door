@@ -12,7 +12,8 @@ struct StagingPullListView: View {
     @Environment(NavigationCoordinator.self) private var coordinator: NavigationCoordinator
 
     @State private var showPDFPreview: Bool = false
-    @State private var errorMessage: String?
+    @State private var alertMessage: String?
+    @State private var showAlert: Bool = false
 
     init(pullList: RDList) {
         viewModel = PullListViewModel(selectedList: pullList)   
@@ -28,7 +29,7 @@ struct StagingPullListView: View {
                 status: viewModel.selectedList.status
             )
 
-            RDListDetails(installDate: viewModel.selectedList.installDate, client: viewModel.selectedList.client)
+            RDListDetails(list: viewModel.selectedList)
 
             HStack(spacing: 0) {
                 SmallCTA(type: .secondary, leadingIcon: SFSymbols.pencilAndListClipboard, text: "Set as planning") {
@@ -60,6 +61,11 @@ struct StagingPullListView: View {
         .ignoresSafeArea(.keyboard)
         .fullScreenCover(isPresented: $showPDFPreview) {
             PullListPDFView(pullList: viewModel.selectedList, rooms: viewModel.rooms)
+        }
+        .alert(alertMessage ?? "", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                alertMessage = nil
+            }
         }
     }
 
@@ -98,7 +104,7 @@ struct StagingPullListView: View {
 
     @ViewBuilder
     private func Footer() -> some View {
-        RDButton(variant: .default, size: .default, leadingIcon: "truck.box.badge.clock.fill", text: "Create Installed List", fullWidth: true) {
+        RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.truckBoxBadgeClockFill, text: "Create Installed List", fullWidth: true) {
             Task { // TODO: consider wrapping this in some error-handling function
                 do {
                     let installedlist = try await viewModel.createInstalledFromPull()
@@ -108,17 +114,17 @@ struct StagingPullListView: View {
                     try? await Task.sleep(for: .milliseconds(250))
                     coordinator.appendToSelectedPath(installedlist)
                 } catch let PullListValidationError.itemDoesNotExist(id) {
-                    errorMessage = "Item \(id) does not exist."
+                    alertMessage = "Item \(id) does not exist."
                 } catch let PullListValidationError.itemNotAvailable(id) {
-                    errorMessage = "Item \(id) is not available."
+                    alertMessage = "Item \(id) is not available."
                 } catch let PullListValidationError.modelDoesNotExist(id) {
-                    errorMessage = "Model \(id) does not exist."
+                    alertMessage = "Model \(id) does not exist."
                 } catch let PullListValidationError.modelAvailableCountInvalid(id) {
-                    errorMessage = "Model \(id) has insufficient available items."
+                    alertMessage = "Model \(id) has insufficient available items."
                 } catch InstalledFromPullError.creationFailed {
-                    errorMessage = "Unable to create Installed list."
+                    alertMessage = "Unable to create Installed list."
                 } catch {
-                    errorMessage = "Unexpected error: \(error.localizedDescription)"
+                    alertMessage = "Unexpected error: \(error.localizedDescription)"
                 }
             }            
         }

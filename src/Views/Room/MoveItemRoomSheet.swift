@@ -18,27 +18,41 @@ struct MoveItemRoomSheet: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text(parentList.address.getStreetAddress() ?? parentList.address.formattedAddress)
+            DragIndicator()
 
-            Text("Other Rooms:")
-            LazyVStack(spacing: 12) {
+            (
+                Text("Other Rooms: ")
+                +
+                Text(parentList.address.getStreetAddress() ?? parentList.address.formattedAddress)
+                    .bold()
+                    .foregroundColor(.red)
+            )
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ForEach(rooms, id: \.self) { otherRoom in
                     if otherRoom.id != roomViewModel.selectedRoom.id {
                         Button {
                             Task {
-                                dismiss()
                                 let added = await roomViewModel.moveItemToNewRoom(item: item, newRoomId: otherRoom.id)
+                                dismiss()
                                 if added {
                                     showAlert = true
                                     alertMessage = "Item has been moved to \(otherRoom.roomName)."
+                                } else {
+                                    showAlert = true
+                                    alertMessage = "Failed to move item to \(otherRoom.roomName)."
                                 }
                             }
                         } label: {
                             Text(otherRoom.roomName)
                                 .padding()
+                                .frame(maxWidth: .infinity)
                                 .background(Color(.systemGray5))
-                                .cornerRadius(6)
+                                .cornerRadius(8)
+                                .foregroundColor(.primary)
+                                .bold()
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
