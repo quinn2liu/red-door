@@ -108,6 +108,7 @@ struct StagingPullListView: View {
             Task { // TODO: consider wrapping this in some error-handling function
                 do {
                     let installedlist = try await viewModel.createInstalledFromPull()
+                    await viewModel.deleteRDList()
                     coordinator.resetSelectedPath()
                     try? await Task.sleep(for: .milliseconds(250))
                     coordinator.setSelectedTab(to:.installedList)
@@ -115,14 +116,19 @@ struct StagingPullListView: View {
                     coordinator.appendToSelectedPath(installedlist)
                 } catch let PullListValidationError.itemDoesNotExist(id) {
                     alertMessage = "Item \(id) does not exist."
+                    showAlert = true
                 } catch let PullListValidationError.itemNotAvailable(id) {
                     alertMessage = "Item \(id) is not available."
+                    showAlert = true
                 } catch let PullListValidationError.modelDoesNotExist(id) {
                     alertMessage = "Model \(id) does not exist."
+                    showAlert = true
                 } catch let PullListValidationError.modelAvailableCountInvalid(id) {
                     alertMessage = "Model \(id) has insufficient available items."
+                    showAlert = true
                 } catch InstalledFromPullError.creationFailed {
                     alertMessage = "Unable to create Installed list."
+                    showAlert = true
                 } catch {
                     alertMessage = "Unexpected error: \(error.localizedDescription)"
                 }

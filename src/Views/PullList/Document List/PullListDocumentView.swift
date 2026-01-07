@@ -142,7 +142,7 @@ struct PullListDocumentView: View {
     
     @ViewBuilder
     private func StagingListSection() -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             Button {
                 withAnimation {
                     showStagingLists.toggle()
@@ -151,24 +151,21 @@ struct PullListDocumentView: View {
                 HStack(spacing: 8) {
                     Text("Staging")
                         .font(.headline)
-                        .foregroundColor(.red)
+                        .foregroundColor(.white)
 
                     Image(systemName: SFSymbols.truckBoxBadgeClockFill)
                         .font(.headline)
-                        .foregroundColor(.red)
+                        .foregroundColor(.white)
 
                     Spacer()
 
                     Text("(\(viewModel.primaryLists.count))")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.black)
 
                     Image(systemName: showStagingLists ? SFSymbols.chevronUp : SFSymbols.chevronDown)
+                        .foregroundColor(.white)
                         .bold()
-                        
                 }
-                .padding(8)
-                .background(Color(.systemGray5))
-                .cornerRadius(6)
             }
             .disabled(viewModel.primaryLists.isEmpty)
 
@@ -189,6 +186,9 @@ struct PullListDocumentView: View {
                 }
             }
         }
+        .padding(12)
+        .background(.red)
+        .cornerRadius(6)
     }
     
     // MARK: Planning Lists Section
@@ -196,8 +196,7 @@ struct PullListDocumentView: View {
     @ViewBuilder
     private func PlanningListSection() -> some View {
         VStack(alignment: .leading, spacing: 8) {
-
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 Text("Planning")
                     .font(.headline)
                     .foregroundColor(.primary)
@@ -208,7 +207,7 @@ struct PullListDocumentView: View {
 
                 Spacer()
             }
-            .padding(8)
+            .padding(12)
             .background(Color(.systemGray5))
             .cornerRadius(6)
             .frame(maxWidth: .infinity)
@@ -236,6 +235,7 @@ struct PullListDocumentView: View {
                             }
                         }
                     }
+                    .padding(8)
                 }
             }
             .refreshable {

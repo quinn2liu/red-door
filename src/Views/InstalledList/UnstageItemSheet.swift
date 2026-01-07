@@ -77,6 +77,7 @@ struct UnstageItemSheet: View {
             HStack(spacing: 16) {
                 Text(warehouse.name)
                     .foregroundColor(.primary)
+                    .bold()
                     
                 VStack(alignment: .leading, spacing: 0) {
                     Text(warehouse.address.getStreetAddress() ?? "")
@@ -87,7 +88,10 @@ struct UnstageItemSheet: View {
                         .foregroundColor(.secondary)
                         .font(.caption2)
                 }
+
+                Spacer()
             }
+            .frame(maxWidth: .infinity)
             .padding()
             .background(Color.gray.opacity(0.1))
             .cornerRadius(8)

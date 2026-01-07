@@ -25,7 +25,7 @@ struct PLGeneratedPDFView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Room: \(roomVM.selectedRoom.roomName)")
                             .font(.system(size: 18, weight: .bold))
-                            .padding(.horizontal, 40)
+                            .padding(.horizontal, 20)
 
                         if !roomVM.items.isEmpty && roomVM.selectedRoom.itemModelIdMap.count > 0 {
                             VStack(spacing: 0) {
@@ -35,12 +35,12 @@ struct PLGeneratedPDFView: View {
                                     ItemRow(item: item, roomVM: roomVM)
                                 }
                             }
-                            .padding(.horizontal, 40)
+                            .padding(.horizontal, 20)
                         } else {
                             Text("No items found")
                                 .font(.system(size: 14))
                                 .foregroundColor(.secondary)
-                                .padding(.horizontal, 40)
+                                .padding(.horizontal, 20)
                         }
                     }
                 }
@@ -65,7 +65,7 @@ struct PLGeneratedPDFView: View {
             Text("Uninstall Date: \(pullList.uninstallDate)").font(.system(size: 12))
         }
         .padding(.top, 40)
-        .padding(.horizontal, 40)
+        .padding(.horizontal, 20)
         .padding(.bottom, 20)
     }
 
@@ -76,36 +76,36 @@ struct PLGeneratedPDFView: View {
         HStack(spacing: 0) {
             Text("Image")
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 50, alignment: .leading)
+                .frame(width: 60, alignment: .leading)
                 .padding(.leading, 6)
 
             Text("Name")    
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 80, alignment: .leading)
+                .frame(width: 120, alignment: .leading)
                 .padding(.leading, 6)
 
             Text("Item ID")
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 120, alignment: .leading)
+                .frame(width: 150, alignment: .leading)
                 .padding(.leading, 6)
 
             Text("Type")
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 100, alignment: .leading)
+                .frame(width: 130, alignment: .leading)
                 .padding(.leading, 6)
 
             Text("Location")
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 120, alignment: .leading)
+                .frame(width: 150, alignment: .leading)
                 .padding(.leading, 6)
 
             Text("Essential")
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 60, alignment: .center)
+                .frame(width: 80, alignment: .center)
 
             Text("QR Code")
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 60, alignment: .center)
+                .frame(width: 80, alignment: .center)
         }
         .frame(height: 25)
         .background(Color(white: 0.9))
@@ -125,25 +125,25 @@ struct PLGeneratedPDFView: View {
 
             Text(model?.name ?? "N/A")
                 .font(.system(size: 9))
-                .frame(width: 80, alignment: .leading)
+                .frame(width: 120, alignment: .leading)
                 .padding(.leading, 6)
                 .lineLimit(2)
 
             Text(item.modelId)
                 .font(.system(size: 9))
-                .frame(width: 120, alignment: .leading)
+                .frame(width: 150, alignment: .leading)
                 .padding(.leading, 6)
                 .lineLimit(2)
 
             Text(model?.type ?? "N/A")
                 .font(.system(size: 9))
-                .frame(width: 100, alignment: .leading)
+                .frame(width: 130, alignment: .leading)
                 .padding(.leading, 6)
                 .lineLimit(1)
 
             Text(item.listId)
                 .font(.system(size: 9))
-                .frame(width: 120, alignment: .leading)
+                .frame(width: 150, alignment: .leading)
                 .padding(.leading, 6)
                 .lineLimit(2)
 
@@ -151,12 +151,12 @@ struct PLGeneratedPDFView: View {
                 Image(systemName: model.isEssential ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 12))
                     .foregroundColor(model.isEssential ? .green : .gray)
-                    .frame(width: 60, alignment: .center)
+                    .frame(width: 80, alignment: .center)
             } else {
                 Text("—")
                     .font(.system(size: 9))
                     .foregroundColor(.gray)
-                    .frame(width: 60, alignment: .center)
+                    .frame(width: 80, alignment: .center)
             }
 
             if let qrCodeImage = item.id.generateQRCode() {
@@ -165,12 +165,12 @@ struct PLGeneratedPDFView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 50, height: 50)
-                    .frame(width: 60, alignment: .center)
+                    .frame(width: 80, alignment: .center)
             } else {
                 Rectangle()
                     .fill(Color.gray.opacity(0.2))
                     .frame(width: 50, height: 50)
-                    .frame(width: 60, alignment: .center)
+                    .frame(width: 80, alignment: .center)
             }
         }
         .frame(height: 60)

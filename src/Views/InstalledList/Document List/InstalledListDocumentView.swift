@@ -116,7 +116,7 @@ struct InstalledListDocumentView: View {
     
     @ViewBuilder
     private func InstalledListSection() -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             Button {
                 withAnimation {
                     showInstalledLists.toggle()
@@ -125,9 +125,11 @@ struct InstalledListDocumentView: View {
                 HStack(spacing: 8) {
                     Text("Installed")
                         .font(.headline)
+                        .foregroundColor(.red)
 
                     Image(systemName: SFSymbols.checkmarkCircleFill)
                         .font(.headline)
+                        .foregroundColor(.red)
 
                     Spacer()
 
@@ -136,11 +138,8 @@ struct InstalledListDocumentView: View {
 
                     Image(systemName: showInstalledLists ? SFSymbols.chevronUp : SFSymbols.chevronDown)
                         .bold()
+                        .foregroundColor(.red)
                 }
-                .foregroundColor(.red)
-                .padding(8)
-                .background(Color(.systemGray5))
-                .cornerRadius(6)
             }
             .disabled(viewModel.primaryLists.isEmpty)
 
@@ -161,6 +160,11 @@ struct InstalledListDocumentView: View {
                 }
             }
         }
+        .padding(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color(.red), lineWidth: 4)
+        )
     }
     
     // MARK: Unstaged Lists Section
@@ -168,7 +172,7 @@ struct InstalledListDocumentView: View {
     @ViewBuilder
     private func UnstagedListSection() -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 Text("Unstaged")
                     .font(.headline)
                     .foregroundColor(.primary)
@@ -207,6 +211,7 @@ struct InstalledListDocumentView: View {
                             }
                         }  
                     }
+                    .padding(8)
                 }
             }
             .refreshable {

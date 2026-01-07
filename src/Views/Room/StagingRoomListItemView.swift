@@ -143,7 +143,7 @@ struct StagingRoomListItemView: View {
             .padding(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(item.attention ? Color.yellow.opacity(0.75) : Color(.systemGray3), lineWidth: 2)
+                    .stroke(item.attention ? Color.yellow.opacity(0.75) : item.isAvailable ? Color(.systemGray3) : Color.red, lineWidth: 2)
             )
         }
     }
