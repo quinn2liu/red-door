@@ -26,16 +26,7 @@ struct StagingRoomListItemView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack(spacing: 0) {
-                Text(viewModel.selectedRoom.roomName)
-                    .foregroundStyle(Color(.label))
-
-                Spacer()
-
-                Text("Items \(viewModel.items.count)")
-
-                Image(systemName: showRoomPreview ? SFSymbols.minus : SFSymbols.plus)
-            }
+            RoomPreviewHeader()
 
             if showRoomPreview {
                 NavigationLink(destination: StagingRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
@@ -43,32 +34,67 @@ struct StagingRoomListItemView: View {
                 }
             }
         }
-        .task {
-            await viewModel.loadItemsAndModels()
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            showRoomPreview.toggle()
-        }
         .padding()
         .background(Color(.systemGray5))
         .cornerRadius(6)
+        .task {
+            await viewModel.loadItemsAndModels()
+        }
+    }
+
+    // MARK: Room Preview Header
+
+    @ViewBuilder
+    private func RoomPreviewHeader() -> some View {
+        HStack(spacing: 12) {
+            RDButton(variant: .outline, size: .icon, leadingIcon: showRoomPreview ? SFSymbols.minus : SFSymbols.plus, iconBold: true, fullWidth: false) {
+                showRoomPreview.toggle()
+            }
+
+            Text(viewModel.selectedRoom.roomName)
+                .foregroundColor(.primary)
+                .bold()
+
+            Spacer()
+
+            (
+                Text("Items: ")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                +
+                Text("\(viewModel.items.count)")
+                    .font(.caption)
+                    .foregroundColor(.red)
+            )
+
+            NavigationLink(destination: PlanningRoomDetailsView(parentList: parentList, rooms: rooms, roomViewModel: $viewModel)) {
+                Image(systemName: SFSymbols.chevronRight)
+                    .font(.system(size: 14))
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(8)
+                    .frame(32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(.red)
+                    )
+            }
+        }
     }
 
     // MARK: Room Preview
 
     @ViewBuilder
     private func RoomPreview() -> some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(viewModel.items, id: \.self) { item in
-                    ItemListItem(
-                        item: item,
-                        isSelected: viewModel.selectedRoom.selectedItemIdSet.contains(item.id)
-                    )
-                }
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+        ], spacing: 8) {
+            ForEach(viewModel.items, id: \.self) { item in
+                ItemListItem(item: item)
             }
         }
+        .padding(4)
         .task {
             if !viewModel.selectedRoom.itemModelIdMap.isEmpty {
                 await viewModel.getRoomModels()
@@ -79,31 +105,46 @@ struct StagingRoomListItemView: View {
     // MARK: Item List Item
 
     @ViewBuilder
-    private func ItemListItem(item: Item, isSelected: Bool) -> some View {
+    private func ItemListItem(item: Item) -> some View {
         let model: Model? = viewModel.getModelForItem(item)
 
-        HStack(spacing: 8) {
-            Button {
-                Task {
-                    await toggleItemSelection(item.id)
+        NavigationLink(destination: PlanningRoomItemView(roomViewModel: $viewModel, item: item, parentList: parentList, rooms: rooms)) {
+            HStack(alignment: .center, spacing: 12) {   
+                Button {
+                    Task {
+                        await toggleItemSelection(item.id)
+                    }
+                } label: {
+                    Image(systemName: viewModel.selectedRoom.selectedItemIdSet.contains(item.id) ? SFSymbols.checkmarkCircleFill : SFSymbols.circle)
+                        .foregroundColor(viewModel.selectedRoom.selectedItemIdSet.contains(item.id) ? .green : .gray)
+                        .frame(16)
                 }
-            } label: {
-                Image(systemName: isSelected ? SFSymbols.checkmarkCircleFill : SFSymbols.circle)
-                    .foregroundColor(isSelected ? .blue : .gray)
-                    .font(.system(size: 20))
-            }
-            
-            Group {
+
                 ItemModelImage(item: item, model: model)
 
-                Text(model?.name ?? "No Model Name")
-            }
-            .opacity(isSelected ? 1.0 : 0.5)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(model?.name ?? "No Model Name")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-            Spacer()
+                    HStack(spacing: 4) {
+                        Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                            .foregroundColor(.secondary)
+
+                        Image(systemName: SFSymbols.circleFill)
+                            .foregroundColor(Model.colorMap[model?.primaryColor ?? ""] ?? .black)
+                    }
+                    .font(.caption)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(item.attention ? Color.yellow.opacity(0.75) : Color(.systemGray3), lineWidth: 2)
+            )
         }
     }
-
 
     // MARK: toggleItemSelection()
     private func toggleItemSelection(_ itemId: String) async {

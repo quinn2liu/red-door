@@ -147,7 +147,7 @@ struct PlanningRoomDetailsView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(roomViewModel.items, id: \.self) { item in
-                    NavigationLink(destination: PlanningRoomItemView(roomViewModel: $roomViewModel, item: item, model: roomViewModel.getModelForItem(item), parentList: parentList, rooms: rooms, currentRoomName: roomViewModel.selectedRoom.roomName)) {
+                    NavigationLink(destination: PlanningRoomItemView(roomViewModel: $roomViewModel, item: item, model: roomViewModel.getModelForItem(item), parentList: parentList, rooms: rooms)) {
                         RoomItemListItemView(item: item, model: roomViewModel.getModelForItem(item))
                     }
                 }
@@ -197,7 +197,7 @@ struct PlanningRoomDetailsView: View {
 
             Spacer() 
 
-            RDButton(variant: .default, size: .icon, leadingIcon: SFSymbols.arrowUturnBackward, iconBold: true, fullWidth: false) {
+            RDButton(variant: .red, size: .icon, leadingIcon: SFSymbols.trash, fullWidth: false) {
                 itemToRemove = item
                 showRemoveItemAlert = true
             }

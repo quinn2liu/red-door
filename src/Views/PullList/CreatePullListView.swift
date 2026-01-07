@@ -74,7 +74,7 @@ struct CreatePullListView: View {
                 }
             }
 
-            RDButton(variant: .default, size: .default, text: "Create Pull List", fullWidth: true) {
+            RDButton(variant: .red, size: .default, text: "Create Pull List", fullWidth: true) {
                 viewModel.selectedList.installDate = installDate.formatted(.dateTime.year().month().day())
                 viewModel.selectedList.uninstallDate = uninstallDate.formatted(.dateTime.year().month().day())
                 viewModel.createPullList()

@@ -16,7 +16,6 @@ struct PlanningRoomItemView: View {
     @State var model: Model?
     let parentList: RDList
     let rooms: [Room]
-    let currentRoomName: String
 
     @State private var showQRCode: Bool = false
     @State private var qrCode: UIImage? = nil
@@ -42,35 +41,21 @@ struct PlanningRoomItemView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 0) {
-                            VStack(spacing: 6) {
-                                Text("Model Image:")
-                                    .bold()
-                                ModelImageView()
-                            }
-
-                            Spacer()
-
-                            VStack(spacing: 6) {
-                                Text("Item Image:")
-                                    .bold()
-                                ItemImageView()
-                            }
-                        }
+                        Images()
 
                         ItemDetails()
 
                         ModelInformation()
-
                     }
                     .padding(.top, 4)
                     .frameHorizontalPadding()
                 }
 
                 Footer()
+                    .frameHorizontalPadding()
             }
             .sheet(isPresented: $showOtherRoomSheet) {
-                OtherRoomSheet()
+                MoveItemRoomSheet(roomViewModel: $roomViewModel, alertMessage: $alertMessage, showAlert: $showAlert, parentList: parentList, item: item, rooms: rooms)
             }
             .alert(alertMessage, isPresented: $showAlert) {
                 Button("OK", role: .cancel) {
@@ -83,7 +68,7 @@ struct PlanningRoomItemView: View {
                     Task {
                         let success = await roomViewModel.removeItemFromRoom(itemId: item.id)
                         if success {
-                            alertMessage = "Item has been removed from \(currentRoomName)."
+                            alertMessage = "Item has been removed from \(roomViewModel.selectedRoom.roomName)."
                             showAlert = true
                             dismiss()
                         }
@@ -93,7 +78,7 @@ struct PlanningRoomItemView: View {
                     showRemoveConfirmationAlert = false
                 }
             } message: {
-                Text("Are you sure you want to remove this item from \(currentRoomName)?")
+                Text("Are you sure you want to remove this item from \(roomViewModel.selectedRoom.roomName)?")
             }
             .frameTop()
             .frameBottomPadding()
@@ -136,29 +121,30 @@ struct PlanningRoomItemView: View {
         })
     }
 
+    // MARK: Images
+    @ViewBuilder
+    private func Images() -> some View {
+        HStack(spacing: 0) {
+            VStack(spacing: 6) {
+                Text("Model Image:")
+                    .bold()
+                ModelImageView()
+            }
+
+            Spacer()
+
+            VStack(spacing: 6) {
+                Text("Item Image:")
+                    .bold()
+                ItemImageView()
+            }
+        }
+    }
+
     // MARK: Item Details
     @ViewBuilder
     private func ItemDetails() -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Description:")
-                    .foregroundColor(.red)
-                    .bold()
-
-                Group {
-                    if let model: Model = model {
-                        Text(model.description)
-                    } else {
-                        Text("No description")
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .foregroundColor(.primary)
-                .padding(6)
-                .background(Color(.systemGray4))
-                .cornerRadius(8)
-            }
-
             HStack(alignment: .center, spacing: 0) {
                 Text("Location: ")
                     .foregroundColor(.red)
@@ -195,6 +181,7 @@ struct PlanningRoomItemView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(8)
         .background(Color(.systemGray5))
         .cornerRadius(8)
@@ -334,43 +321,12 @@ struct PlanningRoomItemView: View {
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 12) {
-            RDButton(variant: .default, size: .default, leadingIcon: SFSymbols.arrowUturnBackward, iconBold: true, text: "Move to Other Room", fullWidth: false) {
+            RDButton(variant: .default, size: .default, leadingIcon: SFSymbols.arrowUturnBackward, text: "Move to Other Room", fullWidth: true) {
                 showOtherRoomSheet = true
             }
 
-            RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.arrowUturnBackward, iconBold: true, text: "Remove from \(currentRoomName)", fullWidth: false) {
+            RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.trash, text: "Remove from \(roomViewModel.selectedRoom.roomName)", fullWidth: true) {
                 showRemoveConfirmationAlert = true
-            }
-        }
-    }
-
-    // MARK: Other Room Sheet
-    @ViewBuilder
-    private func OtherRoomSheet() -> some View {
-        VStack(spacing: 16) {
-            Text(parentList.address.getStreetAddress() ?? parentList.address.formattedAddress)
-
-            Text("Other Rooms:")
-            LazyVStack(spacing: 12) {
-                ForEach(rooms, id: \.self) { otherRoom in
-                    if otherRoom.id != roomViewModel.selectedRoom.id {
-                        Button {
-                            Task {
-                                showOtherRoomSheet = false
-                                let added = await roomViewModel.moveItemToNewRoom(item: item, newRoomId: otherRoom.id)
-                                if added {
-                                    showAlert = true
-                                    alertMessage = "Item has been moved to \(otherRoom.roomName)."
-                                }
-                            }
-                        } label: {
-                            Text(otherRoom.roomName)
-                                .padding()
-                                .background(Color(.systemGray5))
-                                .cornerRadius(6)
-                        }
-                    }
-                }
             }
         }
     }

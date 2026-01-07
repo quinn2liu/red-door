@@ -86,14 +86,12 @@ struct PreviewRoomListItemView: View {
 
     @ViewBuilder
     private func RoomPreview() -> some View {
-        HStack(spacing: 0) {
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-            ], spacing: 4) {
-                ForEach(viewModel.items, id: \.self) { item in
-                    ItemListItem(item: item)
-                }
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+        ], spacing: 8) {
+            ForEach(viewModel.items, id: \.self) { item in
+                ItemListItem(item: item)
             }
         }
         .task {
@@ -109,41 +107,31 @@ struct PreviewRoomListItemView: View {
     private func ItemListItem(item: Item) -> some View {
         let model: Model? = viewModel.getModelForItem(item)
 
-        HStack(spacing: 8) {            
-            ItemModelImage(item: item, model: model)
+        NavigationLink(destination: PlanningRoomItemView(roomViewModel: $viewModel, item: item, parentList: parentList, rooms: rooms)) {
+            HStack(alignment: .center, spacing: 12) {            
+                ItemModelImage(item: item, model: model)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(model?.name ?? "No Model Name")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                HStack(spacing: 4) {
-                    Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(model?.name ?? "No Model Name")
+                        .font(.caption)
                         .foregroundColor(.secondary)
 
-                    Image(systemName: SFSymbols.circleFill)
-                        .foregroundColor(Model.colorMap[model?.primaryColor ?? ""] ?? .black)
+                    HStack(spacing: 4) {
+                        Image(systemName: Model.typeMap[model?.type ?? ""] ?? "nosign")
+                            .foregroundColor(.secondary)
+
+                        Image(systemName: SFSymbols.circleFill)
+                            .foregroundColor(Model.colorMap[model?.primaryColor ?? ""] ?? .black)
+                    }
+                    .font(.caption)
                 }
-                .font(.caption)
-
-                Spacer()
             }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(item.attention ? Color.yellow.opacity(0.75) : Color(.systemGray3), lineWidth: 2)
-        )
-    }
-
-
-    // MARK: toggleItemSelection()
-    private func toggleItemSelection(_ itemId: String) async {
-        if viewModel.selectedRoom.selectedItemIdSet.contains(itemId) {
-            await viewModel.deselectItem(itemId: itemId)
-        } else {
-            await viewModel.selectItem(itemId: itemId)
+            .frame(maxWidth: .infinity)
+            .padding(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(item.attention ? Color.yellow.opacity(0.75) : Color(.systemGray3), lineWidth: 2)
+            )
         }
     }
 }

@@ -14,8 +14,6 @@ struct StagingPullListView: View {
     @State private var showPDFPreview: Bool = false
     @State private var errorMessage: String?
 
-    // MARK: Init
-
     init(pullList: RDList) {
         viewModel = PullListViewModel(selectedList: pullList)   
     }
