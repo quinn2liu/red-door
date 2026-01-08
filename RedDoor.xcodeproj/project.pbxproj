@@ -16,10 +16,12 @@
 		5011BBF82C632FB500A82219 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBF72C632FB500A82219 /* FirebaseStorage */; };
 		5011BBFB2C632FE400A82219 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBFA2C632FE400A82219 /* CodeScanner */; };
 		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
+		5055B5632F0F78D4004DBFBC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5055B5622F0F78D4004DBFBC /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		5011BBB82C63159200A82219 /* RedDoor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RedDoor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5055B5622F0F78D4004DBFBC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -49,6 +51,7 @@
 		5011BBAF2C63159200A82219 = {
 			isa = PBXGroup;
 			children = (
+				5055B5622F0F78D4004DBFBC /* PrivacyInfo.xcprivacy */,
 				50C8DDD22D39CAC7007B3E7B /* src */,
 				5011BBB92C63159200A82219 /* Products */,
 			);
@@ -72,6 +75,7 @@
 				5011BBB42C63159200A82219 /* Sources */,
 				5011BBB52C63159200A82219 /* Frameworks */,
 				5011BBB62C63159200A82219 /* Resources */,
+				5055B5642F0F7D8C004DBFBC /* Copy Firebase dSYMs */,
 			);
 			buildRules = (
 			);
@@ -139,10 +143,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5055B5632F0F78D4004DBFBC /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5055B5642F0F7D8C004DBFBC /* Copy Firebase dSYMs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Firebase dSYMs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy dSYMs from Swift Package Manager frameworks\nif [ \"$CONFIGURATION\" == \"Release\" ]; then\n    FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\n    DSYMS_DIR=\"${DWARF_DSYM_FOLDER_PATH}\"\n    \n    # Create dSYMs directory if it doesn't exist\n    mkdir -p \"${DSYMS_DIR}\"\n    \n    # Find and copy dSYMs for Firebase and Google frameworks\n    find \"${FRAMEWORKS_DIR}\" -name \"*.framework\" -type d | while read framework; do\n        framework_name=$(basename \"${framework}\" .framework)\n        dsym_name=\"${framework_name}.framework.dSYM\"\n        \n        # Look for dSYM in the framework's parent directory\n        parent_dir=$(dirname \"${framework}\")\n        if [ -d \"${parent_dir}/${dsym_name}\" ]; then\n            cp -R \"${parent_dir}/${dsym_name}\" \"${DSYMS_DIR}/\"\n        fi\n    done\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5011BBB42C63159200A82219 /* Sources */ = {
@@ -277,16 +303,17 @@
 		5011BBC72C63159200A82219 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = RedDoor;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"src/Preview Content\"";
 				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera in case you want to take photos of the items you're creating from directly within the app.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "When creating an item in the app, if you use the camera to assign an item an image, it will be useful to save it to your photo library in case the image needs to be shared.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to let you take photos of items to create them in the app.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need photo library access to let you add photos to items created in the app.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "When creating an item in the app, we need access to the photo library in case you want to assign pre-taken photos to an item.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -298,7 +325,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "1.0.0-beta";
 				PRODUCT_BUNDLE_IDENTIFIER = com.liu.quinn.RedDoor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -310,16 +337,17 @@
 		5011BBC82C63159200A82219 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = RedDoor;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"src/Preview Content\"";
 				DEVELOPMENT_TEAM = M3MXPWSA8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera in case you want to take photos of the items you're creating from directly within the app.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "When creating an item in the app, if you use the camera to assign an item an image, it will be useful to save it to your photo library in case the image needs to be shared.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to let you take photos of items to create them in the app.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need photo library access to let you add photos to items created in the app.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "When creating an item in the app, we need access to the photo library in case you want to assign pre-taken photos to an item.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -331,7 +359,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "1.0.0-beta";
 				PRODUCT_BUNDLE_IDENTIFIER = com.liu.quinn.RedDoor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

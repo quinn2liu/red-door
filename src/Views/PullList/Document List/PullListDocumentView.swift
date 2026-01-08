@@ -264,6 +264,7 @@ struct PullListDocumentView: View {
                         .padding()
                 }
             }
+            .padding(4)
         }
         .refreshable {
             await viewModel.fetchSearchResults(query: searchText)

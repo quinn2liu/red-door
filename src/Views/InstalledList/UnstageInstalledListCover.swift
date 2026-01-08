@@ -167,16 +167,16 @@ struct UnstageInstalledListCover: View {
                         .bold()
                 
                     HStack(spacing: 4) {
-                        Image(systemName: Model.typeMap[model.type ?? ""] ?? "nosign")
+                        Image(systemName: Model.typeMap[model.type] ?? "nosign")
                         
                         Text("•")
                         
                         Image(systemName: SFSymbols.circleFill)
-                            .foregroundColor(Model.colorMap[model.primaryColor ?? ""] ?? .black)
+                            .foregroundColor(Model.colorMap[model.primaryColor])
                         
                         Text("•")
 
-                        Text(model.primaryMaterial ?? "No Material")
+                        Text(model.primaryMaterial)
                     }
                     .font(.caption)
                     .foregroundColor(.secondary)
