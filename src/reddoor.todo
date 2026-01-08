@@ -9,7 +9,8 @@ TODO: Pull Lists:
     Pull List View / Create Pull List View:
         ☐ VIEW: add option to add an image of the location
         ☐ FEATURE: maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
-
+        ☐ FEATURE: CREATEINSTALLEDFROMPULL should load updated rooms bc it's a transaction (don't call loadrooms before)
+ 
     Room:
         ☐ FEATURE: Remove room
         ☐ TODO: RoomAddItemsSheet should use updated logic to standard model inventory view
