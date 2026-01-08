@@ -7,16 +7,10 @@ TODO: Address:
 TODO: Pull Lists:
 
     Pull List View / Create Pull List View:
-        ☐ VIEW: update room list item view
         ☐ VIEW: add option to add an image of the location
-        ☐ DEBUG: add room button in pull list detail view doesn't work (list is based off viewmodel.rooms not viewmodel.selectedList.roomIds)
-        ☐ FEATURE: add "send to room" function to planning pull list
-            - In the future, maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
+        ☐ FEATURE: maybe make RoomListItemView contain images of the items (not models), and then make the items draggable and droppable between rooms.
 
     Room:
-        ☐ FEATURE: Remove item from room
-        ☐ VIEW: Create separate room list item / detail views for planning and staging rooms.
-        ☐ VIEW: General Room Views
         ☐ FEATURE: Remove room
         ☐ TODO: RoomAddItemsSheet should use updated logic to standard model inventory view
         ☐ TODO: Get better solution for checking if item is already in pull list (for roomviewmodel.addItemToRoom)
@@ -38,7 +32,6 @@ TODO: Model:
 
 TODO: Item:
     ☐ FEATURE: check whether item images are deleted with the item
-    ☐ VIEW: instead of atttention string, highlight the list item in yellow
     ☐ FEATURE: items can be manually moved to inventory.
 
 TODO: Major Changes:
