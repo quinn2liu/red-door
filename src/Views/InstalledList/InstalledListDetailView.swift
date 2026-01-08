@@ -58,6 +58,11 @@ struct InstalledListDetailView: View {
                     }
                 }
             }
+            .refreshable {
+                Task {
+                    await viewModel.loadRooms()
+                }
+            }
         }
         .onAppear {
             Task {

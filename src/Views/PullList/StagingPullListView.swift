@@ -107,6 +107,7 @@ struct StagingPullListView: View {
         RDButton(variant: .red, size: .default, leadingIcon: SFSymbols.truckBoxBadgeClockFill, text: "Create Installed List", fullWidth: true) {
             Task { // TODO: consider wrapping this in some error-handling function
                 do {
+                    await viewModel.loadRooms() // get updated selections
                     let installedlist = try await viewModel.createInstalledFromPull()
                     await viewModel.deleteRDList()
                     coordinator.resetSelectedPath()

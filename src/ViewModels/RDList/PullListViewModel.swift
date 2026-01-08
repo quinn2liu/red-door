@@ -33,7 +33,10 @@ class PullListViewModel: RDListViewModel {
 
             for var room in self.rooms {
                 let roomRef = roomsRef.document(room.id)
+                print("room.itemModelIdMap: \(room.itemModelIdMap.keys)")
+                print("room.selectedItemIdSet: \(room.selectedItemIdSet)")
                 room.itemModelIdMap = room.itemModelIdMap.filter { room.selectedItemIdSet.contains($0.key) }
+                
                 room.selectedItemIdSet = []
 
                 // Update Item isAvailable to false
