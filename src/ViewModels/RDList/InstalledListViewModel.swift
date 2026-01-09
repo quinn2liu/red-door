@@ -16,6 +16,12 @@ class InstalledListViewModel: RDListViewModel {
     func createPullFromInstalled() async throws -> RDList {
         // Empty Pull List Copy
         var copyPullList = RDList(address: Address(street: "Copy of \(selectedList.address.getStreetAddress() ?? "")"), listType: .pull_list)
+        copyPullList.createdDate = selectedList.createdDate
+        copyPullList.installDate = selectedList.installDate
+        copyPullList.uninstallDate = selectedList.uninstallDate
+        copyPullList.status = .planning
+        copyPullList.client = selectedList.client
+
         copyPullList.roomIds = selectedList.roomIds
 
         let copyPullListRef = db.collection("pull_lists").document(copyPullList.id)

@@ -33,9 +33,21 @@ struct OptionsView: View {
             TopBar()
 
             StorageSection()
+
+            Spacer()
+
+            Link("Suggest a Feature", destination: URL(string: "https://docs.google.com/document/d/19aw0hf8dCUa8ycFY7alWmv5hmq79pkwnndopVsu-IEE/edit?usp=sharing")!)
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemGray5))
+                .cornerRadius(8)
+                .bold()
+                .foregroundColor(.red)
+                
         }
         .frameTop()
         .frameHorizontalPadding()
+        .frameBottomPadding()
         .toolbar(.hidden)
         .task {
             if warehouseViewModel.warehouses.isEmpty {

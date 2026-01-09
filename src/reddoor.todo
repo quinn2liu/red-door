@@ -13,6 +13,7 @@ TODO: Pull Lists:
  
     Room:
         ☐ FEATURE: Remove room
+        ☐ FEATURE: STAGING room should not be able to add items
         ☐ TODO: RoomAddItemsSheet should use updated logic to standard model inventory view
         ☐ TODO: Get better solution for checking if item is already in pull list (for roomviewmodel.addItemToRoom)
             - IDEA: RDList contains itemId -> roomId map, and then the list contains a subcollections for rooms (which only contains info like roomName, selectedItemIdSet).
@@ -21,6 +22,8 @@ TODO: Pull Lists:
         ☐ VIEW: make the edit room sheet view abstracted
 
 TODO: Installed Lists:
+    ☐ FEATURE: create pull list from installed sheet
+    ☐ FEATURE: only unstaged lists should have the create pull list from installed option
     Pipeline:
         ☐ FEATURE: validate installed list behavior (populate only available items vs. populate all items even if invalid)
 
