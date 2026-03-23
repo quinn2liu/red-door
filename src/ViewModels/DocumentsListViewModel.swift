@@ -107,21 +107,21 @@ class DocumentsListViewModel {
     }
 
     // MARK: Fetch All Documents (no pagination)
-    
+
     func fetchAllDocuments(
         filters: [String: Any]? = nil
     ) async -> [Codable] {
         var query: Query = db.collection(documentType.collectionString)
             .order(by: documentType.orderByField)
-        
+
         if let filters {
             query = applyQueryFilters(query, filters: filters)
         }
-        
+
         do {
             let querySnapshot = try await query.getDocuments()
             let dataType = documentType.documentDataType
-            
+
             let documents: [Codable] = querySnapshot.documents.compactMap { document in
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: [])
@@ -131,14 +131,14 @@ class DocumentsListViewModel {
                     return nil
                 }
             }
-            
+
             return documents
         } catch {
             print("Error fetching all documents: \(error.localizedDescription)")
             return []
         }
     }
-    
+
     // MARK: Apply query filters and search filter
 
     func applyQueryFilters(_ query: Query, filters: [String: Any]) -> Query {
@@ -155,7 +155,7 @@ class DocumentsListViewModel {
             }  else if key == "addressId", let searchText: String = value as? String {
                 updatedQuery = updatedQuery
                     .whereField("addressId", isGreaterThanOrEqualTo: searchText)
-                    .whereField("addressId", isLessThan: searchText + "\u{f8ff}")            
+                    .whereField("addressId", isLessThan: searchText + "\u{f8ff}")
             } else {
                 updatedQuery = updatedQuery.whereField(key, isEqualTo: value)
             }

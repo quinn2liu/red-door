@@ -157,12 +157,7 @@ struct OptionsView: View {
     
     @ViewBuilder
     private func WarehouseNameAlertContent() -> some View {
-        if warehouseAddressExists {
-            Button("Cancel", role: .destructive) {
-                showWarehouseNameAlert = false
-                newWarehouse = Warehouse(name: "", address: Address())
-            }
-        } else {
+        Group {
             TextField("Warehouse Name", text: $warehouseName)
                 .textInputAutocapitalization(.never)
 
@@ -171,11 +166,6 @@ struct OptionsView: View {
                 showWarehouseNameAlert = false
                 newWarehouse = Warehouse(name: warehouseName, address: newWarehouse.address)
             }.tint(.blue)
-
-            Button("Cancel", role: .destructive) {
-                showWarehouseNameAlert = false
-                newWarehouse = Warehouse(name: "", address: Address())
-            }
         }
     }
 

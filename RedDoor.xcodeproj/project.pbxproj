@@ -72,6 +72,7 @@
 				5011BBB42C63159200A82219 /* Sources */,
 				5011BBB52C63159200A82219 /* Frameworks */,
 				5011BBB62C63159200A82219 /* Resources */,
+				5062C3792F5671B60075585A /* Select Dev Firebase Script */,
 			);
 			buildRules = (
 			);
@@ -143,6 +144,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5062C3792F5671B60075585A /* Select Dev Firebase Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/dev/GoogleService-Info.plist",
+			);
+			name = "Select Dev Firebase Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Use dev Firebase in Debug, production in Release\n#if [ \"$CONFIGURATION\" = \"Debug\" ]; then\n#  cp \"${SRCROOT}/dev/GoogleService-Info.plist\" \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/GoogleService-Info.plist\"\n#fi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5011BBB42C63159200A82219 /* Sources */ = {
@@ -288,6 +313,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"src/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to let you take photos of items to create them in the app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need photo library access to let you add photos to items created in the app.";
@@ -321,6 +347,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"src/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to let you take photos of items to create them in the app.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need photo library access to let you add photos to items created in the app.";

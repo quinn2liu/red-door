@@ -10,6 +10,7 @@ import FirebaseFirestore
 import FirebaseStorage
 import Foundation
 
+@Observable
 class ItemViewModel {
     let db = Firestore.firestore()
 
