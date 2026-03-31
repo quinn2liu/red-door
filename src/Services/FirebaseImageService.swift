@@ -9,8 +9,8 @@ import Firebase
 import FirebaseStorage
 import Foundation
 
-final class FirebaseImageManager {
-    static let shared = FirebaseImageManager()
+final class FirebaseImageService {
+    static let shared = FirebaseImageService()
     static let storageRef = Storage.storage().reference()
 
     private init() {}
@@ -83,7 +83,7 @@ final class FirebaseImageManager {
             return rdImage
         }
 
-        var storageRef = FirebaseImageManager.storageRef.child(objectPath)
+        var storageRef = FirebaseImageService.storageRef.child(objectPath)
         storageRef = storageRef.child(objectId).child(rdImage.id)
 
         let metaData = StorageMetadata()
@@ -127,7 +127,7 @@ final class FirebaseImageManager {
             throw error
         }
 
-        var storageRef = FirebaseImageManager.storageRef.child(objectPath)
+        var storageRef = FirebaseImageService.storageRef.child(objectPath)
         storageRef = storageRef.child(objectId).child(rdImage.id)
 
         do {

@@ -21,9 +21,11 @@ final class ModelViewModel {
     let db = Firestore.firestore()
     let modelDocumentRef: DocumentReference
     let storageRef: StorageReference
-    private let imageManager: FirebaseImageManager
+    private let imageManager: FirebaseImageService
+    
+    // MARK: init
 
-    init(model: Model = Model(), imageManager: FirebaseImageManager = FirebaseImageManager.shared) {
+    init(model: Model = Model(), imageManager: FirebaseImageService = FirebaseImageService.shared) {
         selectedModel = model
         if model.itemIds.isEmpty {
             itemCount = 1

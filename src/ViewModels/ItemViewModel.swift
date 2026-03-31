@@ -93,7 +93,7 @@ class ItemViewModel {
         do {
             if var image = selectedItem.image, image.imageType == .dirty {
                 image.objectId = selectedItem.id
-                selectedItem.image = try await FirebaseImageManager.shared.updateImage(image, resultImageType: .item) ?? RDImage()
+                selectedItem.image = try await FirebaseImageService.shared.updateImage(image, resultImageType: .item) ?? RDImage()
             }
             try itemRef.setData(from: selectedItem)
         } catch {

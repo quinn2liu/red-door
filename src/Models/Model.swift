@@ -48,7 +48,25 @@ struct Model: Identifiable, Codable, Hashable {
     var description: String
     var descriptionLowercased: String
     var isEssential: Bool
-
+    
+    init(from model: Model) {
+        self.id = model.id
+        self.name = model.name
+        self.nameLowercased = model.nameLowercased
+        self.type = model.type
+        self.primaryColor = model.primaryColor
+        self.secondaryColor = model.secondaryColor
+        self.primaryMaterial = model.primaryMaterial
+        self.secondaryMaterial = model.secondaryMaterial
+        self.itemIds = model.itemIds
+        self.availableItemCount = model.availableItemCount
+        self.primaryImage = model.primaryImage
+        self.secondaryImages = model.secondaryImages
+        self.description = model.description
+        self.descriptionLowercased = model.descriptionLowercased
+        self.isEssential = model.isEssential
+    }
+    
     init(
         id: String = UUID().uuidString,
         name: String = "",
