@@ -16,10 +16,12 @@
 		5011BBF82C632FB500A82219 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBF72C632FB500A82219 /* FirebaseStorage */; };
 		5011BBFB2C632FE400A82219 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 5011BBFA2C632FE400A82219 /* CodeScanner */; };
 		501B59AD2C7928690097A966 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 501B59AC2C7928690097A966 /* CachedAsyncImage */; };
+		503CF03F2F9B22B20088DB8C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 503CF03E2F9B22B20088DB8C /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		5011BBB82C63159200A82219 /* RedDoor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RedDoor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		503CF03E2F9B22B20088DB8C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -49,6 +51,7 @@
 		5011BBAF2C63159200A82219 = {
 			isa = PBXGroup;
 			children = (
+				503CF03E2F9B22B20088DB8C /* README.md */,
 				50C8DDD22D39CAC7007B3E7B /* src */,
 				5011BBB92C63159200A82219 /* Products */,
 			);
@@ -140,6 +143,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				503CF03F2F9B22B20088DB8C /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
