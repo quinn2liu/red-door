@@ -8,12 +8,14 @@
 import Foundation
 
 enum DocumentType: String, Codable {
-    case model, pull_list, installed_list
+    case model, item, pull_list, installed_list
 
     var collectionString: String {
         switch self {
         case .model:
             return "models"
+        case .item:
+            return "items"
         case .pull_list:
             return "pull_lists"
         case .installed_list:
@@ -25,6 +27,8 @@ enum DocumentType: String, Codable {
         switch self {
         case .model:
             return Model.self
+        case .item:
+            return Item.self
         case .pull_list, .installed_list:
             return RDList.self
         }
@@ -34,6 +38,8 @@ enum DocumentType: String, Codable {
         switch self {
         case .model:
             return "nameLowercased"
+        case .item:
+            return "id"
         case .pull_list:
             return "createdDate"
         case .installed_list:
