@@ -7,16 +7,18 @@
 
 import Firebase
 
-class GenericRepository<T: Codable> {
+class GenericRepository<T: AnyRDDocument> {
     let collectionRef: CollectionReference
+    let db: Firestore
     
-    init(documentType: DocumentType, db: Firestore) {
-        self.collectionRef = db.collection(documentType.collectionString)
+    init(db: Firestore = Firestore.firestore()) {
+        self.db = db
+        self.collectionRef = db.collection(T.collectionName)
     }
     
     // MARK: - Standalone async
-    func set(_ model: T, id: String) async throws {
-        try collectionRef.document(id).setData(from: model)
+    func set(_ document: T, id: String) async throws {
+        try collectionRef.document(id).setData(from: document)
     }
     
     func delete(id: String) async throws {
@@ -34,9 +36,9 @@ class GenericRepository<T: Codable> {
     }
     
     // MARK: - Batch participatory
-    func set(_ model: T, id: String, inBatch batch: WriteBatch) throws {
+    func set(_ document: T, id: String, inBatch batch: WriteBatch) throws {
         try batch.setData(
-            from: model,
+            from: document,
             forDocument: collectionRef.document(id)
         )
     }
@@ -57,9 +59,9 @@ class GenericRepository<T: Codable> {
         return try snapshot.data(as: T.self)
     }
     
-    func set(_ model: T, id: String, in transaction: Transaction) throws {
+    func set(_ document: T, id: String, in transaction: Transaction) throws {
         try transaction.setData(
-            from: model,
+            from: document,
             forDocument: collectionRef.document(id)
         )
     }
