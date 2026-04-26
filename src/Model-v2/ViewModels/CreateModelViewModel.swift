@@ -7,32 +7,30 @@
 
 import SwiftUI
 
-// TODO: consider making this actually just expose the model (so that the editing sheet can re-use it)
-
 @Observable
 final class CreateModelViewModel {
-    // Attributes
-    var id: String = UUID().uuidString
-    var name: String = ""
-    var type: ModelTypeV2 = .misc
-    var color: ModelColor = .black
-    var material: ModelMaterial = .none
-    var value: Double? = 0.0
-    var brand: String? = ""
-    var purchaseLocation: String? = ""
-    var datePurchased: String? = ""
-    
-    // Items
+    var model: ModelV2 = ModelV2(
+        id: UUID().uuidString,
+        name: "",
+        nameLowercased: "",
+        type: .misc,
+        color: .black,
+        material: .none,
+        value: 0.0,
+        brand: "",
+        purchaseLocation: "",
+        datePurchased: "",
+        itemIds: [],
+        availableItemCount: 0,
+        primaryImage: RDImage(),
+        secondaryImages: [],
+        description: "",
+        isEssential: false
+    )
+
+    // Separate from ModelV2 — a create-only input that produces itemIds at commit time
     var itemCount: Int = 0
-    
-    // Images
-    var primaryImage: RDImage = RDImage()
-    var secondaryImages: [RDImage] = []
-    
-    // Description
-    var description: String = ""
-    var isEssential: Bool = false
-    
+
     let modelRepo: ModelRepository = ModelRepository()
     let itemRepo: ItemRepository = ItemRepository()
     
@@ -41,7 +39,7 @@ final class CreateModelViewModel {
         var itemIds: [String] = []
         for _ in (0..<itemCount) {
             let newItem = ItemV2(
-                modelId: id,
+                modelId: model.id,
                 id: UUID().uuidString,
                 isAvailable: true,
                 attention: false
@@ -49,25 +47,11 @@ final class CreateModelViewModel {
             items.append(newItem)
             itemIds.append(newItem.id)
         }
-        
-        let model = ModelV2(
-            id: id,
-            name: name,
-            nameLowercased: name.lowercased(),
-            type: type,
-            color: color,
-            material: material,
-            value: value,
-            brand: brand,
-            purchaseLocation: purchaseLocation,
-            datePurchased: datePurchased,
-            itemIds: itemIds,
-            availableItemCount: itemCount,
-            primaryImage: primaryImage,
-            secondaryImages: secondaryImages,
-            description: description.isEmpty ? nil : description,
-            isEssential: isEssential
-        )
+
+        // Derive computed fields at commit time
+        model.nameLowercased = model.name.lowercased()
+        model.itemIds = itemIds
+        model.availableItemCount = itemCount
         
         do {
             var batch = modelRepo.db.batch()
@@ -78,7 +62,7 @@ final class CreateModelViewModel {
             
             try await batch.commit()
         } catch {
-            print("error creating model: \(name)")
+            print("error creating model: \(model.name)")
         }
     }
 }

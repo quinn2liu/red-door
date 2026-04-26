@@ -48,7 +48,7 @@ struct ModelV2: AnyRDDocument{
          availableItemCount: Int,
          primaryImage: RDImage,
          secondaryImages: [RDImage] = [],
-         description: String?,
+         description: String = "",
          isEssential: Bool
     ) {
         self.id = id

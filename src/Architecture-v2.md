@@ -1,4 +1,4 @@
-# Firebase iOS Architecture Summary (v1)
+# Firebase iOS Architecture Summary (v2)
 
 ## Problems & Considerations to Solve
 
