@@ -9,7 +9,11 @@ import SwiftUI
 
 @Observable
 final class CreateModelViewModel {
-    var model: ModelV2 = ModelV2(
+    private let modelRepo: ModelRepository = ModelRepository()
+    private let itemRepo: ItemRepository = ItemRepository()
+    
+    // MARK: modelState
+    var modelState: ModelV2 = ModelV2(
         id: UUID().uuidString,
         name: "",
         nameLowercased: "",
@@ -22,24 +26,27 @@ final class CreateModelViewModel {
         datePurchased: "",
         itemIds: [],
         availableItemCount: 0,
-        primaryImage: RDImage(),
-        secondaryImages: [],
+        image: RDImage(),
         description: "",
         isEssential: false
     )
-
-    // Separate from ModelV2 — a create-only input that produces itemIds at commit time
-    var itemCount: Int = 0
-
-    let modelRepo: ModelRepository = ModelRepository()
-    let itemRepo: ItemRepository = ItemRepository()
+    
+    // MARK: ViewState
+    
+    var itemCount: Int = 0 // Separate from ModelV2 — a create-only input that produces itemIds at commit time
+    
+    // Image Overlay
+    var selectedRDImage: RDImage? = nil
+    var isImageSelected: Bool = false
+    
+    var isLoading: Bool = false
     
     func createModel() async {
         var items: [ItemV2] = []
         var itemIds: [String] = []
         for _ in (0..<itemCount) {
             let newItem = ItemV2(
-                modelId: model.id,
+                modelId: modelState.id,
                 id: UUID().uuidString,
                 isAvailable: true,
                 attention: false
@@ -49,20 +56,23 @@ final class CreateModelViewModel {
         }
 
         // Derive computed fields at commit time
-        model.nameLowercased = model.name.lowercased()
-        model.itemIds = itemIds
-        model.availableItemCount = itemCount
+        modelState.nameLowercased = modelState.name.lowercased()
+        modelState.itemIds = itemIds
+        modelState.availableItemCount = itemCount
+        
+        isLoading = true
+        defer { isLoading = false }
         
         do {
             var batch = modelRepo.db.batch()
             for item in items {
                 try itemRepo.set(item, id: item.id, inBatch: batch)
             }
-            try modelRepo.set(model, id: model.id, inBatch: batch)
+            try modelRepo.set(modelState, id: modelState.id, inBatch: batch)
             
             try await batch.commit()
         } catch {
-            print("error creating model: \(model.name)")
+            print("error creating model: \(modelState.name)")
         }
     }
 }

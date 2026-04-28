@@ -27,8 +27,7 @@ struct ModelV2: AnyRDDocument{
     var availableItemCount: Int
     
     // Images
-    var primaryImage: RDImage
-    var secondaryImages: [RDImage]
+    var image: RDImage
     
     // Description
     var description: String
@@ -46,8 +45,7 @@ struct ModelV2: AnyRDDocument{
          datePurchased: String? = nil,
          itemIds: [String],
          availableItemCount: Int,
-         primaryImage: RDImage,
-         secondaryImages: [RDImage] = [],
+         image: RDImage,
          description: String = "",
          isEssential: Bool
     ) {
@@ -63,8 +61,7 @@ struct ModelV2: AnyRDDocument{
         self.datePurchased = datePurchased
         self.itemIds = itemIds
         self.availableItemCount = availableItemCount
-        self.primaryImage = primaryImage
-        self.secondaryImages = secondaryImages
+        self.image = image
         self.description = description
         self.isEssential = isEssential
     }
@@ -76,8 +73,7 @@ struct ModelV2: AnyRDDocument{
         case datePurchased = "date_purchased"
         case itemIds = "item_ids"
         case availableItemCount = "available_item_count"
-        case primaryImage = "primary_image"
-        case secondaryImages = "seconday_images"
+        case image = "primary_image"
         case isEssential = "is_essential"
     }
 }

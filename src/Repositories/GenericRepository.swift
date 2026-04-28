@@ -16,6 +16,10 @@ class GenericRepository<T: AnyRDDocument> {
         self.collectionRef = db.collection(T.collectionName)
     }
     
+    func newBatch() -> WriteBatch {
+        return db.batch()
+    }
+    
     // MARK: - Standalone async
     func set(_ document: T, id: String) async throws {
         try collectionRef.document(id).setData(from: document)
